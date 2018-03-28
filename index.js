@@ -19,7 +19,7 @@ viewer.baseLayerPicker.viewModel.selectedImagery = imageryProviderViewModels[ima
 viewer.scene.debugShowFramesPerSecond = true;
 var provinceLayer = null;
 var provinceProvider = new VectorTileImageryProvider({
-    source: appConfig.BaseURL + "Assets/Data/json/china_province.json",
+    source: appConfig.BaseURL + "Assets/Data/json/bj.json",
     defaultStyle: {
         outlineColor: "rgb(255,255,255)",
         lineWidth: 2,
