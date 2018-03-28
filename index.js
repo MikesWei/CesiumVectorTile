@@ -32,7 +32,7 @@
                 tileCacheSize: 200
             },
             maximumLevel: 20,
-            minimumLevel: 1,
+            minimumLevel: 8,
             simplify: false
         });
         provinceProvider.readyPromise.then(function () {
@@ -51,7 +51,7 @@
                 tileCacheSize: 200
             },
             maximumLevel: 20,
-            minimumLevel: 1,
+            minimumLevel: 10,
             simplify: false
         }));
     })
