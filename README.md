@@ -1,6 +1,8 @@
 Cesium VectorTileImageryProvider
 支持geojson、shape文件矢量动态切片，实现贴地
 
+ <img src="https://mikeswei.github.io/CesiumVectorTile/screenshot.jpg" />
+
 示例：
           VectorTileImageryProvider = Cesium.VectorTileImageryProvider;
 
