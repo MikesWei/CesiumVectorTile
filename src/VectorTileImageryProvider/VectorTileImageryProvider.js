@@ -1,17 +1,17 @@
 ﻿/// <reference path="../../ThirdParty/Cesium/Cesium.js" />
 /// <reference path="turf-bbox-clip.js" />
 
-define([ 
+define([
     'Util/turf',
-   "ThirdParty/shapefile-js-3.3.2/shp", 
+    "Util/Shp",
     'Data/Geojson/LonLatProjection',
-    'Util/Path', 
+    'Util/Path',
     'VectorRenderer/VectorStyle'
-], function ( 
+], function (
     turf,
-    shp, 
+    shp,
     LonLatProjection,
-    Path, 
+    Path,
     VectorStyle
     ) {
     var defaultColor = new Cesium.Color(1.0, 1.0, 1.0, 0.4);
@@ -23,7 +23,7 @@ define([
         var shpFile, dbfFile, prjFile;
         for (var i = 0; i < files.length; i++) {
             var file = files[i];
-            if (!(file instanceof File)) {
+            if (!(file instanceof File || (file instanceof Blob && file.name))) {
                 return false;
             }
             if (files[i].name.toLocaleLowerCase().indexOf(".shp") > 0) {
@@ -109,11 +109,11 @@ define([
             }
         } else if (options.source.type && options.source.type == "FeatureCollection") {
 
-        }else if (isShpLocalFiles(options.source)) {
+        } else if (isShpLocalFiles(options.source)) {
             isLocalShpFile = true;
-        }  
+        }
         else if (Cesium.isArray(options.source)) {
-              if (!(options.source[0] instanceof PolyLine) && (options.source[0] instanceof Polygon)) {
+            if (!(options.source[0] instanceof PolyLine) && (options.source[0] instanceof Polygon)) {
                 throw new Cesium.DeveloperError("The data  options.source provider is not supported.");
             }
         } else {
