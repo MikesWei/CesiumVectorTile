@@ -18,21 +18,25 @@ var imageryProviderViewModels = viewer.baseLayerPicker.viewModel.imageryProvider
 viewer.baseLayerPicker.viewModel.selectedImagery = imageryProviderViewModels[imageryProviderViewModels.length - 1];
 viewer.scene.debugShowFramesPerSecond = true;
 var provinceLayer = null;
-var provinceProvider = new VectorTileImageryProvider({
-    source: appConfig.BaseURL + "Assets/Data/json/bj.js",
-    defaultStyle: {
-        outlineColor: "rgb(255,255,255)",
-        lineWidth: 2,
-        fill: false,
-        tileCacheSize: 200
-    },
-    maximumLevel: 20,
-    minimumLevel: 1,
-    simplify: false
-});
-provinceProvider.readyPromise.then(function () {
-    provinceLayer = viewer.imageryLayers.addImageryProvider(provinceProvider);
-});
+Cesium.loadText(appConfig.BaseURL + "Assets/Data/json/bj.js").then(function (geojson) {
+    geojson = eval("(" + geojson + ")");
+    var provinceProvider = new VectorTileImageryProvider({
+        source: geojson,
+        defaultStyle: {
+            outlineColor: "rgb(255,255,255)",
+            lineWidth: 2,
+            fill: false,
+            tileCacheSize: 200
+        },
+        maximumLevel: 20,
+        minimumLevel: 1,
+        simplify: false
+    });
+    provinceProvider.readyPromise.then(function () {
+        provinceLayer = viewer.imageryLayers.addImageryProvider(provinceProvider);
+    });
+})
+
 
 var worldLayer = null;
 var worldProvider = new VectorTileImageryProvider({
