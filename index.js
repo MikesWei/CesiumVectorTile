@@ -18,7 +18,7 @@ var imageryProviderViewModels = viewer.baseLayerPicker.viewModel.imageryProvider
 viewer.baseLayerPicker.viewModel.selectedImagery = imageryProviderViewModels[imageryProviderViewModels.length - 1];
 viewer.scene.debugShowFramesPerSecond = true;
 var provinceLayer = null;
-Cesium.loadText(appConfig.BaseURL + "Assets/Data/json/bj.js").then(function (geojson) {
+Cesium.loadText(appConfig.BaseURL + "Assets/Data/json/bj.json").then(function (geojson) {
     geojson = eval("(" + geojson + ")");
     var provinceProvider = new VectorTileImageryProvider({
         source: geojson,
