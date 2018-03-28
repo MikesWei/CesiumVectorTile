@@ -37,6 +37,9 @@ Cesium.loadText(appConfig.BaseURL + "Assets/Data/json/bj.js").then(function (geo
     });
 })
 
+Cesium.loadBlob(appConfig.BaseURL + "Assets/Data/shp/world/国家简化边界.shp").then(function (blob) {
+    console.log(blob);
+})
 
 var worldLayer = null;
 var worldProvider = new VectorTileImageryProvider({
