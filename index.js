@@ -1,14 +1,14 @@
 ﻿/// <reference path="appconfig.js" />
 
-requirejs([
-       "./requirejs.config.js",
-       "./appconfig.js",
-       './src/Main'
-], function (
-       config,
-       appconfig,
-       Cesium
-       ) {
+//requirejs([
+//       "./requirejs.config.js",
+//       "./appconfig.js",
+//       './src/Main'
+//], function (
+//       config,
+//       appconfig,
+//       Cesium
+//       ) {
 
 
     VectorTileImageryProvider = Cesium.VectorTileImageryProvider;
@@ -88,4 +88,4 @@ requirejs([
 
     });
 
-});
+//});
