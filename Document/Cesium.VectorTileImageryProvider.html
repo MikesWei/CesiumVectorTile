@@ -1,0 +1,569 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Cesium.VectorTileImageryProvider参考文档: 类: VectorTileImageryProvider</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">类: VectorTileImageryProvider</h1>
+
+    
+
+
+
+
+<section>
+
+<header>
+    
+        <h2>
+            <span class="ancestors"><a href="Cesium.html">Cesium</a>.</span>
+        
+        VectorTileImageryProvider
+        </h2>
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+
+    
+
+    <h4 class="name" id="VectorTileImageryProvider"><span class="type-signature"></span>new VectorTileImageryProvider<span class="signature">(options)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    动态矢量切片提供程序，支持esri shapefile、geojson文件，也可以直接加载geojson对象
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">参数如下：
+                <h6>Properties</h6>
+                
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>source</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+|
+
+<span class="param-type">turf.FeatureCollection</span>
+|
+
+<span class="param-type">Object</span>
+|
+
+<span class="param-type">Array.&lt;File></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">数组、矢量文件url、矢量文件列表或者geojson对象</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>defaultStyle</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="Cesium.VectorStyle.html">Cesium.VectorStyle</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    Cesium.VectorStyle.Default
+                
+                </td>
+            
+
+            <td class="description last">默认样式</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>simplify</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    false
+                
+                </td>
+            
+
+            <td class="description last">true则简化，默认不简化</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>simplifyTolerance</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    0.01
+                
+                </td>
+            
+
+            <td class="description last">简化公差</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>minimumLevel</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    3
+                
+                </td>
+            
+
+            <td class="description last">最小级别</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>maximumLevel</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    22
+                
+                </td>
+            
+
+            <td class="description last">最大级别</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>styleFilter</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Cesium.VectorTileImageryProvider~StyleFilterCallback</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">样式函数</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+            </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line27248">line 27248</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>var provinceLayer = null;
+        var provinceProvider = new VectorTileImageryProvider({
+            source: appConfig.BaseURL + "Assets/Data/json/china_province.geojson",
+            defaultStyle: {
+                outlineColor: "rgb(255,255,255)",
+                lineWidth: 2,
+                fill: false,
+                tileCacheSize: 200
+            },
+            maximumLevel: 20,
+            minimumLevel: 1,
+            simplify: false
+        });
+        provinceProvider.readyPromise.then(function () {
+            provinceLayer = viewer.imageryLayers.addImageryProvider(provinceProvider);
+        });
+
+        var worldLayer = null;
+        var worldProvider = new VectorTileImageryProvider({
+            source: appConfig.BaseURL + "Assets/Data/shp/world/国家简化边界.shp",
+            defaultStyle: {
+                outlineColor: "rgb(255,0,0)",
+                lineWidth: 1,
+                fill: false,
+                tileCacheSize: 200
+            },
+            maximumLevel: 20,
+            minimumLevel: 1,
+            simplify: false
+        });
+        worldProvider.readyPromise.then(function () {
+            worldLayer = viewer.imageryLayers.addImageryProvider(worldProvider);
+        });</code></pre>
+
+
+
+    
+    </div>
+
+    
+        <h3 class="subsection-title">Extends</h3>
+
+        
+
+
+    <ul>
+        <li>Cesium.ImageryProvider</li>
+    </ul>
+
+
+    
+
+    
+
+    
+
+     
+
+    
+
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">主页</a></h2><h3>命名空间</h3><ul><li><a href="Cesium.html">Cesium</a></li></ul><h3>类</h3><ul><li><h5><a href="Cesium.html">Cesium</a></h5></li><li><a href="Cesium.Path.html">Path</a></li><li><a href="Cesium.VectorRenderer.html">VectorRenderer</a></li><li><a href="Cesium.VectorStyle.html">VectorStyle</a></li><li><a href="Cesium.VectorTileImageryProvider.html">VectorTileImageryProvider</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0</a> on Wed Mar 28 2018 13:05:31 GMT+0800 (中国标准时间)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

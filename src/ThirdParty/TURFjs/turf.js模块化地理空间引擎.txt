@@ -1,0 +1,51 @@
+﻿使用JavaScript编写的模块化地理空间引擎
+根据需要打包指定的模块。官方提供参考的步骤如下：
+Getting started with Turf.js
+
+There are a few different ways to get started using Turf, the documentation below will provide a couple of the common scenarios.
+
+Using directly in the browser
+
+Load the minified file via a script tag, this will expose a global variable named turf.
+
+
+<script src='https://npmcdn.com/@turf/turf/turf.min.js'></script>   
+<script>
+    var bbox = turf.bbox(features);
+</script>
+          
+Note: The full build of Turf weighs around 500kb which is a fair bit of javascript to load so you probably only want to pull in the bits you need, see the instructions below on how to create a custom build.
+
+Using in Node or with a build tool
+
+If you're working in Node or with build tool (such as webpack, browserify or rollup) you can include individual turf modules in your project.
+
+
+// Import your module of interest after you've installed your module
+const turfCollect = require('@turf/collect');
+// And then use it
+turfCollect(points, polys, 'population', 'populationValues')
+          
+Creating custom builds for use in the browser
+
+Step 1 Create a folder and install whatever modules you are interested in via npm
+
+
+npm install @turf/collect @turf/buffer
+          
+Step 2 Create a file called main.js in the root directory, in this include your required modules within a modules.exports statement
+
+
+module.exports = {
+   collect: require('@turf/collect'),
+   buffer: require('@turf/buffer')
+};
+        
+Step 3 Run the following browserify command
+
+
+browserify main.js -s turf > outTurf.js
+        
+Done You can now use your outTurf.js file where you want just like you would normally use Turf, eg load it via a script tag and call turf using the turf global variable.
+
+(⊙o⊙)…也可以直接看我写的main.js和build.bat。。。。
