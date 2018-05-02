@@ -1,11 +1,11 @@
 Cesium VectorTileImageryProvider
-Ö§³Ögeojson¡¢shapeÎÄ¼şÊ¸Á¿¶¯Ì¬ÇĞÆ¬£¬ÊµÏÖÌùµØ
+æ”¯æŒgeojsonã€shapeæ–‡ä»¶çŸ¢é‡åŠ¨æ€åˆ‡ç‰‡ï¼Œå®ç°è´´åœ°
 <img src="https://mikeswei.github.io/CesiumVectorTile/screenshot.jpg" /><br/>
 <img src="https://mikeswei.github.io/CesiumVectorTile/screenshot2.jpg" />
 
 
-Ê¾Àı£º
-
+ç¤ºä¾‹ï¼š
+```javascript
         VectorTileImageryProvider = Cesium.VectorTileImageryProvider;
 
         viewer = new Cesium.Viewer("cesiumContainer");
@@ -32,7 +32,7 @@ Cesium VectorTileImageryProvider
 
         var worldLayer = null;
         var worldProvider = new VectorTileImageryProvider({
-            source: appConfig.BaseURL + "Assets/Data/shp/world/¹ú¼Ò¼ò»¯±ß½ç.shp",
+            source: appConfig.BaseURL + "Assets/Data/shp/world/å›½å®¶ç®€åŒ–è¾¹ç•Œ.shp",
             defaultStyle: {
                 outlineColor: "rgb(255,0,0)",
                 lineWidth: 1,
