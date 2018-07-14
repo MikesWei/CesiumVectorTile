@@ -1,14 +1,14 @@
-Cesium VectorTileImageryProvider
-Ö§³ÖĞ¡Êı¾İÁ¿µÄgeojson¡¢shapeÎÄ¼şÊ¸Á¿¶¯Ì¬ÇĞÆ¬£¬ÊµÏÖÌùµØ
+ï»¿Cesium VectorTileImageryProvider
+æ”¯æŒå°æ•°æ®é‡çš„geojsonã€shapeæ–‡ä»¶çŸ¢é‡åŠ¨æ€åˆ‡ç‰‡ï¼Œå®ç°è´´åœ°
 ![](https://mikeswei.github.io/CesiumVectorTile/screenshot.jpg)
 ![](https://mikeswei.github.io/CesiumVectorTile/screenshot2.jpg)
 ![](https://mikeswei.github.io/CesiumVectorTile/screenshot3.jpg)
 
-npm °²×°
+npm å®‰è£…
 
         npm install CesiumVectorTile
 
-Ê¾Àı£º
+ç¤ºä¾‹ï¼š
 ```javascript 
         VectorTileImageryProvider = Cesium.VectorTileImageryProvider;
 
@@ -36,7 +36,7 @@ npm °²×°
 
         var worldLayer = null;
         var worldProvider = new VectorTileImageryProvider({
-            source: appConfig.BaseURL + "Assets/Data/shp/world/¹ú¼Ò¼ò»¯±ß½ç.shp",
+            source: appConfig.BaseURL + "Assets/Data/shp/world/å›½å®¶ç®€åŒ–è¾¹ç•Œ.shp",
             defaultStyle: {
                 outlineColor: "rgb(255,0,0)",
                 lineWidth: 1,
@@ -48,7 +48,7 @@ npm °²×°
                 labelOffsetX: -10,
                 labelOffsetY: -5,
                 fontSize: 13,
-                fontFamily: "ºÚÌå",
+                fontFamily: "é»‘ä½“",
                 centerLabelPropertyName: "NAME"
             },
             maximumLevel: 20,
@@ -59,14 +59,14 @@ npm °²×°
             worldLayer = viewer.imageryLayers.addImageryProvider(worldProvider);
         });
 ```
-#####  ÒÀÀµ
+#####  ä¾èµ–
 * [Cesium](https://github.com/AnalyticalGraphicsInc/cesium)
 * [turf](https://github.com/Turfjs/turf)
 * [shpjs](https://github.com/calvinmetcalf/shapefile-js)
 * [proj4js](https://github.com/proj4js/proj4js)
 * [text-encoding](https://github.com/inexorabletash/text-encoding)
 * [geojson-topojson](https://github.com/JeffPaine/geojson-topojson)
-#####  ¸üĞÂ
-###### 2018.07.14£º
-* 1¡¢Ö§³Ö×îĞÂ°æCesium£»
-* 2¡¢Ö§³ÖÒÔ×¢¼ÇµÄ·½Ê½ÏÔÊ¾¹Ø¼üÊôĞÔ£¬ÈçµØÃûµÈ¡£
+#####  æ›´æ–°
+###### 2018.07.14ï¼š
+* 1ã€æ”¯æŒæœ€æ–°ç‰ˆCesiumï¼›
+* 2ã€æ”¯æŒä»¥æ³¨è®°çš„æ–¹å¼æ˜¾ç¤ºå…³é”®å±æ€§ï¼Œå¦‚åœ°åç­‰ã€‚

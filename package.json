@@ -16,6 +16,6 @@
     "shape file",
     "shp"
   ],
-  "name": "CesiumVectorTile",
-  "version": "1.0.1"
+  "name": "cesiumvectortile",
+  "version": "1.0.2"
 }
