@@ -6,7 +6,7 @@
 
 npm 安装
 
-        npm install CesiumVectorTile
+        npm install cesiumvectortile
 
 示例：
 ```javascript 
