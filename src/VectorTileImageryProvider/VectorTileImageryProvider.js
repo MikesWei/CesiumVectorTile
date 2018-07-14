@@ -1,19 +1,29 @@
-﻿/// <reference path="../../ThirdParty/Cesium/Cesium.js" />
-/// <reference path="turf-bbox-clip.js" />
-
+﻿  
 define([
     'Util/turf',
     "Util/Shp",
     'Data/Geojson/LonLatProjection',
     'Util/Path',
+    //'Util/Contour/PolyLine',
+    //'Util/Contour/Polygon',
     'VectorRenderer/VectorStyle'
 ], function (
     turf,
     shp,
     LonLatProjection,
     Path,
+    //PolyLine,
+    //Polygon,
     VectorStyle
     ) {
+
+    if (Cesium.Resource) {
+        Cesium.loadText = Cesium.Resource.fetchText;
+        Cesium.loadJson = Cesium.Resource.fetchJson;
+        Cesium.loadBlob = Cesium.Resource.fetchBlob;
+        Cesium.loadArrayBuffer = Cesium.Resource.fetchArrayBuffer;
+        Cesium.loadImage = Cesium.Resource.fetchImage;
+    }
     var defaultColor = new Cesium.Color(1.0, 1.0, 1.0, 0.4);
     var defaultGlowColor = new Cesium.Color(0.0, 1.0, 0.0, 0.05);
     var defaultBackgroundColor = new Cesium.Color(0.0, 0.5, 0.0, 0.2);
@@ -43,10 +53,13 @@ define([
     }
 
     /**
-    *动态矢量切片提供程序，支持esri shapefile、geojson文件，也可以直接加载geojson对象
+    *动态矢量切片提供程序，支持esri shapefile、geojson文件，也可以直接加载geojson对象和Polygon,PolyLine
+    *   <ul class="see-list">
+    *       <li><a href="https://mikeswei.github.io/CesiumVectorTile/" target="_blank">VectorTileImageryProviderDemo</a></li>
+    *  </ul>  
     *@param {Object}options 参数如下：
-    *@param {String|turf.FeatureCollection|Object|Array<File>}options.source 数组、矢量文件url、矢量文件列表或者geojson对象
-    *@param {Cesium.VectorStyle}[options.defaultStyle=Cesium.VectorStyle.Default] 默认样式 
+    *@param {String|turf.FeatureCollection|Object|Array<MeteoLib.Util.Contour.PolyLine|MeteoLib.Util.Contour.Polygon|File>}options.source MeteoLib.Util.Contour.PolyLine及MeteoLib.Util.Contour.Polygon数组、矢量文件url、矢量文件列表或者geojson对象
+    *@param {MeteoLib.Render.VectorStyle}[options.defaultStyle=MeteoLib.Render.VectorStyle.Default] 默认样式 
     *@param {Boolean}[options.simplify=false] true则简化，默认不简化
     *@param {Boolean}[options.simplifyTolerance=0.01] 简化公差
    *@param {Boolean}[options.minimumLevel=3] 最小级别
@@ -56,39 +69,72 @@ define([
     *@memberof Cesium
     *@extends Cesium.ImageryProvider
     *@example
-         var provinceLayer = null;
-        var provinceProvider = new VectorTileImageryProvider({
-            source: appConfig.BaseURL + "Assets/Data/json/china_province.geojson",
-            defaultStyle: {
-                outlineColor: "rgb(255,255,255)",
-                lineWidth: 2,
-                fill: false,
-                tileCacheSize: 200
+        //1.面数据
+        viewer.imageryLayers.addImageryProvider(new VectorTileImageryProvider({
+            source: appConfig.BaseURL + "Assets/VectorData/中国数据/陕西/榆林/county_sshanxi_yulin.shp",
+            defaultStyle:{ outlineColor: Cesium.Color.WHITE, 
+                fill: true
             },
-            maximumLevel: 20,
-            minimumLevel: 1,
-            simplify: false
-        });
-        provinceProvider.readyPromise.then(function () {
-            provinceLayer = viewer.imageryLayers.addImageryProvider(provinceProvider);
-        });
+            maximumLevel: 22,
+            minimumLevel: 0
+        }))
+        //2.点数据
+        viewer.imageryLayers.addImageryProvider(new VectorTileImageryProvider({
+            source: appConfig.BaseURL + "Assets/VectorData/中国数据/陕西/榆林/town_sshanxi_yulin.shp"
+            ,defaultStyle:{ 
+                fontColor: Cesium.Color.WHITE
+                , fontSize: 20
+                , fontFamily: '微软雅黑'
+                , makerImage: appConfig.BaseURL + "Assets/Images/Stations/autonew.png"
+                 , labelOffsetY: 5
+                , labelOffsetX: 10
+            }
+                , maximumLevel: 22
+                , minimumLevel: 9
+        }))
+        //3.线数据
+          viewer.imageryLayers.addImageryProvider(new VectorTileImageryProvider({
+            source: appConfig.BaseURL + "Assets/VectorData/中国数据/中国边界.shp" 
+        }))
 
-        var worldLayer = null;
-        var worldProvider = new VectorTileImageryProvider({
-            source: appConfig.BaseURL + "Assets/Data/shp/world/国家简化边界.shp",
+        //4.geojson
+        viewer.imageryLayers.addImageryProvider(new VectorTileImageryProvider({
+            source: appConfig.BaseURL + "Assets/SampleData/simplestyles.geojson",//VectorData/中国数据/中国边界.shp",
+            defaultStyle:{
+                fill: true
+            },
+                minimumLevel: 0
+        }))
+
+        5.使用样式函数（styleFilter）设置样式
+         viewer.imageryLayers.addImageryProvider(new Cesium.VectorTileImageryProvider({
+            source: appConfig.BaseURL + "Assets/VectorData/世界数据/Countries.shp",
             defaultStyle: {
-                outlineColor: "rgb(255,0,0)",
-                lineWidth: 1,
+                outlineColor: Cesium.Color.YELLOW,
+                lineWidth: 2,
+                fillColor: Cesium.Color.fromBytes(2, 24, 47, 200),
                 fill: false,
-                tileCacheSize: 200
+                tileCacheSize: 200,
+                showMaker: false,
+                showCenterLabel: true,
+                fontColor: "rgba(255,0,0,1)",
+                labelOffsetX: -10,
+                labelOffsetY: -5,
+                fontSize: 13,
+                fontFamily: "黑体",
+                centerLabelPropertyName: "NAME"
             },
             maximumLevel: 20,
             minimumLevel: 1,
-            simplify: false
-        });
-        worldProvider.readyPromise.then(function () {
-            worldLayer = viewer.imageryLayers.addImageryProvider(worldProvider);
-        });
+            simplify: false ,
+            styleFilter: function (feature, style) {
+                if (feature.properties.hasOwnProperty("NAME") && feature.properties["NAME"].toLocaleLowerCase().indexOf("china") >= 0) {
+                    style.outlineColor = Cesium.Color.RED;
+                    style.fill = true;
+                    style.fillColor = Cesium.Color.AZURE.withAlpha(0.5);
+                }
+            }
+        }))
 
     */
     function VectorTileImageryProvider(options) {
@@ -102,8 +148,8 @@ define([
         var ext = null;
         var isLocalShpFile = false;
         if (typeof options.source == 'string') {
-            options.source = options.source.toLowerCase();
-            ext = Path.GetExtension(options.source)
+            var source = options.source.toLowerCase();
+            ext = Path.GetExtension(source)
             if (ext !== '.shp' && ext !== '.json' && ext !== '.geojson' && ext !== '.topojson') {
                 throw new Cesium.DeveloperError("The data  options.source provider is not supported.");
             }
@@ -125,7 +171,7 @@ define([
         this._tileHeight = Cesium.defaultValue(options.tileHeight, 256);
 
         if (ext) {
-            this._url = options.source.replace('.shp', '');
+            this._url = options.source.replace(ext, '');
         } else {
             this._url = options.source;
         }
@@ -261,7 +307,15 @@ define([
                 if (feature.geometry.type == "Point"
                     || feature.geometry.type == "MultiPoint") {
                     points.push(feature);
+                } else if (that._defaultStyle.showCenterLabel
+                    && that._defaultStyle.centerLabelPropertyName) {
+                    that._defaultStyle.showLabel = true;
+                    that._defaultStyle.labelPropertyName = that._defaultStyle.centerLabelPropertyName;
+                    var center = turf.centerOfMass(feature)
+                    points.push(center);
+                    center.properties = feature.properties;
                 }
+
                 if (feature.geometry.type == "Polygon"
                     || feature.geometry.type == "MultiPolygon") {
                     outlines = outlines.concat(turf.polygonToLineString(feature).features);
@@ -324,10 +378,10 @@ define([
 
     /**
     *样式设置函数
-    *@callback  CesiumVectorTileImageryProvider~StyleFilterCallback
+    *@callback  Cesium.VectorTileImageryProvider~StyleFilterCallback
     *@param {Geojson.Feature}feature 当前要素（用Geojson.Feature存储）
-    *@param {Cesium.VectorStyle}style 即将应用与当前要素的样式，可以通过修改该参数中的各样式设置选项来针对当前要素进行特殊的样式设置。
-    *修改后只对当前要素有效，不会修改CesiumVectorTileImageryProvider的默认样式
+    *@param {MeteoLib.Render.VectorStyle}style 即将应用与当前要素的样式，可以通过修改该参数中的各样式设置选项来针对当前要素进行特殊的样式设置。
+    *修改后只对当前要素有效，不会修改Cesium.VectorTileImageryProvider的默认样式
     */
 
     VectorTileImageryProvider.instanceCount = 0;
@@ -343,7 +397,7 @@ define([
     Cesium.defineProperties(VectorTileImageryProvider.prototype, {
         /**
          * Gets the proxy used by this provider.
-         * @memberof CesiumVectorTileImageryProvider.prototype
+         * @memberof Cesium.VectorTileImageryProvider.prototype
          * @type {Proxy}
          * @readonly
          */
@@ -355,8 +409,8 @@ define([
 
         /**
          * Gets the width of each tile, in pixels. This function should
-         * not be called before {@link CesiumVectorTileImageryProvider#ready} returns true.
-         * @memberof CesiumVectorTileImageryProvider.prototype
+         * not be called before {@link Cesium.VectorTileImageryProvider#ready} returns true.
+         * @memberof Cesium.VectorTileImageryProvider.prototype
          * @type {Number}
          * @readonly
          */
@@ -368,8 +422,8 @@ define([
 
         /**
          * Gets the height of each tile, in pixels.  This function should
-         * not be called before {@link CesiumVectorTileImageryProvider#ready} returns true.
-         * @memberof CesiumVectorTileImageryProvider.prototype
+         * not be called before {@link Cesium.VectorTileImageryProvider#ready} returns true.
+         * @memberof Cesium.VectorTileImageryProvider.prototype
          * @type {Number}
          * @readonly
          */
@@ -381,8 +435,8 @@ define([
 
         /**
          * Gets the maximum level-of-detail that can be requested.  This function should
-         * not be called before {@link CesiumVectorTileImageryProvider#ready} returns true.
-         * @memberof CesiumVectorTileImageryProvider.prototype
+         * not be called before {@link Cesium.VectorTileImageryProvider#ready} returns true.
+         * @memberof Cesium.VectorTileImageryProvider.prototype
          * @type {Number}
          * @readonly
          */
@@ -394,8 +448,8 @@ define([
 
         /**
          * Gets the minimum level-of-detail that can be requested.  This function should
-         * not be called before {@link CesiumVectorTileImageryProvider#ready} returns true.
-         * @memberof CesiumVectorTileImageryProvider.prototype
+         * not be called before {@link Cesium.VectorTileImageryProvider#ready} returns true.
+         * @memberof Cesium.VectorTileImageryProvider.prototype
          * @type {Number}
          * @readonly
          */
@@ -410,8 +464,8 @@ define([
 
         /**
          * Gets the tiling scheme used by this provider.  This function should
-         * not be called before {@link CesiumVectorTileImageryProvider#ready} returns true.
-         * @memberof CesiumVectorTileImageryProvider.prototype
+         * not be called before {@link Cesium.VectorTileImageryProvider#ready} returns true.
+         * @memberof Cesium.VectorTileImageryProvider.prototype
          * @type {TilingScheme}
          * @readonly
          */
@@ -423,8 +477,8 @@ define([
 
         /**
          * Gets the rectangle, in radians, of the imagery provided by this instance.  This function should
-         * not be called before {@link CesiumVectorTileImageryProvider#ready} returns true.
-         * @memberof CesiumVectorTileImageryProvider.prototype
+         * not be called before {@link Cesium.VectorTileImageryProvider#ready} returns true.
+         * @memberof Cesium.VectorTileImageryProvider.prototype
          * @type {Rectangle}
          * @readonly
          */
@@ -438,8 +492,8 @@ define([
          * Gets the tile discard policy.  If not undefined, the discard policy is responsible
          * for filtering out "missing" tiles via its shouldDiscardImage function.  If this function
          * returns undefined, no tiles are filtered.  This function should
-         * not be called before {@link CesiumVectorTileImageryProvider#ready} returns true.
-         * @memberof CesiumVectorTileImageryProvider.prototype
+         * not be called before {@link Cesium.VectorTileImageryProvider#ready} returns true.
+         * @memberof Cesium.VectorTileImageryProvider.prototype
          * @type {TileDiscardPolicy}
          * @readonly
          */
@@ -453,7 +507,7 @@ define([
          * Gets an event that is raised when the imagery provider encounters an asynchronous error.  By subscribing
          * to the event, you will be notified of the error and can potentially recover from it.  Event listeners
          * are passed an instance of {@link TileProviderError}.
-         * @memberof CesiumVectorTileImageryProvider.prototype
+         * @memberof Cesium.VectorTileImageryProvider.prototype
          * @type {Event}
          * @readonly
          */
@@ -465,7 +519,7 @@ define([
 
         /**
          * Gets a value indicating whether or not the provider is ready for use.
-         * @memberof CesiumVectorTileImageryProvider.prototype
+         * @memberof Cesium.VectorTileImageryProvider.prototype
          * @type {Boolean}
          * @readonly
          */
@@ -477,7 +531,7 @@ define([
 
         /**
          * Gets a promise that resolves to true when the provider is ready for use.
-         * @memberof CesiumVectorTileImageryProvider.prototype
+         * @memberof Cesium.VectorTileImageryProvider.prototype
          * @type {Promise.<Boolean>}
          * @readonly
          */
@@ -489,8 +543,8 @@ define([
 
         /**
          * Gets the credit to display when this imagery provider is active.  Typically this is used to credit
-         * the source of the imagery.  This function should not be called before {@link CesiumVectorTileImageryProvider#ready} returns true.
-         * @memberof CesiumVectorTileImageryProvider.prototype
+         * the source of the imagery.  This function should not be called before {@link Cesium.VectorTileImageryProvider#ready} returns true.
+         * @memberof Cesium.VectorTileImageryProvider.prototype
          * @type {Credit}
          * @readonly
          */
@@ -506,7 +560,7 @@ define([
          * be ignored.  If this property is true, any images without an alpha channel will be treated
          * as if their alpha is 1.0 everywhere.  When this property is false, memory usage
          * and texture upload time are reduced.
-         * @memberof CesiumVectorTileImageryProvider.prototype
+         * @memberof Cesium.VectorTileImageryProvider.prototype
          * @type {Boolean}
          * @readonly
          */

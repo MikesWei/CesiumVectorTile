@@ -1,6 +1,6 @@
 ﻿define([
     'Util/turf',
-    "ThirdParty/shapefile-js-3.3.2/shp",
+    "Util/shp",
     'Util/Path',
     'VectorRenderer/VectorStyle' 
 ], function (
@@ -13,11 +13,11 @@
     /**
     *
     *@param {Object} options
-    *@param {String|turf.FeatureCollection|Object}options.source 矢量文件url或者geojson对象    
-    *@param {CesiumVectorStyle}[options.style=new VectorStyle()] 矢量文件url或者geojson对象    
+    *@param {String|turf.FeatureCollection|Object|Array<MeteoLib.Util.Contour.PolyLine>|Array<MeteoLib.Util.Contour.Polygon>}options.source 矢量文件url或者geojson对象    
+    *@param {Cesium.VectorStyle}[options.style=new VectorStyle()] 矢量文件url或者geojson对象    
     *@param {Boolean}[options.simplify=false] true则简化，默认不简化
     *@param {Boolean}[options.simplifyTolerance=0.01] 简化公差
-    *@memberof MeteoLib.Render
+    *@memberof Cesium
     *@constructor 
     */
     function VectorLayer(options) {
@@ -55,7 +55,7 @@
 
         /**
          *
-         *@type {CesiumVectorStyle}
+         *@type {Cesium.VectorStyle}
          */
         this.style = Cesium.defaultValue(options.style, new VectorStyle());
         /**

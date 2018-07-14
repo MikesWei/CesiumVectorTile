@@ -1,8 +1,8 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Cesium.VectorTileImageryProvider参考文档: 类: VectorTileImageryProvider</title>
+    <title>CesiumVectorTile参考文档: 类: VectorTileImageryProvider</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -51,7 +51,7 @@
 
 
 <div class="description">
-    动态矢量切片提供程序，支持esri shapefile、geojson文件，也可以直接加载geojson对象
+    动态矢量切片提供程序，支持esri shapefile、geojson文件，也可以直接加载geojson对象和Polygon,PolyLine  <ul class="see-list">      <li><a href="https://mikeswei.github.io/CesiumVectorTile/" target="_blank">VectorTileImageryProviderDemo</a></li> </ul>
 </div>
 
 
@@ -148,7 +148,7 @@
 <span class="param-type">Object</span>
 |
 
-<span class="param-type">Array.&lt;File></span>
+<span class="param-type">Array.&lt;(MeteoLib.Util.Contour.PolyLine|MeteoLib.Util.Contour.Polygon|<a href="File.html">File</a>)></span>
 
 
             
@@ -170,7 +170,7 @@
                 </td>
             
 
-            <td class="description last">数组、矢量文件url、矢量文件列表或者geojson对象</td>
+            <td class="description last">MeteoLib.Util.Contour.PolyLine及MeteoLib.Util.Contour.Polygon数组、矢量文件url、矢量文件列表或者geojson对象</td>
         </tr>
 
     
@@ -183,7 +183,7 @@
             <td class="type">
             
                 
-<span class="param-type"><a href="Cesium.VectorStyle.html">Cesium.VectorStyle</a></span>
+<span class="param-type">MeteoLib.Render.VectorStyle</span>
 
 
             
@@ -204,7 +204,7 @@
             
                 <td class="default">
                 
-                    Cesium.VectorStyle.Default
+                    MeteoLib.Render.VectorStyle.Default
                 
                 </td>
             
@@ -378,7 +378,7 @@
             <td class="type">
             
                 
-<span class="param-type">Cesium.VectorTileImageryProvider~StyleFilterCallback</span>
+<span class="param-type"><a href="Cesium.VectorTileImageryProvider.html#~StyleFilterCallback">Cesium.VectorTileImageryProvider~StyleFilterCallback</a></span>
 
 
             
@@ -450,7 +450,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line27248">line 27248</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line38863">line 38863</a>
     </li></ul></dd>
     
 
@@ -477,39 +477,72 @@
 
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>var provinceLayer = null;
-        var provinceProvider = new VectorTileImageryProvider({
-            source: appConfig.BaseURL + "Assets/Data/json/china_province.geojson",
-            defaultStyle: {
-                outlineColor: "rgb(255,255,255)",
-                lineWidth: 2,
-                fill: false,
-                tileCacheSize: 200
+    <pre class="prettyprint"><code>//1.面数据
+        viewer.imageryLayers.addImageryProvider(new VectorTileImageryProvider({
+            source: appConfig.BaseURL + "Assets/VectorData/中国数据/陕西/榆林/county_sshanxi_yulin.shp",
+            defaultStyle:{ outlineColor: Cesium.Color.WHITE, 
+                fill: true
             },
-            maximumLevel: 20,
-            minimumLevel: 1,
-            simplify: false
-        });
-        provinceProvider.readyPromise.then(function () {
-            provinceLayer = viewer.imageryLayers.addImageryProvider(provinceProvider);
-        });
+            maximumLevel: 22,
+            minimumLevel: 0
+        }))
+        //2.点数据
+        viewer.imageryLayers.addImageryProvider(new VectorTileImageryProvider({
+            source: appConfig.BaseURL + "Assets/VectorData/中国数据/陕西/榆林/town_sshanxi_yulin.shp"
+            ,defaultStyle:{ 
+                fontColor: Cesium.Color.WHITE
+                , fontSize: 20
+                , fontFamily: '微软雅黑'
+                , makerImage: appConfig.BaseURL + "Assets/Images/Stations/autonew.png"
+                 , labelOffsetY: 5
+                , labelOffsetX: 10
+            }
+                , maximumLevel: 22
+                , minimumLevel: 9
+        }))
+        //3.线数据
+          viewer.imageryLayers.addImageryProvider(new VectorTileImageryProvider({
+            source: appConfig.BaseURL + "Assets/VectorData/中国数据/中国边界.shp" 
+        }))
 
-        var worldLayer = null;
-        var worldProvider = new VectorTileImageryProvider({
-            source: appConfig.BaseURL + "Assets/Data/shp/world/国家简化边界.shp",
+        //4.geojson
+        viewer.imageryLayers.addImageryProvider(new VectorTileImageryProvider({
+            source: appConfig.BaseURL + "Assets/SampleData/simplestyles.geojson",//VectorData/中国数据/中国边界.shp",
+            defaultStyle:{
+                fill: true
+            },
+                minimumLevel: 0
+        }))
+
+        5.使用样式函数（styleFilter）设置样式
+         viewer.imageryLayers.addImageryProvider(new Cesium.VectorTileImageryProvider({
+            source: appConfig.BaseURL + "Assets/VectorData/世界数据/Countries.shp",
             defaultStyle: {
-                outlineColor: "rgb(255,0,0)",
-                lineWidth: 1,
+                outlineColor: Cesium.Color.YELLOW,
+                lineWidth: 2,
+                fillColor: Cesium.Color.fromBytes(2, 24, 47, 200),
                 fill: false,
-                tileCacheSize: 200
+                tileCacheSize: 200,
+                showMaker: false,
+                showCenterLabel: true,
+                fontColor: "rgba(255,0,0,1)",
+                labelOffsetX: -10,
+                labelOffsetY: -5,
+                fontSize: 13,
+                fontFamily: "黑体",
+                centerLabelPropertyName: "NAME"
             },
             maximumLevel: 20,
             minimumLevel: 1,
-            simplify: false
-        });
-        worldProvider.readyPromise.then(function () {
-            worldLayer = viewer.imageryLayers.addImageryProvider(worldProvider);
-        });</code></pre>
+            simplify: false ,
+            styleFilter: function (feature, style) {
+                if (feature.properties.hasOwnProperty("NAME") &amp;&amp; feature.properties["NAME"].toLocaleLowerCase().indexOf("china") >= 0) {
+                    style.outlineColor = Cesium.Color.RED;
+                    style.fill = true;
+                    style.fillColor = Cesium.Color.AZURE.withAlpha(0.5);
+                }
+            }
+        }))</code></pre>
 
 
 
@@ -538,9 +571,1107 @@
     
 
     
+        <h3 class="subsection-title">Members</h3>
+
+        
+            
+<h4 class="name" id="credit"><span class="type-signature">(readonly) </span>credit<span class="type-signature"> :Credit</span></h4>
+
+
+
+
+<div class="description">
+    Gets the credit to display when this imagery provider is active.  Typically this is used to creditthe source of the imagery.  This function should not be called before <a href="Cesium.VectorTileImageryProvider.html#ready">Cesium.VectorTileImageryProvider#ready</a> returns true.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Credit</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
 
     
 
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line39274">line 39274</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="errorEvent"><span class="type-signature">(readonly) </span>errorEvent<span class="type-signature"> :Event</span></h4>
+
+
+
+
+<div class="description">
+    Gets an event that is raised when the imagery provider encounters an asynchronous error.  By subscribingto the event, you will be notified of the error and can potentially recover from it.  Event listenersare passed an instance of TileProviderError.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Event</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line39237">line 39237</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="hasAlphaChannel"><span class="type-signature">(readonly) </span>hasAlphaChannel<span class="type-signature"> :Boolean</span></h4>
+
+
+
+
+<div class="description">
+    Gets a value indicating whether or not the images provided by this imagery providerinclude an alpha channel.  If this property is false, an alpha channel, if present, willbe ignored.  If this property is true, any images without an alpha channel will be treatedas if their alpha is 1.0 everywhere.  When this property is false, memory usageand texture upload time are reduced.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Boolean</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line39290">line 39290</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="maximumLevel"><span class="type-signature">(readonly) </span>maximumLevel<span class="type-signature"> :Number</span></h4>
+
+
+
+
+<div class="description">
+    Gets the maximum level-of-detail that can be requested.  This function shouldnot be called before <a href="Cesium.VectorTileImageryProvider.html#ready">Cesium.VectorTileImageryProvider#ready</a> returns true.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Number</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line39166">line 39166</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="minimumLevel"><span class="type-signature">(readonly) </span>minimumLevel<span class="type-signature"> :Number</span></h4>
+
+
+
+
+<div class="description">
+    Gets the minimum level-of-detail that can be requested.  This function shouldnot be called before <a href="Cesium.VectorTileImageryProvider.html#ready">Cesium.VectorTileImageryProvider#ready</a> returns true.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Number</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line39179">line 39179</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="proxy"><span class="type-signature">(readonly) </span>proxy<span class="type-signature"> :Proxy</span></h4>
+
+
+
+
+<div class="description">
+    Gets the proxy used by this provider.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Proxy</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line39127">line 39127</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="ready"><span class="type-signature">(readonly) </span>ready<span class="type-signature"> :Boolean</span></h4>
+
+
+
+
+<div class="description">
+    Gets a value indicating whether or not the provider is ready for use.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Boolean</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line39249">line 39249</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="readyPromise"><span class="type-signature">(readonly) </span>readyPromise<span class="type-signature"> :Promise.&lt;Boolean></span></h4>
+
+
+
+
+<div class="description">
+    Gets a promise that resolves to true when the provider is ready for use.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Promise.&lt;Boolean></span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line39261">line 39261</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="rectangle"><span class="type-signature">(readonly) </span>rectangle<span class="type-signature"> :Rectangle</span></h4>
+
+
+
+
+<div class="description">
+    Gets the rectangle, in radians, of the imagery provided by this instance.  This function shouldnot be called before <a href="Cesium.VectorTileImageryProvider.html#ready">Cesium.VectorTileImageryProvider#ready</a> returns true.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Rectangle</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line39208">line 39208</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="tileDiscardPolicy"><span class="type-signature">(readonly) </span>tileDiscardPolicy<span class="type-signature"> :TileDiscardPolicy</span></h4>
+
+
+
+
+<div class="description">
+    Gets the tile discard policy.  If not undefined, the discard policy is responsiblefor filtering out "missing" tiles via its shouldDiscardImage function.  If this functionreturns undefined, no tiles are filtered.  This function shouldnot be called before <a href="Cesium.VectorTileImageryProvider.html#ready">Cesium.VectorTileImageryProvider#ready</a> returns true.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">TileDiscardPolicy</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line39223">line 39223</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="tileHeight"><span class="type-signature">(readonly) </span>tileHeight<span class="type-signature"> :Number</span></h4>
+
+
+
+
+<div class="description">
+    Gets the height of each tile, in pixels.  This function shouldnot be called before <a href="Cesium.VectorTileImageryProvider.html#ready">Cesium.VectorTileImageryProvider#ready</a> returns true.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Number</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line39153">line 39153</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="tileWidth"><span class="type-signature">(readonly) </span>tileWidth<span class="type-signature"> :Number</span></h4>
+
+
+
+
+<div class="description">
+    Gets the width of each tile, in pixels. This function shouldnot be called before <a href="Cesium.VectorTileImageryProvider.html#ready">Cesium.VectorTileImageryProvider#ready</a> returns true.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Number</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line39140">line 39140</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="tilingScheme"><span class="type-signature">(readonly) </span>tilingScheme<span class="type-signature"> :TilingScheme</span></h4>
+
+
+
+
+<div class="description">
+    Gets the tiling scheme used by this provider.  This function shouldnot be called before <a href="Cesium.VectorTileImageryProvider.html#ready">Cesium.VectorTileImageryProvider#ready</a> returns true.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">TilingScheme</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line39195">line 39195</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+    
+
+    
+
+    
+        <h3 class="subsection-title">Type Definitions</h3>
+
+        
+                
+
+    
+
+    <h4 class="name" id="~StyleFilterCallback"><span class="type-signature"></span>StyleFilterCallback<span class="signature">(feature, style)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    样式设置函数
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>feature</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Geojson.Feature</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">当前要素（用Geojson.Feature存储）</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>style</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">MeteoLib.Render.VectorStyle</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">即将应用与当前要素的样式，可以通过修改该参数中的各样式设置选项来针对当前要素进行特殊的样式设置。修改后只对当前要素有效，不会修改Cesium.VectorTileImageryProvider的默认样式</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line39102">line 39102</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            
     
 
     
@@ -554,13 +1685,13 @@
 </div>
 
 <nav>
-    <h2><a href="index.html">主页</a></h2><h3>命名空间</h3><ul><li><a href="Cesium.html">Cesium</a></li></ul><h3>类</h3><ul><li><h5><a href="Cesium.html">Cesium</a></h5></li><li><a href="Cesium.Path.html">Path</a></li><li><a href="Cesium.VectorRenderer.html">VectorRenderer</a></li><li><a href="Cesium.VectorStyle.html">VectorStyle</a></li><li><a href="Cesium.VectorTileImageryProvider.html">VectorTileImageryProvider</a></li></ul>
+    <h2><a href="index.html">主页</a></h2><h3>命名空间</h3><ul><li><a href="Cesium.html">Cesium</a></li></ul><h3>类</h3><ul><li><h5><a href="Cesium.html">Cesium</a></h5></li><li><a href="Cesium.Path.html">Path</a></li><li><a href="Cesium.VectorLayer.html">VectorLayer</a></li><li><a href="Cesium.VectorRenderer.html">VectorRenderer</a></li><li><a href="Cesium.VectorStyle.html">VectorStyle</a></li><li><a href="Cesium.VectorTileImageryProvider.html">VectorTileImageryProvider</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0</a> on Wed Mar 28 2018 13:05:31 GMT+0800 (中国标准时间)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sat Jul 14 2018 20:25:26 GMT+0800 (中国标准时间)
 </footer>
 
 <script> prettyPrint(); </script>

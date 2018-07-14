@@ -19,12 +19,17 @@
      *@param {Boolean}[options.circleLineWidth=2] 注记点样式为Circle时，圆形线宽
      *@param {Boolean}[options.showMaker=true] 是否显示注记点，仅在数据有点时有效。
      *@param {Boolean}[options.showLabel=true] 是否显示文本，仅在数据有点时有效。
+     *@param {Boolean}[options.showCentroidLabel=true] 是否显示文本，仅对线和面数据有效。
+     *@param {Boolean}[options.centroidLabelPropertyName] 是否显示文本，仅对线和面数据有效。
      *@param {Boolean}[options.labelOffsetX=10] 标注文本x方向偏移量，仅在数据有点时有效。以屏幕为参考，左上角为0，向右为正，单位为像素
      *@param {Boolean}[options.labelOffsetY=5] 标注文本y方向偏移量，仅在数据有点时有效。以屏幕为参考，左上角为0，向下为正，单位为像素 
      *@memberof Cesium
      *@constructor 
      */
     function VectorStyle(options) {
+        if (typeof document == 'undefined') {
+            return options;
+        }
         options = Cesium.defaultValue(options, Cesium.defaultValue.EMPTY_OBJECT);
         //面样式
         this.fillColor = Cesium.defaultValue(options.fillColor, Cesium.Color.fromBytes(0, 255, 255, 30));
@@ -62,6 +67,10 @@
         this.circleLineWidth = Cesium.defaultValue(options.circleLineWidth, 2);
         this.showMaker = Cesium.defaultValue(options.showMaker, true);
         this.showLabel = Cesium.defaultValue(options.showLabel, true);
+         
+        this.showCenterLabel = Cesium.defaultValue(options.showCenterLabel, false);
+        this.centerLabelPropertyName = options.centerLabelPropertyName;
+
         this.labelOffsetX = Cesium.defaultValue(options.labelOffsetX, 0);
         this.labelOffsetY = Cesium.defaultValue(options.labelOffsetY, 0);
         this.makerImage = options.makerImage;
@@ -85,7 +94,7 @@
                 this.makerImageEl = this.makerImage;
             }
             setTimeout(function () {
-                  
+
                 that.readyPromise.resolve(true);
             }, 10)
         }

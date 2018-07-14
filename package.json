@@ -1,0 +1,21 @@
+{
+  "dependencies": {},
+  "devDependencies": {
+    "uglify-js": "^2.8.13",
+    "JSDoc": "^3.5.5"
+  },
+  "description": "Cesium VectorTileImageryProvider",
+  "author": {
+    "name": "weixiuyong",
+    "url": "https://github.com/MikesWei"
+  },
+  "keywords":[
+    "Cesium",
+    "VectorTile",
+    "geojson",
+    "shape file",
+    "shp"
+  ],
+  "name": "CesiumVectorTile",
+  "version": "1.0.1"
+}

@@ -1,0 +1,106 @@
+{
+  "name": "proj4",
+  "version": "2.3.15",
+  "description": "Proj4js is a JavaScript library to transform point coordinates from one coordinate system to another, including datum transformations.",
+  "main": "lib/index.js",
+  "directories": {
+    "test": "test",
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "./node_modules/istanbul/lib/cli.js test ./node_modules/mocha/bin/_mocha test/test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/proj4js/proj4js.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "jam": {
+    "main": "dist/proj4.js",
+    "include": [
+      "dist/proj4.js",
+      "README.md",
+      "AUTHORS",
+      "LICENSE.md"
+    ]
+  },
+  "devDependencies": {
+    "grunt-cli": "~0.1.13",
+    "grunt": "~0.4.2",
+    "grunt-contrib-connect": "~0.6.0",
+    "grunt-contrib-jshint": "~0.8.0",
+    "chai": "~1.8.1",
+    "mocha": "~1.17.1",
+    "grunt-mocha-phantomjs": "~0.4.0",
+    "browserify": "~12.0.1",
+    "grunt-browserify": "~4.0.1",
+    "grunt-contrib-uglify": "~0.11.1",
+    "curl": "git://github.com/cujojs/curl.git",
+    "istanbul": "~0.2.4",
+    "tin": "~0.4.0"
+  },
+  "dependencies": {
+    "mgrs": "~0.0.2"
+  },
+  "contributors": [
+    {
+      "name": "Mike Adair",
+      "email": "madair@dmsolutions.ca"
+    },
+    {
+      "name": "Richard Greenwood",
+      "email": "rich@greenwoodmap.com"
+    },
+    {
+      "name": "Calvin Metcalf",
+      "email": "calvin.metcalf@gmail.com"
+    },
+    {
+      "name": "Richard Marsden",
+      "url": "http://www.winwaed.com"
+    },
+    {
+      "name": "T. Mittan"
+    },
+    {
+      "name": "D. Steinwand"
+    },
+    {
+      "name": "S. Nelson"
+    }
+  ],
+  "gitHead": "9fa5249c1f4183d5ddee3c4793dfd7b9f29f1886",
+  "bugs": {
+    "url": "https://github.com/proj4js/proj4js/issues"
+  },
+  "homepage": "https://github.com/proj4js/proj4js#readme",
+  "_id": "proj4@2.3.15",
+  "_shasum": "5ad06e8bca30be0ffa389a49e4565f51f06d089e",
+  "_from": "proj4@latest",
+  "_npmVersion": "3.8.6",
+  "_nodeVersion": "6.1.0",
+  "_npmUser": {
+    "name": "ahocevar",
+    "email": "andreas.hocevar@gmail.com"
+  },
+  "dist": {
+    "shasum": "5ad06e8bca30be0ffa389a49e4565f51f06d089e",
+    "tarball": "https://registry.npmjs.org/proj4/-/proj4-2.3.15.tgz"
+  },
+  "maintainers": [
+    {
+      "name": "cwmma",
+      "email": "calvin.metcalf@gmail.com"
+    },
+    {
+      "name": "ahocevar",
+      "email": "andreas.hocevar@gmail.com"
+    }
+  ],
+  "_npmOperationalInternal": {
+    "host": "packages-12-west.internal.npmjs.com",
+    "tmp": "tmp/proj4-2.3.15.tgz_1471808262546_0.6752060337457806"
+  },
+  "_resolved": "https://registry.npmjs.org/proj4/-/proj4-2.3.15.tgz"
+}

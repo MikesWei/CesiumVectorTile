@@ -1,8 +1,8 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Cesium.VectorTileImageryProvider参考文档: 类: VectorRenderer</title>
+    <title>CesiumVectorTile参考文档: 类: VectorRenderer</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -51,7 +51,7 @@
 
 
 <div class="description">
-    矢量渲染器，支持esri shapefile、geojson文件
+    矢量渲染器，支持esri shapefile、geojson文件，也可以直接加载geojson对象或MeteoLib.Contour.Polygon、MeteoLib.Contour.Polyline集合
 </div>
 
 
@@ -209,7 +209,7 @@
             <td class="type">
             
                 
-<span class="param-type">Cesium.VectorLayer</span>
+<span class="param-type"><a href="Cesium.VectorLayer.html">Cesium.VectorLayer</a></span>
 |
 
 <span class="param-type">String</span>
@@ -221,7 +221,7 @@
 <span class="param-type">Object</span>
 |
 
-<span class="param-type">Array.&lt;Cesium.VectorLayer></span>
+<span class="param-type">Array.&lt;<a href="Cesium.VectorLayer.html">Cesium.VectorLayer</a>></span>
 |
 
 <span class="param-type">Array.&lt;String></span>
@@ -334,6 +334,43 @@
         </tr>
 
     
+
+        <tr>
+            
+                <td class="name"><code>prj</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
     </tbody>
 </table>
 
@@ -378,7 +415,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line26658">line 26658</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line38140">line 38140</a>
     </li></ul></dd>
     
 
@@ -406,38 +443,38 @@
     <h5>Example</h5>
     
     <pre class="prettyprint"><code>var defaultStyle = new VectorStyle({
-        outlineColor: Cesium.Color.BLACK,
-        fill: true,
-    });
-
-    var shengjieLayer = new VectorLayer({
-        source: appConfig.BaseURL + "Assets/Shp/L_shengjie.shp",
-        style: defaultStyle
-    });
-
-    var chinaLayer = new VectorLayer({
-        source: appConfig.BaseURL + "Assets/Shp/china.shp",
-        style: defaultStyle
-    });
-
-    var vectorRenderer = new VectorRenderer({
-        layers: [
-            chinaLayer,
-            shengjieLayer
-        ],
-        width: 1024,
-        height: 512,
-        //fitExtent: false,
-        resizable:true
-    });
-     
-    Cesium.when(vectorRenderer.readyPromise, function () {
-        vectorRenderer.addLayer(chinaLayer);
-        var canvas = vectorRenderer.render(vectorRenderer.rectangle);
-        document.getElementById("cesiumContainer").appendChild(canvas); 
-    }, function (err) {
-        console.log(err);
-    })</code></pre>
+            outlineColor: Cesium.Color.BLACK,
+            fill: true,
+        });
+    
+        var shengjieLayer = new VectorLayer({
+            source: appConfig.BaseURL + "Assets/Shp/L_shengjie.shp",
+            style: defaultStyle
+        });
+    
+        var chinaLayer = new VectorLayer({
+            source: appConfig.BaseURL + "Assets/Shp/china.shp",
+            style: defaultStyle
+        });
+    
+        var vectorRenderer = new VectorRenderer({
+            layers: [
+                chinaLayer,
+                shengjieLayer
+            ],
+            width: 1024,
+            height: 512,
+            //fitExtent: false,
+            resizable:true
+        });
+         
+        Cesium.when(vectorRenderer.readyPromise, function () {
+            vectorRenderer.addLayer(chinaLayer);
+            var canvas = vectorRenderer.render(vectorRenderer.rectangle);
+            document.getElementById("cesiumContainer").appendChild(canvas); 
+        }, function (err) {
+            console.log(err);
+        })</code></pre>
 
 
 
@@ -509,7 +546,7 @@
             <td class="type">
             
                 
-<span class="param-type">Cesium.VectorLayer</span>
+<span class="param-type"><a href="Cesium.VectorLayer.html">Cesium.VectorLayer</a></span>
 
 
             
@@ -560,7 +597,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line26761">line 26761</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line38328">line 38328</a>
     </li></ul></dd>
     
 
@@ -736,7 +773,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line27098">line 27098</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line38666">line 38666</a>
     </li></ul></dd>
     
 
@@ -781,6 +818,179 @@
 
 
         
+            
+
+    
+
+    <h4 class="name" id="transform"><span class="type-signature"></span>transform<span class="signature">(lon, lat, result)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>lon</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>lat</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>result</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Cesium.Cartesian2</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line38265">line 38265</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
     
 
     
@@ -796,13 +1006,13 @@
 </div>
 
 <nav>
-    <h2><a href="index.html">主页</a></h2><h3>命名空间</h3><ul><li><a href="Cesium.html">Cesium</a></li></ul><h3>类</h3><ul><li><h5><a href="Cesium.html">Cesium</a></h5></li><li><a href="Cesium.Path.html">Path</a></li><li><a href="Cesium.VectorRenderer.html">VectorRenderer</a></li><li><a href="Cesium.VectorStyle.html">VectorStyle</a></li><li><a href="Cesium.VectorTileImageryProvider.html">VectorTileImageryProvider</a></li></ul>
+    <h2><a href="index.html">主页</a></h2><h3>命名空间</h3><ul><li><a href="Cesium.html">Cesium</a></li></ul><h3>类</h3><ul><li><h5><a href="Cesium.html">Cesium</a></h5></li><li><a href="Cesium.Path.html">Path</a></li><li><a href="Cesium.VectorLayer.html">VectorLayer</a></li><li><a href="Cesium.VectorRenderer.html">VectorRenderer</a></li><li><a href="Cesium.VectorStyle.html">VectorStyle</a></li><li><a href="Cesium.VectorTileImageryProvider.html">VectorTileImageryProvider</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0</a> on Wed Mar 28 2018 13:05:31 GMT+0800 (中国标准时间)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sat Jul 14 2018 20:25:26 GMT+0800 (中国标准时间)
 </footer>
 
 <script> prettyPrint(); </script>

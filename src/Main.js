@@ -2,16 +2,18 @@
     'VectorRenderer/VectorLayer',
     'VectorRenderer/VectorRenderer',
     'VectorRenderer/VectorStyle',
-    'VectorTileImageryProvider/VectorTileImageryProvider' 
+    'VectorTileImageryProvider/VectorTileImageryProvider'
 ], function (
     VectorLayer,
     VectorRenderer,
     VectorStyle,
-    VectorTileImageryProvider  
+    VectorTileImageryProvider
     ) {
 
-    if (!window.Cesium ) {
+    if (typeof window!=='undefined'&&!window.Cesium) {
         window.Cesium = {};
+    } else if (typeof global !== 'undefined' && !global.Cesium) {
+        global.Cesium = {};
     }
     Cesium.VectorRenderer = VectorRenderer;
     Cesium.VectorTileImageryProvider = VectorTileImageryProvider;
