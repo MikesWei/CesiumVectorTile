@@ -142,7 +142,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line1027">line 1027</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line1028">line 1028</a>
     </li></ul></dd>
     
 
@@ -222,7 +222,7 @@ var bboxPolygon = turf.bboxPolygon(bbox);
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line7733">line 7733</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line8978">line 8978</a>
     </li></ul></dd>
     
 
@@ -240,73 +240,6 @@ var bboxPolygon = turf.bboxPolygon(bbox);
     <h5>Example</h5>
     
     <pre class="prettyprint"><code>var pt1 = turf.point([114.175329, 22.2524])var pt2 = turf.point([114.170007, 22.267969])var pt3 = turf.point([114.200649, 22.274641])var pt4 = turf.point([114.200649, 22.274641])var pt5 = turf.point([114.186744, 22.265745])var features = turf.featureCollection([pt1, pt2, pt3, pt4, pt5])var bbox = turf.bbox(features);var bboxPolygon = turf.bboxPolygon(bbox);//=bbox//=bboxPolygon</code></pre>
-
-
-
-        
-            
-<h4 class="name" id="bbox-clip"><span class="type-signature"></span>bbox-clip<span class="type-signature"></span></h4>
-
-
-
-
-<div class="description">
-    Takes a Feature and a bbox and clips the feature to the bbox using [lineclip](https://github.com/mapbox/lineclip).May result in degenerate edges when clipping Polygons.
-</div>
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line7178">line 7178</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-    <h5>Example</h5>
-    
-    <pre class="prettyprint"><code>var bbox = [0, 0, 10, 10];var poly = {  "type": "Feature",  "properties": {},  "geometry": {    "type": "Polygon",    "coordinates": [[[2, 2], [8, 4], [12, 8], [3, 7], [2, 2]]]  }}var clipped = turf.bboxClip(poly, bbox);//=clipped</code></pre>
 
 
 
@@ -357,7 +290,7 @@ May result in degenerate edges when clipping Polygons.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line472">line 472</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line473">line 473</a>
     </li></ul></dd>
     
 
@@ -387,6 +320,136 @@ var poly = {
 var clipped = turf.bboxClip(poly, bbox);
 
 //=clipped</code></pre>
+
+
+
+        
+            
+<h4 class="name" id="bbox-clip"><span class="type-signature"></span>bbox-clip<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    Takes a Feature and a bbox and clips the feature to the bbox using [lineclip](https://github.com/mapbox/lineclip).May result in degenerate edges when clipping Polygons.
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line8423">line 8423</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>var bbox = [0, 0, 10, 10];var poly = {  "type": "Feature",  "properties": {},  "geometry": {    "type": "Polygon",    "coordinates": [[[2, 2], [8, 4], [12, 8], [3, 7], [2, 2]]]  }}var clipped = turf.bboxClip(poly, bbox);//=clipped</code></pre>
+
+
+
+        
+            
+<h4 class="name" id="bearingToAzimuth"><span class="type-signature"></span>bearingToAzimuth<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    Converts any bearing angle from the north line direction (positive clockwise)
+and returns an angle between 0-360 degrees (positive clockwise), 0 being the north line
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line2127">line 2127</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
 
 
 
@@ -436,7 +499,7 @@ var clipped = turf.bboxClip(poly, bbox);
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line1250">line 1250</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line1251">line 1251</a>
     </li></ul></dd>
     
 
@@ -607,7 +670,7 @@ the centroid of a set of polygons.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line1372">line 1372</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line1373">line 1373</a>
     </li></ul></dd>
     
 
@@ -658,7 +721,8 @@ var result = {
 
 
 <div class="description">
-    Enforce expectations about types of FeatureCollection inputs for Turf.Internally this uses <a href="global.html#geojsonType">geojsonType</a> to judge geometry types.
+    Enforce expectations about types of FeatureCollection inputs for Turf.
+Internally this uses <a href="global.html#geojsonType">geojsonType</a> to judge geometry types.
 </div>
 
 
@@ -696,7 +760,7 @@ var result = {
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line7694">line 7694</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line2543">line 2543</a>
     </li></ul></dd>
     
 
@@ -759,7 +823,69 @@ Internally this uses <a href="global.html#geojsonType">geojsonType</a> to judge 
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line988">line 988</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line989">line 989</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="collectionOf"><span class="type-signature"></span>collectionOf<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    Enforce expectations about types of FeatureCollection inputs for Turf.Internally this uses <a href="global.html#geojsonType">geojsonType</a> to judge geometry types.
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line8939">line 8939</a>
     </li></ul></dd>
     
 
@@ -821,7 +947,7 @@ Internally this uses <a href="global.html#geojsonType">geojsonType</a> to judge 
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line7636">line 7636</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line2487">line 2487</a>
     </li></ul></dd>
     
 
@@ -883,7 +1009,69 @@ Internally this uses <a href="global.html#geojsonType">geojsonType</a> to judge 
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line930">line 930</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line8881">line 8881</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="containsNumber"><span class="type-signature"></span>containsNumber<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    Checks if coordinates contains a number
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line931">line 931</a>
     </li></ul></dd>
     
 
@@ -949,7 +1137,7 @@ implements a [monotone chain hull](http://en.wikibooks.org/wiki/Algorithm_Implem
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line1421">line 1421</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line1422">line 1422</a>
     </li></ul></dd>
     
 
@@ -1073,7 +1261,7 @@ var result = {
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line9560">line 9560</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line9895">line 9895</a>
     </li></ul></dd>
     
 
@@ -1140,7 +1328,7 @@ var result = {
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line3574">line 3574</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line4269">line 4269</a>
     </li></ul></dd>
     
 
@@ -1157,29 +1345,13 @@ var result = {
 
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>var features = {
-  "type": "FeatureCollection",
-  "features": [
-    {
-      "type": "Feature",
-      "properties": {},
-      "geometry": {
-        "type": "Point",
-        "coordinates": [26, 37]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {},
-      "geometry": {
-        "type": "Point",
-        "coordinates": [36, 53]
-      }
-    }
-  ]
-};
+    <pre class="prettyprint"><code>var features = turf.featureCollection([
+  turf.point([26, 37], {foo: 'bar'}),
+  turf.point([36, 53], {hello: 'world'})
+]);
+
 var coords = turf.coordAll(features);
-//=coords</code></pre>
+//= [[26, 37], [36, 53]]</code></pre>
 
 
 
@@ -1229,7 +1401,7 @@ var coords = turf.coordAll(features);
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line8650">line 8650</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line10805">line 10805</a>
     </li></ul></dd>
     
 
@@ -1296,7 +1468,7 @@ var coords = turf.coordAll(features);
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line2664">line 2664</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line3199">line 3199</a>
     </li></ul></dd>
     
 
@@ -1385,7 +1557,7 @@ var coords = turf.coordAll(features);
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line2228">line 2228</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line10363">line 10363</a>
     </li></ul></dd>
     
 
@@ -1402,30 +1574,84 @@ var coords = turf.coordAll(features);
 
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>var features = {
-  "type": "FeatureCollection",
-  "features": [
-    {
-      "type": "Feature",
-      "properties": {},
-      "geometry": {
-        "type": "Point",
-        "coordinates": [26, 37]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {},
-      "geometry": {
-        "type": "Point",
-        "coordinates": [36, 53]
-      }
-    }
-  ]
-};
-turf.coordEach(features, function (currentCoords, currentIndex) {
-  //=currentCoords
-  //=currentIndex
+    <pre class="prettyprint"><code>var features = {  "type": "FeatureCollection",  "features": [    {      "type": "Feature",      "properties": {},      "geometry": {        "type": "Point",        "coordinates": [26, 37]      }    },    {      "type": "Feature",      "properties": {},      "geometry": {        "type": "Point",        "coordinates": [36, 53]      }    }  ]};turf.coordEach(features, function (currentCoords, currentIndex) {  //=currentCoords  //=currentIndex});</code></pre>
+
+
+
+        
+            
+<h4 class="name" id="coordEach"><span class="type-signature"></span>coordEach<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    Iterate over coordinates in any GeoJSON object, similar to Array.forEach()
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line3909">line 3909</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>var features = turf.featureCollection([
+  turf.point([26, 37], {"foo": "bar"}),
+  turf.point([36, 53], {"hello": "world"})
+]);
+
+turf.coordEach(features, function (currentCoord, coordIndex, featureIndex, multiFeatureIndex, geometryIndex) {
+  //=currentCoord
+  //=coordIndex
+  //=featureIndex
+  //=multiFeatureIndex
+  //=geometryIndex
 });</code></pre>
 
 
@@ -1476,7 +1702,7 @@ turf.coordEach(features, function (currentCoords, currentIndex) {
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line9118">line 9118</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line9459">line 9459</a>
     </li></ul></dd>
     
 
@@ -1543,74 +1769,7 @@ turf.coordEach(features, function (currentCoords, currentIndex) {
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line8214">line 8214</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-    <h5>Example</h5>
-    
-    <pre class="prettyprint"><code>var features = {  "type": "FeatureCollection",  "features": [    {      "type": "Feature",      "properties": {},      "geometry": {        "type": "Point",        "coordinates": [26, 37]      }    },    {      "type": "Feature",      "properties": {},      "geometry": {        "type": "Point",        "coordinates": [36, 53]      }    }  ]};turf.coordEach(features, function (currentCoords, currentIndex) {  //=currentCoords  //=currentIndex});</code></pre>
-
-
-
-        
-            
-<h4 class="name" id="coordEach"><span class="type-signature"></span>coordEach<span class="type-signature"></span></h4>
-
-
-
-
-<div class="description">
-    Iterate over coordinates in any GeoJSON object, similar to Array.forEach()
-</div>
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line3132">line 3132</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line2763">line 2763</a>
     </li></ul></dd>
     
 
@@ -1701,74 +1860,7 @@ turf.coordEach(features, function (currentCoords, currentIndex) {
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line9246">line 9246</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-    <h5>Example</h5>
-    
-    <pre class="prettyprint"><code>var features = {  "type": "FeatureCollection",  "features": [    {      "type": "Feature",      "properties": {},      "geometry": {        "type": "Point",        "coordinates": [26, 37]      }    },    {      "type": "Feature",      "properties": {},      "geometry": {        "type": "Point",        "coordinates": [36, 53]      }    }  ]};turf.coordReduce(features, function (previousValue, currentCoords, currentIndex) {  //=previousValue  //=currentCoords  //=currentIndex  return currentCoords;});</code></pre>
-
-
-
-        
-            
-<h4 class="name" id="coordReduce"><span class="type-signature"></span>coordReduce<span class="type-signature"></span></h4>
-
-
-
-
-<div class="description">
-    Reduce coordinates in any GeoJSON object, similar to Array.reduce()
-</div>
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line2355">line 2355</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line2890">line 2890</a>
     </li></ul></dd>
     
 
@@ -1861,7 +1953,87 @@ turf.coordReduce(features, function (previousValue, currentCoords, currentIndex)
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line8341">line 8341</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line4053">line 4053</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>var features = turf.featureCollection([
+  turf.point([26, 37], {"foo": "bar"}),
+  turf.point([36, 53], {"hello": "world"})
+]);
+
+turf.coordReduce(features, function (previousValue, currentCoord, coordIndex, featureIndex, multiFeatureIndex, geometryIndex) {
+  //=previousValue
+  //=currentCoord
+  //=coordIndex
+  //=featureIndex
+  //=multiFeatureIndex
+  //=geometryIndex
+  return currentCoord;
+});</code></pre>
+
+
+
+        
+            
+<h4 class="name" id="coordReduce"><span class="type-signature"></span>coordReduce<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    Reduce coordinates in any GeoJSON object, similar to Array.reduce()
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line10491">line 10491</a>
     </li></ul></dd>
     
 
@@ -1928,7 +2100,7 @@ turf.coordReduce(features, function (previousValue, currentCoords, currentIndex)
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line3260">line 3260</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line9586">line 9586</a>
     </li></ul></dd>
     
 
@@ -1945,45 +2117,19 @@ turf.coordReduce(features, function (previousValue, currentCoords, currentIndex)
 
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>var features = {
-  "type": "FeatureCollection",
-  "features": [
-    {
-      "type": "Feature",
-      "properties": {},
-      "geometry": {
-        "type": "Point",
-        "coordinates": [26, 37]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {},
-      "geometry": {
-        "type": "Point",
-        "coordinates": [36, 53]
-      }
-    }
-  ]
-};
-turf.coordReduce(features, function (previousValue, currentCoords, currentIndex) {
-  //=previousValue
-  //=currentCoords
-  //=currentIndex
-  return currentCoords;
-});</code></pre>
+    <pre class="prettyprint"><code>var features = {  "type": "FeatureCollection",  "features": [    {      "type": "Feature",      "properties": {},      "geometry": {        "type": "Point",        "coordinates": [26, 37]      }    },    {      "type": "Feature",      "properties": {},      "geometry": {        "type": "Point",        "coordinates": [36, 53]      }    }  ]};turf.coordReduce(features, function (previousValue, currentCoords, currentIndex) {  //=previousValue  //=currentCoords  //=currentIndex  return currentCoords;});</code></pre>
 
 
 
         
             
-<h4 class="name" id="distanceToDegrees"><span class="type-signature"></span>distanceToDegrees<span class="type-signature"></span></h4>
+<h4 class="name" id="degreesToRadians"><span class="type-signature"></span>degreesToRadians<span class="type-signature"></span></h4>
 
 
 
 
 <div class="description">
-    Convert a distance measurement from a real-world unit into degrees
+    Converts an angle in degrees to radians
 </div>
 
 
@@ -2021,7 +2167,7 @@ turf.coordReduce(features, function (previousValue, currentCoords, currentIndex)
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line7552">line 7552</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line2157">line 2157</a>
     </li></ul></dd>
     
 
@@ -2083,7 +2229,69 @@ turf.coordReduce(features, function (previousValue, currentCoords, currentIndex)
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line846">line 846</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line847">line 847</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="distanceToDegrees"><span class="type-signature"></span>distanceToDegrees<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    Convert a distance measurement from a real-world unit into degrees
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line8797">line 8797</a>
     </li></ul></dd>
     
 
@@ -2145,7 +2353,7 @@ turf.coordReduce(features, function (previousValue, currentCoords, currentIndex)
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line831">line 831</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line8782">line 8782</a>
     </li></ul></dd>
     
 
@@ -2207,7 +2415,7 @@ turf.coordReduce(features, function (previousValue, currentCoords, currentIndex)
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line7537">line 7537</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line832">line 832</a>
     </li></ul></dd>
     
 
@@ -2270,7 +2478,7 @@ points.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line1519">line 1519</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line1520">line 1520</a>
     </li></ul></dd>
     
 
@@ -2358,7 +2566,7 @@ var points = turf.explode(poly);
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line540">line 540</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line541">line 541</a>
     </li></ul></dd>
     
 
@@ -2435,7 +2643,7 @@ var feature = turf.feature(geometry);
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line7767">line 7767</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line9012">line 9012</a>
     </li></ul></dd>
     
 
@@ -2502,7 +2710,74 @@ var feature = turf.feature(geometry);
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line1568">line 1568</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line8491">line 8491</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>var geometry = {     "type": "Point",     "coordinates": [       67.5,       32.84267363195431     ]   }var feature = turf.feature(geometry);//=feature</code></pre>
+
+
+
+        
+            
+<h4 class="name" id="feature"><span class="type-signature"></span>feature<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    Wraps a GeoJSON Geometry in a GeoJSON Feature.
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line1639">line 1639</a>
     </li></ul></dd>
     
 
@@ -2520,12 +2795,9 @@ var feature = turf.feature(geometry);
     <h5>Example</h5>
     
     <pre class="prettyprint"><code>var geometry = {
-     "type": "Point",
-     "coordinates": [
-       67.5,
-       32.84267363195431
-     ]
-   }
+  "type": "Point",
+  "coordinates": [110, 50]
+};
 
 var feature = turf.feature(geometry);
 
@@ -2535,13 +2807,13 @@ var feature = turf.feature(geometry);
 
         
             
-<h4 class="name" id="feature"><span class="type-signature"></span>feature<span class="type-signature"></span></h4>
+<h4 class="name" id="featureCollection"><span class="type-signature"></span>featureCollection<span class="type-signature"></span></h4>
 
 
 
 
 <div class="description">
-    Wraps a GeoJSON Geometry in a GeoJSON Feature.
+    Takes one or more Features and creates a FeatureCollection.
 </div>
 
 
@@ -2579,7 +2851,7 @@ var feature = turf.feature(geometry);
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line7246">line 7246</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line1902">line 1902</a>
     </li></ul></dd>
     
 
@@ -2596,7 +2868,17 @@ var feature = turf.feature(geometry);
 
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>var geometry = {     "type": "Point",     "coordinates": [       67.5,       32.84267363195431     ]   }var feature = turf.feature(geometry);//=feature</code></pre>
+    <pre class="prettyprint"><code>var locationA = turf.point([-75.343, 39.984], {name: 'Location A'});
+var locationB = turf.point([-75.833, 39.284], {name: 'Location B'});
+var locationC = turf.point([-75.534, 39.123], {name: 'Location C'});
+
+var collection = turf.featureCollection([
+  locationA,
+  locationB,
+  locationC
+]);
+
+//=collection</code></pre>
 
 
 
@@ -2646,7 +2928,7 @@ var feature = turf.feature(geometry);
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line7379">line 7379</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line8624">line 8624</a>
     </li></ul></dd>
     
 
@@ -2713,7 +2995,7 @@ var feature = turf.feature(geometry);
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line673">line 673</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line674">line 674</a>
     </li></ul></dd>
     
 
@@ -2788,82 +3070,7 @@ var fc = turf.featureCollection(features);
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line1702">line 1702</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-    <h5>Example</h5>
-    
-    <pre class="prettyprint"><code>var features = [
- turf.point([-75.343, 39.984], {name: 'Location A'}),
- turf.point([-75.833, 39.284], {name: 'Location B'}),
- turf.point([-75.534, 39.123], {name: 'Location C'})
-];
-
-var fc = turf.featureCollection(features);
-
-//=fc</code></pre>
-
-
-
-        
-            
-<h4 class="name" id="featureCollection"><span class="type-signature"></span>featureCollection<span class="type-signature"></span></h4>
-
-
-
-
-<div class="description">
-    Takes one or more Features and creates a FeatureCollection.
-</div>
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line7901">line 7901</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line9146">line 9146</a>
     </li></ul></dd>
     
 
@@ -2881,73 +3088,6 @@ var fc = turf.featureCollection(features);
     <h5>Example</h5>
     
     <pre class="prettyprint"><code>var features = [ turf.point([-75.343, 39.984], {name: 'Location A'}), turf.point([-75.833, 39.284], {name: 'Location B'}), turf.point([-75.534, 39.123], {name: 'Location C'})];var fc = turf.featureCollection(features);//=fc</code></pre>
-
-
-
-        
-            
-<h4 class="name" id="featureEach"><span class="type-signature"></span>featureEach<span class="type-signature"></span></h4>
-
-
-
-
-<div class="description">
-    Iterate over features in any GeoJSON object, similar toArray.forEach.
-</div>
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line9442">line 9442</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-    <h5>Example</h5>
-    
-    <pre class="prettyprint"><code>var features = {  "type": "FeatureCollection",  "features": [    {      "type": "Feature",      "properties": {},      "geometry": {        "type": "Point",        "coordinates": [26, 37]      }    },    {      "type": "Feature",      "properties": {},      "geometry": {        "type": "Point",        "coordinates": [36, 53]      }    }  ]};turf.featureEach(features, function (currentFeature, currentIndex) {  //=currentFeature  //=currentIndex});</code></pre>
 
 
 
@@ -2998,7 +3138,7 @@ Array.forEach.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line2548">line 2548</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line3083">line 3083</a>
     </li></ul></dd>
     
 
@@ -3089,7 +3229,74 @@ turf.featureEach(features, function (currentFeature, currentIndex) {
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line8534">line 8534</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line10687">line 10687</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>var features = {  "type": "FeatureCollection",  "features": [    {      "type": "Feature",      "properties": {},      "geometry": {        "type": "Point",        "coordinates": [26, 37]      }    },    {      "type": "Feature",      "properties": {},      "geometry": {        "type": "Point",        "coordinates": [36, 53]      }    }  ]};turf.featureEach(features, function (currentFeature, currentIndex) {  //=currentFeature  //=currentIndex});</code></pre>
+
+
+
+        
+            
+<h4 class="name" id="featureEach"><span class="type-signature"></span>featureEach<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    Iterate over features in any GeoJSON object, similar toArray.forEach.
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line9779">line 9779</a>
     </li></ul></dd>
     
 
@@ -3157,7 +3364,7 @@ Array.forEach.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line3456">line 3456</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line4189">line 4189</a>
     </li></ul></dd>
     
 
@@ -3174,30 +3381,14 @@ Array.forEach.
 
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>var features = {
-  "type": "FeatureCollection",
-  "features": [
-    {
-      "type": "Feature",
-      "properties": {},
-      "geometry": {
-        "type": "Point",
-        "coordinates": [26, 37]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {},
-      "geometry": {
-        "type": "Point",
-        "coordinates": [36, 53]
-      }
-    }
-  ]
-};
-turf.featureEach(features, function (currentFeature, currentIndex) {
+    <pre class="prettyprint"><code>var features = turf.featureCollection([
+  turf.point([26, 37], {foo: 'bar'}),
+  turf.point([36, 53], {hello: 'world'})
+]);
+
+turf.featureEach(features, function (currentFeature, featureIndex) {
   //=currentFeature
-  //=currentIndex
+  //=featureIndex
 });</code></pre>
 
 
@@ -3249,7 +3440,7 @@ Internally this uses <a href="global.html#geojsonType">geojsonType</a> to judge 
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line967">line 967</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line968">line 968</a>
     </li></ul></dd>
     
 
@@ -3311,7 +3502,70 @@ Internally this uses <a href="global.html#geojsonType">geojsonType</a> to judge 
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line7673">line 7673</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line8918">line 8918</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="featureOf"><span class="type-signature"></span>featureOf<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    Enforce expectations about types of Feature inputs for Turf.
+Internally this uses <a href="global.html#geojsonType">geojsonType</a> to judge geometry types.
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line2522">line 2522</a>
     </li></ul></dd>
     
 
@@ -3373,7 +3627,7 @@ Internally this uses <a href="global.html#geojsonType">geojsonType</a> to judge 
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line3524">line 3524</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line4239">line 4239</a>
     </li></ul></dd>
     
 
@@ -3390,31 +3644,15 @@ Internally this uses <a href="global.html#geojsonType">geojsonType</a> to judge 
 
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>var features = {
-  "type": "FeatureCollection",
-  "features": [
-    {
-      "type": "Feature",
-      "properties": {"foo": "bar"},
-      "geometry": {
-        "type": "Point",
-        "coordinates": [26, 37]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {"hello": "world"},
-      "geometry": {
-        "type": "Point",
-        "coordinates": [36, 53]
-      }
-    }
-  ]
-};
-turf.featureReduce(features, function (previousValue, currentFeature, currentIndex) {
+    <pre class="prettyprint"><code>var features = turf.featureCollection([
+  turf.point([26, 37], {"foo": "bar"}),
+  turf.point([36, 53], {"hello": "world"})
+]);
+
+turf.featureReduce(features, function (previousValue, currentFeature, featureIndex) {
   //=previousValue
   //=currentFeature
-  //=currentIndex
+  //=featureIndex
   return currentFeature
 });</code></pre>
 
@@ -3466,100 +3704,7 @@ turf.featureReduce(features, function (previousValue, currentFeature, currentInd
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line2615">line 2615</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-    <h5>Example</h5>
-    
-    <pre class="prettyprint"><code>var features = {
-  "type": "FeatureCollection",
-  "features": [
-    {
-      "type": "Feature",
-      "properties": {"foo": "bar"},
-      "geometry": {
-        "type": "Point",
-        "coordinates": [26, 37]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {"hello": "world"},
-      "geometry": {
-        "type": "Point",
-        "coordinates": [36, 53]
-      }
-    }
-  ]
-};
-turf.featureReduce(features, function (previousValue, currentFeature, currentIndex) {
-  //=previousValue
-  //=currentFeature
-  //=currentIndex
-  return currentFeature
-});</code></pre>
-
-
-
-        
-            
-<h4 class="name" id="featureReduce"><span class="type-signature"></span>featureReduce<span class="type-signature"></span></h4>
-
-
-
-
-<div class="description">
-    Reduce features in any GeoJSON object, similar to Array.reduce().
-</div>
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line8601">line 8601</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line10755">line 10755</a>
     </li></ul></dd>
     
 
@@ -3626,7 +3771,100 @@ turf.featureReduce(features, function (previousValue, currentFeature, currentInd
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line9510">line 9510</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line3150">line 3150</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>var features = {
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {"foo": "bar"},
+      "geometry": {
+        "type": "Point",
+        "coordinates": [26, 37]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {"hello": "world"},
+      "geometry": {
+        "type": "Point",
+        "coordinates": [36, 53]
+      }
+    }
+  ]
+};
+turf.featureReduce(features, function (previousValue, currentFeature, currentIndex) {
+  //=previousValue
+  //=currentFeature
+  //=currentIndex
+  return currentFeature
+});</code></pre>
+
+
+
+        
+            
+<h4 class="name" id="featureReduce"><span class="type-signature"></span>featureReduce<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    Reduce features in any GeoJSON object, similar to Array.reduce().
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line9846">line 9846</a>
     </li></ul></dd>
     
 
@@ -3693,7 +3931,7 @@ turf.featureReduce(features, function (previousValue, currentFeature, currentInd
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line8959">line 8959</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line10204">line 10204</a>
     </li></ul></dd>
     
 
@@ -3760,7 +3998,7 @@ turf.featureReduce(features, function (previousValue, currentFeature, currentInd
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line2973">line 2973</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line3743">line 3743</a>
     </li></ul></dd>
     
 
@@ -3794,6 +4032,161 @@ var flattened = turf.flatten(geometry);
 
         
             
+<h4 class="name" id="flattenEach"><span class="type-signature"></span>flattenEach<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    Iterate over flattened features in any GeoJSON object, similar to
+Array.forEach.
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line4461">line 4461</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>var features = turf.featureCollection([
+    turf.point([26, 37], {foo: 'bar'}),
+    turf.multiPoint([[40, 30], [36, 53]], {hello: 'world'})
+]);
+
+turf.flattenEach(features, function (currentFeature, featureIndex, multiFeatureIndex) {
+  //=currentFeature
+  //=featureIndex
+  //=multiFeatureIndex
+});</code></pre>
+
+
+
+        
+            
+<h4 class="name" id="flattenReduce"><span class="type-signature"></span>flattenReduce<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    Reduce flattened features in any GeoJSON object, similar to Array.reduce().
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line4541">line 4541</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>var features = turf.featureCollection([
+    turf.point([26, 37], {foo: 'bar'}),
+    turf.multiPoint([[40, 30], [36, 53]], {hello: 'world'})
+]);
+
+turf.flattenReduce(features, function (previousValue, currentFeature, featureIndex, multiFeatureIndex) {
+  //=previousValue
+  //=currentFeature
+  //=featureIndex
+  //=multiFeatureIndex
+  return currentFeature
+});</code></pre>
+
+
+
+        
+            
 <h4 class="name" id="geojsonType"><span class="type-signature"></span>geojsonType<span class="type-signature"></span></h4>
 
 
@@ -3838,7 +4231,7 @@ var flattened = turf.flatten(geometry);
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line950">line 950</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line951">line 951</a>
     </li></ul></dd>
     
 
@@ -3900,7 +4293,69 @@ var flattened = turf.flatten(geometry);
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line7656">line 7656</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line2505">line 2505</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="geojsonType"><span class="type-signature"></span>geojsonType<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    Enforce expectations about types of GeoJSON objects for Turf.
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line8901">line 8901</a>
     </li></ul></dd>
     
 
@@ -3962,7 +4417,7 @@ var flattened = turf.flatten(geometry);
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line2703">line 2703</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line3238">line 3238</a>
     </li></ul></dd>
     
 
@@ -4053,7 +4508,7 @@ turf.geomEach(features, function (currentGeometry, currentIndex) {
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line3614">line 3614</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line4303">line 4303</a>
     </li></ul></dd>
     
 
@@ -4070,30 +4525,17 @@ turf.geomEach(features, function (currentGeometry, currentIndex) {
 
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>var features = {
-  "type": "FeatureCollection",
-  "features": [
-    {
-      "type": "Feature",
-      "properties": {},
-      "geometry": {
-        "type": "Point",
-        "coordinates": [26, 37]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {},
-      "geometry": {
-        "type": "Point",
-        "coordinates": [36, 53]
-      }
-    }
-  ]
-};
-turf.geomEach(features, function (currentGeometry, currentIndex) {
+    <pre class="prettyprint"><code>var features = turf.featureCollection([
+    turf.point([26, 37], {foo: 'bar'}),
+    turf.point([36, 53], {hello: 'world'})
+]);
+
+turf.geomEach(features, function (currentGeometry, featureIndex, featureProperties, featureBBox, featureId) {
   //=currentGeometry
-  //=currentIndex
+  //=featureIndex
+  //=featureProperties
+  //=featureBBox
+  //=featureId
 });</code></pre>
 
 
@@ -4144,7 +4586,7 @@ turf.geomEach(features, function (currentGeometry, currentIndex) {
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line8689">line 8689</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line9934">line 9934</a>
     </li></ul></dd>
     
 
@@ -4211,7 +4653,7 @@ turf.geomEach(features, function (currentGeometry, currentIndex) {
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line9600">line 9600</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line10845">line 10845</a>
     </li></ul></dd>
     
 
@@ -4234,6 +4676,79 @@ turf.geomEach(features, function (currentGeometry, currentIndex) {
 
         
             
+<h4 class="name" id="geometry"><span class="type-signature"></span>geometry<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    Creates a GeoJSON Geometry from a Geometry string type & coordinates.
+For GeometryCollection type use `helpers.geometryCollection`
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line1681">line 1681</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>var type = 'Point';
+var coordinates = [110, 50];
+
+var geometry = turf.geometry(type, coordinates);
+
+//=geometry</code></pre>
+
+
+
+        
+            
 <h4 class="name" id="geometryCollection"><span class="type-signature"></span>geometryCollection<span class="type-signature"></span></h4>
 
 
@@ -4279,7 +4794,7 @@ coordinate array. Properties can be added optionally.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line772">line 772</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line2024">line 2024</a>
     </li></ul></dd>
     
 
@@ -4356,7 +4871,7 @@ var collection = turf.geometryCollection([pt, line]);
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line7478">line 7478</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line8723">line 8723</a>
     </li></ul></dd>
     
 
@@ -4424,7 +4939,7 @@ coordinate array. Properties can be added optionally.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line1801">line 1801</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line773">line 773</a>
     </li></ul></dd>
     
 
@@ -4501,7 +5016,7 @@ var collection = turf.geometryCollection([pt, line]);
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line8000">line 8000</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line9245">line 9245</a>
     </li></ul></dd>
     
 
@@ -4568,7 +5083,7 @@ var collection = turf.geometryCollection([pt, line]);
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line9709">line 9709</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line10042">line 10042</a>
     </li></ul></dd>
     
 
@@ -4635,74 +5150,7 @@ var collection = turf.geometryCollection([pt, line]);
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line8797">line 8797</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-    <h5>Example</h5>
-    
-    <pre class="prettyprint"><code>var features = {  "type": "FeatureCollection",  "features": [    {      "type": "Feature",      "properties": {"foo": "bar"},      "geometry": {        "type": "Point",        "coordinates": [26, 37]      }    },    {      "type": "Feature",      "properties": {"hello": "world"},      "geometry": {        "type": "Point",        "coordinates": [36, 53]      }    }  ]};turf.geomReduce(features, function (previousValue, currentGeometry, currentIndex) {  //=previousValue  //=currentGeometry  //=currentIndex  return currentGeometry});</code></pre>
-
-
-
-        
-            
-<h4 class="name" id="geomReduce"><span class="type-signature"></span>geomReduce<span class="type-signature"></span></h4>
-
-
-
-
-<div class="description">
-    Reduce geometry in any GeoJSON object, similar to Array.reduce().
-</div>
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line2811">line 2811</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line3346">line 3346</a>
     </li></ul></dd>
     
 
@@ -4795,7 +5243,7 @@ turf.geomReduce(features, function (previousValue, currentGeometry, currentIndex
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line3723">line 3723</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line4419">line 4419</a>
     </li></ul></dd>
     
 
@@ -4812,31 +5260,18 @@ turf.geomReduce(features, function (previousValue, currentGeometry, currentIndex
 
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>var features = {
-  "type": "FeatureCollection",
-  "features": [
-    {
-      "type": "Feature",
-      "properties": {"foo": "bar"},
-      "geometry": {
-        "type": "Point",
-        "coordinates": [26, 37]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {"hello": "world"},
-      "geometry": {
-        "type": "Point",
-        "coordinates": [36, 53]
-      }
-    }
-  ]
-};
-turf.geomReduce(features, function (previousValue, currentGeometry, currentIndex) {
+    <pre class="prettyprint"><code>var features = turf.featureCollection([
+    turf.point([26, 37], {foo: 'bar'}),
+    turf.point([36, 53], {hello: 'world'})
+]);
+
+turf.geomReduce(features, function (previousValue, currentGeometry, featureIndex, featureProperties, featureBBox, featureId) {
   //=previousValue
   //=currentGeometry
-  //=currentIndex
+  //=featureIndex
+  //=featureProperties
+  //=featureBBox
+  //=featureId
   return currentGeometry
 });</code></pre>
 
@@ -4844,6 +5279,73 @@ turf.geomReduce(features, function (previousValue, currentGeometry, currentIndex
 
         
             
+<h4 class="name" id="geomReduce"><span class="type-signature"></span>geomReduce<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    Reduce geometry in any GeoJSON object, similar to Array.reduce().
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line10954">line 10954</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>var features = {  "type": "FeatureCollection",  "features": [    {      "type": "Feature",      "properties": {"foo": "bar"},      "geometry": {        "type": "Point",        "coordinates": [26, 37]      }    },    {      "type": "Feature",      "properties": {"hello": "world"},      "geometry": {        "type": "Point",        "coordinates": [36, 53]      }    }  ]};turf.geomReduce(features, function (previousValue, currentGeometry, currentIndex) {  //=previousValue  //=currentGeometry  //=currentIndex  return currentGeometry});</code></pre>
+
+
+
+        
+            
 <h4 class="name" id="getCoord"><span class="type-signature"></span>getCoord<span class="type-signature"></span></h4>
 
 
@@ -4888,7 +5390,7 @@ turf.geomReduce(features, function (previousValue, currentGeometry, currentIndex
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line7583">line 7583</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line878">line 878</a>
     </li></ul></dd>
     
 
@@ -4950,7 +5452,209 @@ turf.geomReduce(features, function (previousValue, currentGeometry, currentIndex
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line877">line 877</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line8828">line 8828</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="getCoord"><span class="type-signature"></span>getCoord<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    Unwrap a coordinate from a Point Feature, Geometry or a single coordinate.
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line2439">line 2439</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>var pt = turf.point([10, 10]);
+
+var coord = turf.getCoord(pt);
+//= [10, 10]</code></pre>
+
+
+
+        
+            
+<h4 class="name" id="getCoords"><span class="type-signature"></span>getCoords<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    Unwrap coordinates from a Feature, Geometry Object or an Array
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line2460">line 2460</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>var poly = turf.polygon([[[119.32, -8.7], [119.55, -8.69], [119.51, -8.54], [119.32, -8.7]]]);
+
+var coords = turf.getCoords(poly);
+//= [[[119.32, -8.7], [119.55, -8.69], [119.51, -8.54], [119.32, -8.7]]]</code></pre>
+
+
+
+        
+            
+<h4 class="name" id="getCoords"><span class="type-signature"></span>getCoords<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    Unwrap coordinates from a Feature, Geometry Object or an Array of numbers
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line900">line 900</a>
     </li></ul></dd>
     
 
@@ -5012,69 +5716,7 @@ turf.geomReduce(features, function (previousValue, currentGeometry, currentIndex
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line7605">line 7605</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-        
-            
-<h4 class="name" id="getCoords"><span class="type-signature"></span>getCoords<span class="type-signature"></span></h4>
-
-
-
-
-<div class="description">
-    Unwrap coordinates from a Feature, Geometry Object or an Array of numbers
-</div>
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line899">line 899</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line8850">line 8850</a>
     </li></ul></dd>
     
 
@@ -5137,7 +5779,7 @@ be convex or concave. The function accounts for holes.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line1900">line 1900</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line2368">line 2368</a>
     </li></ul></dd>
     
 
@@ -5171,13 +5813,14 @@ var isInside = turf.inside(pt, poly);
 
         
             
-<h4 class="name" id="lineIntersect"><span class="type-signature"></span>lineIntersect<span class="type-signature"></span></h4>
+<h4 class="name" id="lengthToDegrees"><span class="type-signature"></span>lengthToDegrees<span class="type-signature"></span></h4>
 
 
 
 
 <div class="description">
-    Takes any LineString or Polygon GeoJSON and returns the intersecting point(s).
+    Convert a distance measurement (assuming a spherical Earth) from a real-world unit into degrees
+Valid units: miles, nauticalmiles, inches, yards, meters, metres, centimeters, kilometres, feet
 </div>
 
 
@@ -5215,7 +5858,133 @@ var isInside = turf.inside(pt, poly);
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line8102">line 8102</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line2114">line 2114</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="lengthToRadians"><span class="type-signature"></span>lengthToRadians<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    Convert a distance measurement (assuming a spherical Earth) from a real-world unit into radians
+Valid units: miles, nauticalmiles, inches, yards, meters, metres, kilometers, centimeters, feet
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line2096">line 2096</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="lineEach"><span class="type-signature"></span>lineEach<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    Iterate over line or ring coordinates in LineString, Polygon, MultiLineString, MultiPolygon Features or Geometries,
+similar to Array.forEach.
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line4709">line 4709</a>
     </li></ul></dd>
     
 
@@ -5232,7 +6001,17 @@ var isInside = turf.inside(pt, poly);
 
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>var line1 = {  "type": "Feature",  "properties": {},  "geometry": {    "type": "LineString",    "coordinates": [[126, -11], [129, -21]]  }};var line2 = {  "type": "Feature",  "properties": {},  "geometry": {    "type": "LineString",    "coordinates": [[123, -18], [131, -14]]  }};var points = turf.lineIntersect(line1, line2);//= points</code></pre>
+    <pre class="prettyprint"><code>var multiLine = turf.multiLineString([
+  [[26, 37], [35, 45]],
+  [[36, 53], [38, 50], [41, 55]]
+]);
+
+turf.lineEach(multiLine, function (currentLine, featureIndex, multiFeatureIndex, geometryIndex) {
+  //=currentLine
+  //=featureIndex
+  //=multiFeatureIndex
+  //=geometryIndex
+});</code></pre>
 
 
 
@@ -5282,7 +6061,7 @@ var isInside = turf.inside(pt, poly);
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line2116">line 2116</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line2651">line 2651</a>
     </li></ul></dd>
     
 
@@ -5317,6 +6096,225 @@ var line2 = {
 };
 var points = turf.lineIntersect(line1, line2);
 //= points</code></pre>
+
+
+
+        
+            
+<h4 class="name" id="lineIntersect"><span class="type-signature"></span>lineIntersect<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    Takes any LineString or Polygon GeoJSON and returns the intersecting point(s).
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line9347">line 9347</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>var line1 = {  "type": "Feature",  "properties": {},  "geometry": {    "type": "LineString",    "coordinates": [[126, -11], [129, -21]]  }};var line2 = {  "type": "Feature",  "properties": {},  "geometry": {    "type": "LineString",    "coordinates": [[123, -18], [131, -14]]  }};var points = turf.lineIntersect(line1, line2);//= points</code></pre>
+
+
+
+        
+            
+<h4 class="name" id="lineOffset"><span class="type-signature"></span>lineOffset<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    Takes a line and returns a line at offset by the specified distance.
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line3530">line 3530</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>var line = turf.lineString([[-83, 30], [-84, 36], [-78, 41]], { "stroke": "#F00" });
+
+var offsetLine = turf.lineOffset(line, 2, {units: 'miles'});
+
+//addToMap
+var addToMap = [offsetLine, line]
+offsetLine.properties.stroke = "#00F"</code></pre>
+
+
+
+        
+            
+<h4 class="name" id="lineReduce"><span class="type-signature"></span>lineReduce<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    Reduce features in any GeoJSON object, similar to Array.reduce().
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line4773">line 4773</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>var multiPoly = turf.multiPolygon([
+  turf.polygon([[[12,48],[2,41],[24,38],[12,48]], [[9,44],[13,41],[13,45],[9,44]]]),
+  turf.polygon([[[5, 5], [0, 0], [2, 2], [4, 4], [5, 5]]])
+]);
+
+turf.lineReduce(multiPoly, function (previousValue, currentLine, featureIndex, multiFeatureIndex, geometryIndex) {
+  //=previousValue
+  //=currentLine
+  //=featureIndex
+  //=multiFeatureIndex
+  //=geometryIndex
+  return currentLine
+});</code></pre>
 
 
 
@@ -5366,7 +6364,7 @@ var points = turf.lineIntersect(line1, line2);
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line2879">line 2879</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line3649">line 3649</a>
     </li></ul></dd>
     
 
@@ -5442,7 +6440,7 @@ var segments = turf.lineSegment(polygon);
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line8865">line 8865</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line10110">line 10110</a>
     </li></ul></dd>
     
 
@@ -5471,6 +6469,89 @@ var segments = turf.lineSegment(polygon);
 
 
 <div class="description">
+    Creates a LineString based on a
+coordinate array. Properties can be added optionally.
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line638">line 638</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>var linestring1 = turf.lineString([
+  [-21.964416, 64.148203],
+  [-21.956176, 64.141316],
+  [-21.93901, 64.135924],
+  [-21.927337, 64.136673]
+]);
+var linestring2 = turf.lineString([
+  [-21.929054, 64.127985],
+  [-21.912918, 64.134726],
+  [-21.916007, 64.141016],
+  [-21.930084, 64.14446]
+], {name: 'line 1', distance: 145});
+
+//=linestring1
+
+//=linestring2</code></pre>
+
+
+
+        
+            
+<h4 class="name" id="lineString"><span class="type-signature"></span>lineString<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
     Creates a LineString based on acoordinate array. Properties can be added optionally.
 </div>
 
@@ -5509,7 +6590,7 @@ var segments = turf.lineSegment(polygon);
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line7865">line 7865</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line9110">line 9110</a>
     </li></ul></dd>
     
 
@@ -5576,7 +6657,7 @@ var segments = turf.lineSegment(polygon);
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line7343">line 7343</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line8588">line 8588</a>
     </li></ul></dd>
     
 
@@ -5605,8 +6686,7 @@ var segments = turf.lineSegment(polygon);
 
 
 <div class="description">
-    Creates a LineString based on a
-coordinate array. Properties can be added optionally.
+    Creates a LineString Feature from an Array of Positions.
 </div>
 
 
@@ -5644,7 +6724,7 @@ coordinate array. Properties can be added optionally.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line1666">line 1666</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line1846">line 1846</a>
     </li></ul></dd>
     
 
@@ -5661,35 +6741,23 @@ coordinate array. Properties can be added optionally.
 
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>var linestring1 = turf.lineString([
-  [-21.964416, 64.148203],
-  [-21.956176, 64.141316],
-  [-21.93901, 64.135924],
-  [-21.927337, 64.136673]
-]);
-var linestring2 = turf.lineString([
-  [-21.929054, 64.127985],
-  [-21.912918, 64.134726],
-  [-21.916007, 64.141016],
-  [-21.930084, 64.14446]
-], {name: 'line 1', distance: 145});
+    <pre class="prettyprint"><code>var linestring1 = turf.lineString([[-24, 63], [-23, 60], [-25, 65], [-20, 69]], {name: 'line 1'});
+var linestring2 = turf.lineString([[-14, 43], [-13, 40], [-15, 45], [-10, 49]], {name: 'line 2'});
 
 //=linestring1
-
 //=linestring2</code></pre>
 
 
 
         
             
-<h4 class="name" id="lineString"><span class="type-signature"></span>lineString<span class="type-signature"></span></h4>
+<h4 class="name" id="lineStrings"><span class="type-signature"></span>lineStrings<span class="type-signature"></span></h4>
 
 
 
 
 <div class="description">
-    Creates a LineString based on a
-coordinate array. Properties can be added optionally.
+    Creates a LineString FeatureCollection from an Array of LineString coordinates.
 </div>
 
 
@@ -5727,7 +6795,7 @@ coordinate array. Properties can be added optionally.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line637">line 637</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line1875">line 1875</a>
     </li></ul></dd>
     
 
@@ -5744,89 +6812,12 @@ coordinate array. Properties can be added optionally.
 
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>var linestring1 = turf.lineString([
-  [-21.964416, 64.148203],
-  [-21.956176, 64.141316],
-  [-21.93901, 64.135924],
-  [-21.927337, 64.136673]
+    <pre class="prettyprint"><code>var linestrings = turf.lineStrings([
+  [[-24, 63], [-23, 60], [-25, 65], [-20, 69]],
+  [[-14, 43], [-13, 40], [-15, 45], [-10, 49]]
 ]);
-var linestring2 = turf.lineString([
-  [-21.929054, 64.127985],
-  [-21.912918, 64.134726],
-  [-21.916007, 64.141016],
-  [-21.930084, 64.14446]
-], {name: 'line 1', distance: 145});
 
-//=linestring1
-
-//=linestring2</code></pre>
-
-
-
-        
-            
-<h4 class="name" id="multiLineString"><span class="type-signature"></span>multiLineString<span class="type-signature"></span></h4>
-
-
-
-
-<div class="description">
-    Creates a Feature.&lt;MultiLineString> based on acoordinate array. Properties can be added optionally.
-</div>
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line7405">line 7405</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-    <h5>Example</h5>
-    
-    <pre class="prettyprint"><code>var multiLine = turf.multiLineString([[[0,0],[10,10]]]);//=multiLine</code></pre>
+//=linestrings</code></pre>
 
 
 
@@ -5877,77 +6868,7 @@ coordinate array. Properties can be added optionally.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line1728">line 1728</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-    <h5>Example</h5>
-    
-    <pre class="prettyprint"><code>var multiLine = turf.multiLineString([[[0,0],[10,10]]]);
-
-//=multiLine</code></pre>
-
-
-
-        
-            
-<h4 class="name" id="multiLineString"><span class="type-signature"></span>multiLineString<span class="type-signature"></span></h4>
-
-
-
-
-<div class="description">
-    Creates a Feature.&lt;MultiLineString> based on a
-coordinate array. Properties can be added optionally.
-</div>
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line699">line 699</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line700">line 700</a>
     </li></ul></dd>
     
 
@@ -6016,7 +6937,144 @@ coordinate array. Properties can be added optionally.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line7927">line 7927</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line8650">line 8650</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>var multiLine = turf.multiLineString([[[0,0],[10,10]]]);//=multiLine</code></pre>
+
+
+
+        
+            
+<h4 class="name" id="multiLineString"><span class="type-signature"></span>multiLineString<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    Creates a Feature.&lt;MultiLineString> based on a
+coordinate array. Properties can be added optionally.
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line1945">line 1945</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>var multiLine = turf.multiLineString([[[0,0],[10,10]]]);
+
+//=multiLine</code></pre>
+
+
+
+        
+            
+<h4 class="name" id="multiLineString"><span class="type-signature"></span>multiLineString<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    Creates a Feature.&lt;MultiLineString> based on acoordinate array. Properties can be added optionally.
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line9172">line 9172</a>
     </li></ul></dd>
     
 
@@ -6084,7 +7142,7 @@ coordinate array. Properties can be added optionally.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line1752">line 1752</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line724">line 724</a>
     </li></ul></dd>
     
 
@@ -6153,7 +7211,74 @@ coordinate array. Properties can be added optionally.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line7429">line 7429</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line8674">line 8674</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>var multiPt = turf.multiPoint([[0,0],[10,10]]);//=multiPt</code></pre>
+
+
+
+        
+            
+<h4 class="name" id="multiPoint"><span class="type-signature"></span>multiPoint<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    Creates a Feature.&lt;MultiPoint> based on acoordinate array. Properties can be added optionally.
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line9196">line 9196</a>
     </li></ul></dd>
     
 
@@ -6221,7 +7346,7 @@ coordinate array. Properties can be added optionally.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line723">line 723</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line1971">line 1971</a>
     </li></ul></dd>
     
 
@@ -6246,140 +7371,6 @@ coordinate array. Properties can be added optionally.
 
         
             
-<h4 class="name" id="multiPoint"><span class="type-signature"></span>multiPoint<span class="type-signature"></span></h4>
-
-
-
-
-<div class="description">
-    Creates a Feature.&lt;MultiPoint> based on acoordinate array. Properties can be added optionally.
-</div>
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line7951">line 7951</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-    <h5>Example</h5>
-    
-    <pre class="prettyprint"><code>var multiPt = turf.multiPoint([[0,0],[10,10]]);//=multiPt</code></pre>
-
-
-
-        
-            
-<h4 class="name" id="multiPolygon"><span class="type-signature"></span>multiPolygon<span class="type-signature"></span></h4>
-
-
-
-
-<div class="description">
-    Creates a Feature.&lt;MultiPolygon> based on acoordinate array. Properties can be added optionally.
-</div>
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line7976">line 7976</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-    <h5>Example</h5>
-    
-    <pre class="prettyprint"><code>var multiPoly = turf.multiPolygon([[[[0,0],[0,10],[10,10],[10,0],[0,0]]]]);//=multiPoly</code></pre>
-
-
-
-        
-            
 <h4 class="name" id="multiPolygon"><span class="type-signature"></span>multiPolygon<span class="type-signature"></span></h4>
 
 
@@ -6425,7 +7416,7 @@ coordinate array. Properties can be added optionally.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line748">line 748</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line1997">line 1997</a>
     </li></ul></dd>
     
 
@@ -6494,7 +7485,74 @@ coordinate array. Properties can be added optionally.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line7454">line 7454</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line8699">line 8699</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>var multiPoly = turf.multiPolygon([[[[0,0],[0,10],[10,10],[10,0],[0,0]]]]);//=multiPoly</code></pre>
+
+
+
+        
+            
+<h4 class="name" id="multiPolygon"><span class="type-signature"></span>multiPolygon<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    Creates a Feature.&lt;MultiPolygon> based on acoordinate array. Properties can be added optionally.
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line9221">line 9221</a>
     </li></ul></dd>
     
 
@@ -6562,7 +7620,7 @@ coordinate array. Properties can be added optionally.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line1777">line 1777</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line749">line 749</a>
     </li></ul></dd>
     
 
@@ -6593,6 +7651,75 @@ coordinate array. Properties can be added optionally.
 
 
 <div class="description">
+    Creates a Point Feature from a Position.
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line1726">line 1726</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>var point = turf.point([-75.343, 39.984]);
+
+//=point</code></pre>
+
+
+
+        
+            
+<h4 class="name" id="point"><span class="type-signature"></span>point<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
     Takes coordinates and properties (optional) and returns a new Point feature.
 </div>
 
@@ -6631,7 +7758,74 @@ coordinate array. Properties can be added optionally.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line570">line 570</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line9043">line 9043</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>var pt1 = turf.point([-75.343, 39.984]);//=pt1</code></pre>
+
+
+
+        
+            
+<h4 class="name" id="point"><span class="type-signature"></span>point<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    Takes coordinates and properties (optional) and returns a new Point feature.
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line571">line 571</a>
     </li></ul></dd>
     
 
@@ -6700,7 +7894,7 @@ coordinate array. Properties can be added optionally.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line1599">line 1599</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line8521">line 8521</a>
     </li></ul></dd>
     
 
@@ -6717,21 +7911,19 @@ coordinate array. Properties can be added optionally.
 
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>var pt1 = turf.point([-75.343, 39.984]);
-
-//=pt1</code></pre>
+    <pre class="prettyprint"><code>var pt1 = turf.point([-75.343, 39.984]);//=pt1</code></pre>
 
 
 
         
             
-<h4 class="name" id="point"><span class="type-signature"></span>point<span class="type-signature"></span></h4>
+<h4 class="name" id="points"><span class="type-signature"></span>points<span class="type-signature"></span></h4>
 
 
 
 
 <div class="description">
-    Takes coordinates and properties (optional) and returns a new Point feature.
+    Creates a Point FeatureCollection from an Array of Point coordinates.
 </div>
 
 
@@ -6769,7 +7961,7 @@ coordinate array. Properties can be added optionally.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line7276">line 7276</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line1753">line 1753</a>
     </li></ul></dd>
     
 
@@ -6786,74 +7978,13 @@ coordinate array. Properties can be added optionally.
 
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>var pt1 = turf.point([-75.343, 39.984]);//=pt1</code></pre>
+    <pre class="prettyprint"><code>var points = turf.points([
+  [-75, 39],
+  [-80, 45],
+  [-78, 50]
+]);
 
-
-
-        
-            
-<h4 class="name" id="point"><span class="type-signature"></span>point<span class="type-signature"></span></h4>
-
-
-
-
-<div class="description">
-    Takes coordinates and properties (optional) and returns a new Point feature.
-</div>
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line7798">line 7798</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-    <h5>Example</h5>
-    
-    <pre class="prettyprint"><code>var pt1 = turf.point([-75.343, 39.984]);//=pt1</code></pre>
+//=points</code></pre>
 
 
 
@@ -6903,82 +8034,7 @@ coordinate array. Properties can be added optionally.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line1624">line 1624</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-    <h5>Example</h5>
-    
-    <pre class="prettyprint"><code>var polygon = turf.polygon([[
- [-2.275543, 53.464547],
- [-2.275543, 53.489271],
- [-2.215118, 53.489271],
- [-2.215118, 53.464547],
- [-2.275543, 53.464547]
-]], { name: 'poly1', population: 400});
-
-//=polygon</code></pre>
-
-
-
-        
-            
-<h4 class="name" id="polygon"><span class="type-signature"></span>polygon<span class="type-signature"></span></h4>
-
-
-
-
-<div class="description">
-    Takes an array of LinearRings and optionally an Object with properties and returns a Polygon feature.
-</div>
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line7301">line 7301</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line9068">line 9068</a>
     </li></ul></dd>
     
 
@@ -7045,7 +8101,7 @@ coordinate array. Properties can be added optionally.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line595">line 595</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line596">line 596</a>
     </li></ul></dd>
     
 
@@ -7069,6 +8125,75 @@ coordinate array. Properties can be added optionally.
  [-2.215118, 53.464547],
  [-2.275543, 53.464547]
 ]], { name: 'poly1', population: 400});
+
+//=polygon</code></pre>
+
+
+
+        
+            
+<h4 class="name" id="polygon"><span class="type-signature"></span>polygon<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    Creates a Polygon Feature from an Array of LinearRings.
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line1781">line 1781</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>var polygon = turf.polygon([[[-5, 52], [-4, 56], [-2, 51], [-7, 54], [-5, 52]]], { name: 'poly1' });
 
 //=polygon</code></pre>
 
@@ -7120,7 +8245,7 @@ coordinate array. Properties can be added optionally.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line7823">line 7823</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line8546">line 8546</a>
     </li></ul></dd>
     
 
@@ -7138,6 +8263,78 @@ coordinate array. Properties can be added optionally.
     <h5>Example</h5>
     
     <pre class="prettyprint"><code>var polygon = turf.polygon([[ [-2.275543, 53.464547], [-2.275543, 53.489271], [-2.215118, 53.489271], [-2.215118, 53.464547], [-2.275543, 53.464547]]], { name: 'poly1', population: 400});//=polygon</code></pre>
+
+
+
+        
+            
+<h4 class="name" id="polygons"><span class="type-signature"></span>polygons<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    Creates a Polygon FeatureCollection from an Array of Polygon coordinates.
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line1819">line 1819</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>var polygons = turf.polygons([
+  [[[-5, 52], [-4, 56], [-2, 51], [-7, 54], [-5, 52]]],
+  [[[-15, 42], [-14, 46], [-12, 41], [-17, 44], [-15, 42]]],
+]);
+
+//=polygons</code></pre>
 
 
 
@@ -7187,7 +8384,74 @@ coordinate array. Properties can be added optionally.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line3780">line 3780</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line11011">line 11011</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>var poly = {  'type': 'Feature',  'properties': {},  'geometry': {    'type': 'Polygon',    'coordinates': [[[125, -30], [145, -30], [145, -20], [125, -20], [125, -30]]]  }}var lines = turf.polygonToLineString(poly);//addToMapvar addToMap = [lines]</code></pre>
+
+
+
+        
+            
+<h4 class="name" id="polygonToLineString"><span class="type-signature"></span>polygonToLineString<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    Converts a Polygon or MultiPolygon to a FeatureCollection of LineString or MultiLineString.
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line5025">line 5025</a>
     </li></ul></dd>
     
 
@@ -7220,73 +8484,6 @@ var addToMap = [lines]</code></pre>
 
         
             
-<h4 class="name" id="polygonToLineString"><span class="type-signature"></span>polygonToLineString<span class="type-signature"></span></h4>
-
-
-
-
-<div class="description">
-    Converts a Polygon or MultiPolygon to a FeatureCollection of LineString or MultiLineString.
-</div>
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line9766">line 9766</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-    <h5>Example</h5>
-    
-    <pre class="prettyprint"><code>var poly = {  'type': 'Feature',  'properties': {},  'geometry': {    'type': 'Polygon',    'coordinates': [[[125, -30], [145, -30], [145, -20], [125, -20], [125, -30]]]  }}var lines = turf.polygonToLineString(poly);//addToMapvar addToMap = [lines]</code></pre>
-
-
-
-        
-            
 <h4 class="name" id="propEach"><span class="type-signature"></span>propEach<span class="type-signature"></span></h4>
 
 
@@ -7331,7 +8528,7 @@ var addToMap = [lines]</code></pre>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line9308">line 9308</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line10553">line 10553</a>
     </li></ul></dd>
     
 
@@ -7398,7 +8595,7 @@ var addToMap = [lines]</code></pre>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line8402">line 8402</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line4095">line 4095</a>
     </li></ul></dd>
     
 
@@ -7415,97 +8612,14 @@ var addToMap = [lines]</code></pre>
 
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>var features = {  "type": "FeatureCollection",  "features": [    {      "type": "Feature",      "properties": {"foo": "bar"},      "geometry": {        "type": "Point",        "coordinates": [26, 37]      }    },    {      "type": "Feature",      "properties": {"hello": "world"},      "geometry": {        "type": "Point",        "coordinates": [36, 53]      }    }  ]};turf.propEach(features, function (currentProperties, currentIndex) {  //=currentProperties  //=currentIndex});</code></pre>
+    <pre class="prettyprint"><code>var features = turf.featureCollection([
+    turf.point([26, 37], {foo: 'bar'}),
+    turf.point([36, 53], {hello: 'world'})
+]);
 
-
-
-        
-            
-<h4 class="name" id="propEach"><span class="type-signature"></span>propEach<span class="type-signature"></span></h4>
-
-
-
-
-<div class="description">
-    Iterate over properties in any GeoJSON object, similar to Array.forEach()
-</div>
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line2416">line 2416</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-    <h5>Example</h5>
-    
-    <pre class="prettyprint"><code>var features = {
-  "type": "FeatureCollection",
-  "features": [
-    {
-      "type": "Feature",
-      "properties": {"foo": "bar"},
-      "geometry": {
-        "type": "Point",
-        "coordinates": [26, 37]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {"hello": "world"},
-      "geometry": {
-        "type": "Point",
-        "coordinates": [36, 53]
-      }
-    }
-  ]
-};
-turf.propEach(features, function (currentProperties, currentIndex) {
+turf.propEach(features, function (currentProperties, featureIndex) {
   //=currentProperties
-  //=currentIndex
+  //=featureIndex
 });</code></pre>
 
 
@@ -7556,7 +8670,74 @@ turf.propEach(features, function (currentProperties, currentIndex) {
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line3322">line 3322</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line9647">line 9647</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>var features = {  "type": "FeatureCollection",  "features": [    {      "type": "Feature",      "properties": {"foo": "bar"},      "geometry": {        "type": "Point",        "coordinates": [26, 37]      }    },    {      "type": "Feature",      "properties": {"hello": "world"},      "geometry": {        "type": "Point",        "coordinates": [36, 53]      }    }  ]};turf.propEach(features, function (currentProperties, currentIndex) {  //=currentProperties  //=currentIndex});</code></pre>
+
+
+
+        
+            
+<h4 class="name" id="propEach"><span class="type-signature"></span>propEach<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    Iterate over properties in any GeoJSON object, similar to Array.forEach()
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line2951">line 2951</a>
     </li></ul></dd>
     
 
@@ -7647,7 +8828,7 @@ turf.propEach(features, function (currentProperties, currentIndex) {
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line8473">line 8473</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line10625">line 10625</a>
     </li></ul></dd>
     
 
@@ -7665,6 +8846,85 @@ turf.propEach(features, function (currentProperties, currentIndex) {
     <h5>Example</h5>
     
     <pre class="prettyprint"><code>var features = {  "type": "FeatureCollection",  "features": [    {      "type": "Feature",      "properties": {"foo": "bar"},      "geometry": {        "type": "Point",        "coordinates": [26, 37]      }    },    {      "type": "Feature",      "properties": {"hello": "world"},      "geometry": {        "type": "Point",        "coordinates": [36, 53]      }    }  ]};turf.propReduce(features, function (previousValue, currentProperties, currentIndex) {  //=previousValue  //=currentProperties  //=currentIndex  return currentProperties});</code></pre>
+
+
+
+        
+            
+<h4 class="name" id="propReduce"><span class="type-signature"></span>propReduce<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    Reduce properties in any GeoJSON object into a single value,
+similar to how Array.reduce works. However, in this case we lazily run
+the reduction, so an array of all properties is unnecessary.
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line4149">line 4149</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>var features = turf.featureCollection([
+    turf.point([26, 37], {foo: 'bar'}),
+    turf.point([36, 53], {hello: 'world'})
+]);
+
+turf.propReduce(features, function (previousValue, currentProperties, featureIndex) {
+  //=previousValue
+  //=currentProperties
+  //=featureIndex
+  return currentProperties
+});</code></pre>
 
 
 
@@ -7714,7 +8974,7 @@ turf.propEach(features, function (currentProperties, currentIndex) {
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line9380">line 9380</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line9718">line 9718</a>
     </li></ul></dd>
     
 
@@ -7783,7 +9043,7 @@ the reduction, so an array of all properties is unnecessary.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line2487">line 2487</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line3022">line 3022</a>
     </li></ul></dd>
     
 
@@ -7832,15 +9092,13 @@ turf.propReduce(features, function (previousValue, currentProperties, currentInd
 
         
             
-<h4 class="name" id="propReduce"><span class="type-signature"></span>propReduce<span class="type-signature"></span></h4>
+<h4 class="name" id="radiansToDegrees"><span class="type-signature"></span>radiansToDegrees<span class="type-signature"></span></h4>
 
 
 
 
 <div class="description">
-    Reduce properties in any GeoJSON object into a single value,
-similar to how Array.reduce works. However, in this case we lazily run
-the reduction, so an array of all properties is unnecessary.
+    Converts an angle in radians to degrees
 </div>
 
 
@@ -7878,100 +9136,7 @@ the reduction, so an array of all properties is unnecessary.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line3394">line 3394</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-    <h5>Example</h5>
-    
-    <pre class="prettyprint"><code>var features = {
-  "type": "FeatureCollection",
-  "features": [
-    {
-      "type": "Feature",
-      "properties": {"foo": "bar"},
-      "geometry": {
-        "type": "Point",
-        "coordinates": [26, 37]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {"hello": "world"},
-      "geometry": {
-        "type": "Point",
-        "coordinates": [36, 53]
-      }
-    }
-  ]
-};
-turf.propReduce(features, function (previousValue, currentProperties, currentIndex) {
-  //=previousValue
-  //=currentProperties
-  //=currentIndex
-  return currentProperties
-});</code></pre>
-
-
-
-        
-            
-<h4 class="name" id="radiansToDistance"><span class="type-signature"></span>radiansToDistance<span class="type-signature"></span></h4>
-
-
-
-
-<div class="description">
-    Convert a distance measurement from radians to a more friendly unit.
-</div>
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line7522">line 7522</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line2143">line 2143</a>
     </li></ul></dd>
     
 
@@ -8033,7 +9198,132 @@ turf.propReduce(features, function (previousValue, currentProperties, currentInd
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line816">line 816</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line817">line 817</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="radiansToDistance"><span class="type-signature"></span>radiansToDistance<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    Convert a distance measurement from radians to a more friendly unit.
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line8767">line 8767</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="radiansToLength"><span class="type-signature"></span>radiansToLength<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    Convert a distance measurement (assuming a spherical Earth) from radians to a more friendly unit.
+Valid units: miles, nauticalmiles, inches, yards, meters, metres, kilometers, centimeters, feet
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line2078">line 2078</a>
     </li></ul></dd>
     
 
@@ -8095,7 +9385,7 @@ turf.propReduce(features, function (previousValue, currentProperties, currentInd
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line9824">line 9824</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line11069">line 11069</a>
     </li></ul></dd>
     
 
@@ -8162,7 +9452,7 @@ turf.propReduce(features, function (previousValue, currentProperties, currentInd
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line4509">line 4509</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line5754">line 5754</a>
     </li></ul></dd>
     
 
@@ -8230,7 +9520,7 @@ var tree = rbush()</code></pre>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line3838">line 3838</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line5083">line 5083</a>
     </li></ul></dd>
     
 
@@ -8333,7 +9623,7 @@ var simplified = turf.simplify(
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line4019">line 4019</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line5264">line 5264</a>
     </li></ul></dd>
     
 
@@ -8427,22 +9717,23 @@ var ptsWithin = turf.within(points, searchWithin);
     
 
     
-        <h3 class="subsection-title">Methods</h3>
+
+    
+        <h3 class="subsection-title">Type Definitions</h3>
 
         
-            
+                
 
     
 
-    <h4 class="name" id="collectionOf"><span class="type-signature"></span>collectionOf<span class="signature">(featureCollection, type, name)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="coordEachCallback"><span class="type-signature"></span>coordEachCallback<span class="signature">(currentCoord, coordIndex, featureIndex, multiFeatureIndex, geometryIndex)</span><span class="type-signature"></span></h4>
 
     
 
 
 
 <div class="description">
-    Enforce expectations about types of FeatureCollection inputs for Turf.
-Internally this uses <a href="global.html#geojsonType">geojsonType</a> to judge geometry types.
+    Callback for coordEach
 </div>
 
 
@@ -8478,13 +9769,13 @@ Internally this uses <a href="global.html#geojsonType">geojsonType</a> to judge 
 
         <tr>
             
-                <td class="name"><code>featureCollection</code></td>
+                <td class="name"><code>currentCoord</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">FeatureCollection</span>
+<span class="param-type">Array.&lt;number></span>
 
 
             
@@ -8494,20 +9785,20 @@ Internally this uses <a href="global.html#geojsonType">geojsonType</a> to judge 
 
             
 
-            <td class="description last">a FeatureCollection for which features will be judged</td>
+            <td class="description last">The current coordinate being processed.</td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>type</code></td>
+                <td class="name"><code>coordIndex</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">string</span>
+<span class="param-type">number</span>
 
 
             
@@ -8517,20 +9808,20 @@ Internally this uses <a href="global.html#geojsonType">geojsonType</a> to judge 
 
             
 
-            <td class="description last">expected GeoJSON type</td>
+            <td class="description last">The current index of the coordinate being processed.</td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>name</code></td>
+                <td class="name"><code>featureIndex</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">string</span>
+<span class="param-type">number</span>
 
 
             
@@ -8540,7 +9831,53 @@ Internally this uses <a href="global.html#geojsonType">geojsonType</a> to judge 
 
             
 
-            <td class="description last">name of calling function</td>
+            <td class="description last">The current index of the Feature being processed.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>multiFeatureIndex</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The current index of the Multi-Feature being processed.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>geometryIndex</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The current index of the Geometry being processed.</td>
         </tr>
 
     
@@ -8581,7 +9918,7 @@ Internally this uses <a href="global.html#geojsonType">geojsonType</a> to judge 
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line2083">line 2083</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line3898">line 3898</a>
     </li></ul></dd>
     
 
@@ -8602,54 +9939,35 @@ Internally this uses <a href="global.html#geojsonType">geojsonType</a> to judge 
 
 
 
-<h5>Throws:</h5>
-
-        
-
-<dl>
-    <dt>
-        <div class="param-desc">
-        if value is not the expected type.
-        </div>
-    </dt>
-    <dd></dd>
-    <dt>
-        <dl>
-            <dt>
-                Type
-            </dt>
-            <dd>
-                
-<span class="param-type">Error</span>
-
-
-            </dd>
-        </dl>
-    </dt>
-    <dd></dd>
-</dl>
-
-
-    
 
 
 
 
 
-        
             
+                
 
     
 
-    <h4 class="name" id="featureOf"><span class="type-signature"></span>featureOf<span class="signature">(feature, type, name)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="coordReduceCallback"><span class="type-signature"></span>coordReduceCallback<span class="signature">(previousValue, currentCoord, coordIndex, featureIndex, multiFeatureIndex, geometryIndex)</span><span class="type-signature"></span></h4>
 
     
 
 
 
 <div class="description">
-    Enforce expectations about types of Feature inputs for Turf.
-Internally this uses <a href="global.html#geojsonType">geojsonType</a> to judge geometry types.
+    Callback for coordReduce
+
+The first time the callback function is called, the values provided as arguments depend
+on whether the reduce method has an initialValue argument.
+
+If an initialValue is provided to the reduce method:
+ - The previousValue argument is initialValue.
+ - The currentValue argument is the value of the first element present in the array.
+
+If an initialValue is not provided:
+ - The previousValue argument is the value of the first element present in the array.
+ - The currentValue argument is the value of the second element present in the array.
 </div>
 
 
@@ -8685,7 +10003,444 @@ Internally this uses <a href="global.html#geojsonType">geojsonType</a> to judge 
 
         <tr>
             
-                <td class="name"><code>feature</code></td>
+                <td class="name"><code>previousValue</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">*</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The accumulated value previously returned in the last invocation
+of the callback, or initialValue, if supplied.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>currentCoord</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array.&lt;number></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The current coordinate being processed.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>coordIndex</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The current index of the coordinate being processed.
+Starts at index 0, if an initialValue is provided, and at index 1 otherwise.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>featureIndex</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The current index of the Feature being processed.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>multiFeatureIndex</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The current index of the Multi-Feature being processed.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>geometryIndex</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The current index of the Geometry being processed.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line4028">line 4028</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            
+                
+
+    
+
+    <h4 class="name" id="featureEachCallback"><span class="type-signature"></span>featureEachCallback<span class="signature">(currentFeature, featureIndex)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    Callback for featureEach
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>currentFeature</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Feature.&lt;any></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The current Feature being processed.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>featureIndex</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The current index of the Feature being processed.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line4181">line 4181</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            
+                
+
+    
+
+    <h4 class="name" id="featureReduceCallback"><span class="type-signature"></span>featureReduceCallback<span class="signature">(previousValue, currentFeature, featureIndex)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    Callback for featureReduce
+
+The first time the callback function is called, the values provided as arguments depend
+on whether the reduce method has an initialValue argument.
+
+If an initialValue is provided to the reduce method:
+ - The previousValue argument is initialValue.
+ - The currentValue argument is the value of the first element present in the array.
+
+If an initialValue is not provided:
+ - The previousValue argument is the value of the first element present in the array.
+ - The currentValue argument is the value of the second element present in the array.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>previousValue</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">*</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The accumulated value previously returned in the last invocation
+of the callback, or initialValue, if supplied.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>currentFeature</code></td>
             
 
             <td class="type">
@@ -8701,20 +10456,20 @@ Internally this uses <a href="global.html#geojsonType">geojsonType</a> to judge 
 
             
 
-            <td class="description last">a feature with an expected geometry type</td>
+            <td class="description last">The current Feature being processed.</td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>type</code></td>
+                <td class="name"><code>featureIndex</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">string</span>
+<span class="param-type">number</span>
 
 
             
@@ -8724,30 +10479,7 @@ Internally this uses <a href="global.html#geojsonType">geojsonType</a> to judge 
 
             
 
-            <td class="description last">expected GeoJSON type</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>name</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">name of calling function</td>
+            <td class="description last">The current index of the Feature being processed.</td>
         </tr>
 
     
@@ -8788,7 +10520,7 @@ Internally this uses <a href="global.html#geojsonType">geojsonType</a> to judge 
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line2062">line 2062</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line4218">line 4218</a>
     </li></ul></dd>
     
 
@@ -8809,53 +10541,24 @@ Internally this uses <a href="global.html#geojsonType">geojsonType</a> to judge 
 
 
 
-<h5>Throws:</h5>
-
-        
-
-<dl>
-    <dt>
-        <div class="param-desc">
-        error if value is not the expected type.
-        </div>
-    </dt>
-    <dd></dd>
-    <dt>
-        <dl>
-            <dt>
-                Type
-            </dt>
-            <dd>
-                
-<span class="param-type">Error</span>
-
-
-            </dd>
-        </dl>
-    </dt>
-    <dd></dd>
-</dl>
-
-
-    
 
 
 
 
 
-        
             
+                
 
     
 
-    <h4 class="name" id="geojsonType"><span class="type-signature"></span>geojsonType<span class="signature">(value, type, name)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="flattenEachCallback"><span class="type-signature"></span>flattenEachCallback<span class="signature">(currentFeature, featureIndex, multiFeatureIndex)</span><span class="type-signature"></span></h4>
 
     
 
 
 
 <div class="description">
-    Enforce expectations about types of GeoJSON objects for Turf.
+    Callback for flattenEach
 </div>
 
 
@@ -8891,13 +10594,13 @@ Internally this uses <a href="global.html#geojsonType">geojsonType</a> to judge 
 
         <tr>
             
-                <td class="name"><code>value</code></td>
+                <td class="name"><code>currentFeature</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">GeoJSON</span>
+<span class="param-type">Feature</span>
 
 
             
@@ -8907,20 +10610,20 @@ Internally this uses <a href="global.html#geojsonType">geojsonType</a> to judge 
 
             
 
-            <td class="description last">any GeoJSON object</td>
+            <td class="description last">The current flattened feature being processed.</td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>type</code></td>
+                <td class="name"><code>featureIndex</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">string</span>
+<span class="param-type">number</span>
 
 
             
@@ -8930,20 +10633,20 @@ Internally this uses <a href="global.html#geojsonType">geojsonType</a> to judge 
 
             
 
-            <td class="description last">expected GeoJSON type</td>
+            <td class="description last">The current index of the Feature being processed.</td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>name</code></td>
+                <td class="name"><code>multiFeatureIndex</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">string</span>
+<span class="param-type">number</span>
 
 
             
@@ -8953,7 +10656,7 @@ Internally this uses <a href="global.html#geojsonType">geojsonType</a> to judge 
 
             
 
-            <td class="description last">name of calling function</td>
+            <td class="description last">The current index of the Multi-Feature being processed.</td>
         </tr>
 
     
@@ -8994,7 +10697,7 @@ Internally this uses <a href="global.html#geojsonType">geojsonType</a> to judge 
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line2044">line 2044</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line4452">line 4452</a>
     </li></ul></dd>
     
 
@@ -9015,43 +10718,1988 @@ Internally this uses <a href="global.html#geojsonType">geojsonType</a> to judge 
 
 
 
-<h5>Throws:</h5>
+
+
+
+
+
+            
+                
+
+    
+
+    <h4 class="name" id="flattenReduceCallback"><span class="type-signature"></span>flattenReduceCallback<span class="signature">(previousValue, currentFeature, featureIndex, multiFeatureIndex)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    Callback for flattenReduce
+
+The first time the callback function is called, the values provided as arguments depend
+on whether the reduce method has an initialValue argument.
+
+If an initialValue is provided to the reduce method:
+ - The previousValue argument is initialValue.
+ - The currentValue argument is the value of the first element present in the array.
+
+If an initialValue is not provided:
+ - The previousValue argument is the value of the first element present in the array.
+ - The currentValue argument is the value of the second element present in the array.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
 
         
 
-<dl>
-    <dt>
-        <div class="param-desc">
-        if value is not the expected type.
-        </div>
-    </dt>
-    <dd></dd>
-    <dt>
-        <dl>
-            <dt>
-                Type
-            </dt>
-            <dd>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>previousValue</code></td>
+            
+
+            <td class="type">
+            
                 
-<span class="param-type">Error</span>
+<span class="param-type">*</span>
 
 
-            </dd>
-        </dl>
-    </dt>
-    <dd></dd>
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The accumulated value previously returned in the last invocation
+of the callback, or initialValue, if supplied.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>currentFeature</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Feature</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The current Feature being processed.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>featureIndex</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The current index of the Feature being processed.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>multiFeatureIndex</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The current index of the Multi-Feature being processed.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line4519">line 4519</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
 </dl>
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            
+                
+
+    
+
+    <h4 class="name" id="geomEachCallback"><span class="type-signature"></span>geomEachCallback<span class="signature">(currentGeometry, featureIndex, featureProperties, featureBBox, featureId)</span><span class="type-signature"></span></h4>
+
     
 
 
 
+<div class="description">
+    Callback for geomEach
+</div>
 
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
 
         
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
     
 
+        <tr>
+            
+                <td class="name"><code>currentGeometry</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Geometry</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The current Geometry being processed.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>featureIndex</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The current index of the Feature being processed.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>featureProperties</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The current Feature Properties being processed.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>featureBBox</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array.&lt;number></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The current Feature BBox being processed.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>featureId</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+|
+
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The current Feature Id being processed.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line4292">line 4292</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            
+                
+
+    
+
+    <h4 class="name" id="geomReduceCallback"><span class="type-signature"></span>geomReduceCallback<span class="signature">(previousValue, currentGeometry, featureIndex, featureProperties, featureBBox, featureId)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    Callback for geomReduce
+
+The first time the callback function is called, the values provided as arguments depend
+on whether the reduce method has an initialValue argument.
+
+If an initialValue is provided to the reduce method:
+ - The previousValue argument is initialValue.
+ - The currentValue argument is the value of the first element present in the array.
+
+If an initialValue is not provided:
+ - The previousValue argument is the value of the first element present in the array.
+ - The currentValue argument is the value of the second element present in the array.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>previousValue</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">*</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The accumulated value previously returned in the last invocation
+of the callback, or initialValue, if supplied.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>currentGeometry</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Geometry</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The current Geometry being processed.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>featureIndex</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The current index of the Feature being processed.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>featureProperties</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The current Feature Properties being processed.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>featureBBox</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array.&lt;number></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The current Feature BBox being processed.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>featureId</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+|
+
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The current Feature Id being processed.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line4395">line 4395</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            
+                
+
+    
+
+    <h4 class="name" id="lineEachCallback"><span class="type-signature"></span>lineEachCallback<span class="signature">(currentLine, featureIndex, multiFeatureIndex, geometryIndex)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    Callback for lineEach
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>currentLine</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Feature.&lt;LineString></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The current LineString|LinearRing being processed</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>featureIndex</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The current index of the Feature being processed</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>multiFeatureIndex</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The current index of the Multi-Feature being processed</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>geometryIndex</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The current index of the Geometry being processed</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line4699">line 4699</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            
+                
+
+    
+
+    <h4 class="name" id="lineReduceCallback"><span class="type-signature"></span>lineReduceCallback<span class="signature">(previousValue, currentLine, featureIndex, multiFeatureIndex, geometryIndex)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    Callback for lineReduce
+
+The first time the callback function is called, the values provided as arguments depend
+on whether the reduce method has an initialValue argument.
+
+If an initialValue is provided to the reduce method:
+ - The previousValue argument is initialValue.
+ - The currentValue argument is the value of the first element present in the array.
+
+If an initialValue is not provided:
+ - The previousValue argument is the value of the first element present in the array.
+ - The currentValue argument is the value of the second element present in the array.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>previousValue</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">*</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The accumulated value previously returned in the last invocation
+of the callback, or initialValue, if supplied.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>currentLine</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Feature.&lt;LineString></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The current LineString|LinearRing being processed.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>featureIndex</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The current index of the Feature being processed</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>multiFeatureIndex</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The current index of the Multi-Feature being processed</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>geometryIndex</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The current index of the Geometry being processed</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line4750">line 4750</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            
+                
+
+    
+
+    <h4 class="name" id="propEachCallback"><span class="type-signature"></span>propEachCallback<span class="signature">(currentProperties, featureIndex)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    Callback for propEach
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>currentProperties</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The current Properties being processed.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>featureIndex</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The current index of the Feature being processed.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line4087">line 4087</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            
+                
+
+    
+
+    <h4 class="name" id="propReduceCallback"><span class="type-signature"></span>propReduceCallback<span class="signature">(previousValue, currentProperties, featureIndex)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    Callback for propReduce
+
+The first time the callback function is called, the values provided as arguments depend
+on whether the reduce method has an initialValue argument.
+
+If an initialValue is provided to the reduce method:
+ - The previousValue argument is initialValue.
+ - The currentValue argument is the value of the first element present in the array.
+
+If an initialValue is not provided:
+ - The previousValue argument is the value of the first element present in the array.
+ - The currentValue argument is the value of the second element present in the array.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>previousValue</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">*</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The accumulated value previously returned in the last invocation
+of the callback, or initialValue, if supplied.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>currentProperties</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">*</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The current Properties being processed.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>featureIndex</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The current index of the Feature being processed.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line4128">line 4128</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            
+                
+
+    
+
+    <h4 class="name" id="segmentEachCallback"><span class="type-signature"></span>segmentEachCallback<span class="signature">(currentSegment, featureIndex, multiFeatureIndex, geometryIndex, segmentIndex)</span><span class="type-signature"> &rarr; {void}</span></h4>
+
+    
+
+
+
+<div class="description">
+    Callback for segmentEach
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>currentSegment</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Feature.&lt;LineString></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The current Segment being processed.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>featureIndex</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The current index of the Feature being processed.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>multiFeatureIndex</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The current index of the Multi-Feature being processed.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>geometryIndex</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The current index of the Geometry being processed.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>segmentIndex</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The current index of the Segment being processed.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line4572">line 4572</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">void</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+            
+                
+
+    
+
+    <h4 class="name" id="segmentReduceCallback"><span class="type-signature"></span>segmentReduceCallback<span class="signature">(previousValue, currentSegment, featureIndex, multiFeatureIndex, geometryIndex, segmentIndex)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    Callback for segmentReduce
+
+The first time the callback function is called, the values provided as arguments depend
+on whether the reduce method has an initialValue argument.
+
+If an initialValue is provided to the reduce method:
+ - The previousValue argument is initialValue.
+ - The currentValue argument is the value of the first element present in the array.
+
+If an initialValue is not provided:
+ - The previousValue argument is the value of the first element present in the array.
+ - The currentValue argument is the value of the second element present in the array.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>previousValue</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">*</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The accumulated value previously returned in the last invocation
+of the callback, or initialValue, if supplied.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>currentSegment</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Feature.&lt;LineString></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The current Segment being processed.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>featureIndex</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The current index of the Feature being processed.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>multiFeatureIndex</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The current index of the Multi-Feature being processed.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>geometryIndex</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The current index of the Geometry being processed.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>segmentIndex</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The current index of the Segment being processed.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line4635">line 4635</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            
     
 
     
@@ -9071,7 +12719,7 @@ Internally this uses <a href="global.html#geojsonType">geojsonType</a> to judge 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sat Jul 14 2018 20:25:26 GMT+0800 (中国标准时间)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sun Jul 15 2018 16:49:15 GMT+0800 (中国标准时间)
 </footer>
 
 <script> prettyPrint(); </script>

@@ -136,6 +136,9 @@
             
                 
 <span class="param-type">Cesium.Color</span>
+|
+
+<span class="param-type">String</span>
 
 
             
@@ -175,6 +178,9 @@
             
                 
 <span class="param-type">Cesium.Color</span>
+|
+
+<span class="param-type">String</span>
 
 
             
@@ -330,7 +336,10 @@
             <td class="type">
             
                 
-<span class="param-type">Boolean</span>
+<span class="param-type">Cesium.Color</span>
+|
+
+<span class="param-type">String</span>
 
 
             
@@ -369,7 +378,7 @@
             <td class="type">
             
                 
-<span class="param-type">Boolean</span>
+<span class="param-type">Number</span>
 
 
             
@@ -408,7 +417,7 @@
             <td class="type">
             
                 
-<span class="param-type">Boolean</span>
+<span class="param-type">String</span>
 
 
             
@@ -447,7 +456,7 @@
             <td class="type">
             
                 
-<span class="param-type">Boolean</span>
+<span class="param-type">Number</span>
 
 
             
@@ -486,7 +495,10 @@
             <td class="type">
             
                 
-<span class="param-type">Boolean</span>
+<span class="param-type">Cesium.Color</span>
+|
+
+<span class="param-type">String</span>
 
 
             
@@ -525,7 +537,7 @@
             <td class="type">
             
                 
-<span class="param-type">Boolean</span>
+<span class="param-type">String</span>
 
 
             
@@ -601,7 +613,7 @@
             <td class="type">
             
                 
-<span class="param-type">Boolean</span>
+<span class="param-type">Number</span>
 
 
             
@@ -679,7 +691,7 @@
             <td class="type">
             
                 
-<span class="param-type">Boolean</span>
+<span class="param-type">Number</span>
 
 
             
@@ -835,7 +847,7 @@
             <td class="type">
             
                 
-<span class="param-type">Boolean</span>
+<span class="param-type">String</span>
 
 
             
@@ -859,7 +871,7 @@
                 </td>
             
 
-            <td class="description last">是否显示文本，仅对线和面数据有效。</td>
+            <td class="description last">几何中心注记文本属性名称，仅对线和面数据有效。</td>
         </tr>
 
     
@@ -872,7 +884,7 @@
             <td class="type">
             
                 
-<span class="param-type">Boolean</span>
+<span class="param-type">Number</span>
 
 
             
@@ -911,7 +923,7 @@
             <td class="type">
             
                 
-<span class="param-type">Boolean</span>
+<span class="param-type">Number</span>
 
 
             
@@ -938,6 +950,308 @@
             
 
             <td class="description last">标注文本y方向偏移量，仅在数据有点时有效。以屏幕为参考，左上角为0，向下为正，单位为像素</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>lineDash</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array.&lt;Number></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">虚线样式，不设置则为实线</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>lineCap</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    "butt"
+                
+                </td>
+            
+
+            <td class="description last">设置线条末端线帽的样式。 butt——默认。向线条的每个末端添加平直的边缘；round——向线条的每个末端添加圆形线帽；square——向线条的每个末端添加正方形线帽。</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>shadowColor</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">设置用于阴影的颜色</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>shadowBlur</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">设置用于阴影的模糊级别</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>shadowOffsetX</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">设置阴影距形状的水平距离</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>shadowOffsetY</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">设置阴影距形状的垂直距离</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>lineJoin</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    "miter"
+                
+                </td>
+            
+
+            <td class="description last">设置当两条线交汇时所创建边角的类型。bevel——斜角；round——创建圆角；miter——默认。创建尖角。</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>miterLimit</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    10
+                
+                </td>
+            
+
+            <td class="description last">设置最大斜接长度。</td>
         </tr>
 
     
@@ -985,7 +1299,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line31217">line 31217</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line32470">line 32470</a>
     </li></ul></dd>
     
 
@@ -1079,7 +1393,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line31315">line 31315</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line32582">line 32582</a>
     </li></ul></dd>
     
 
@@ -1153,7 +1467,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line31296">line 31296</a>
+        <a href="CesiumVectorTile.js.html">CesiumVectorTile.js</a>, <a href="CesiumVectorTile.js.html#line32563">line 32563</a>
     </li></ul></dd>
     
 
@@ -1219,7 +1533,7 @@
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sat Jul 14 2018 20:25:26 GMT+0800 (中国标准时间)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sun Jul 15 2018 16:49:15 GMT+0800 (中国标准时间)
 </footer>
 
 <script> prettyPrint(); </script>

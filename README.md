@@ -3,6 +3,7 @@
 ![](https://mikeswei.github.io/CesiumVectorTile/screenshot.jpg)
 ![](https://mikeswei.github.io/CesiumVectorTile/screenshot2.jpg)
 ![](https://mikeswei.github.io/CesiumVectorTile/screenshot3.jpg)
+![](https://mikeswei.github.io/CesiumVectorTile/screenshot4.jpg)
 
 npm 安装
 
@@ -67,6 +68,10 @@ npm 安装
 * [text-encoding](https://github.com/inexorabletash/text-encoding)
 * [geojson-topojson](https://github.com/JeffPaine/geojson-topojson)
 #####  更新
+
+###### 2018.07.15：
+* 1、支持虚线和阴影
+
 ###### 2018.07.14：
 * 1、支持最新版Cesium；
 * 2、支持以注记的方式显示关键属性，如地名等。

@@ -1,4 +1,4 @@
-﻿  
+﻿
 define([
     'Util/turf',
     "Util/Shp",
@@ -303,6 +303,7 @@ define([
             var tolerance = that._simplifyTolerance;
             var lines = [], outlines = [], points = [], polygons = [];
             var onlyPoint = true;
+            var simplified;
             turf.featureEach(geoJSON, function (feature, index) {
                 if (feature.geometry.type == "Point"
                     || feature.geometry.type == "MultiPoint") {
@@ -323,17 +324,25 @@ define([
                     if (that._simplify) {
                         simplified = turf.simplify(feature, tolerance, false);
                         polygons.push(simplified);
+
+                        simplified = null;
                     } else {
                         polygons.push(feature);
+
                     }
                 }
                 if (feature.geometry.type == "MultiLineString"
                     || feature.geometry.type == "LineString") {
+
                     if (that._simplify) {
                         simplified = turf.simplify(feature, tolerance, false);
                         lines.push(simplified);
+
+                        simplified = null;
+
                     } else {
                         lines.push(feature);
+
                     }
                     onlyPoint = false;
                 }
@@ -341,6 +350,7 @@ define([
 
             if (lines.length > 0) {
                 that._lineGeoJSON = turf.featureCollection(lines);
+                lines = null;
             }
 
             if (outlines.length > 0) {
@@ -348,14 +358,17 @@ define([
                     outline.properties.isOutline = true;
                 })
                 that._outlineGeoJSON = turf.featureCollection(outlines);
+                outlines = null;
             }
 
             if (points.length > 0) {
                 that._pointGeoJSON = turf.featureCollection(points);
+                points = null;
             }
 
             if (polygons.length > 0) {
                 that._polygonJSON = turf.featureCollection(polygons);
+                polygons = null;
             }
 
             that._onlyPoint = onlyPoint;
@@ -382,6 +395,7 @@ define([
     *@param {Geojson.Feature}feature 当前要素（用Geojson.Feature存储）
     *@param {MeteoLib.Render.VectorStyle}style 即将应用与当前要素的样式，可以通过修改该参数中的各样式设置选项来针对当前要素进行特殊的样式设置。
     *修改后只对当前要素有效，不会修改Cesium.VectorTileImageryProvider的默认样式
+    *@example
     */
 
     VectorTileImageryProvider.instanceCount = 0;
@@ -612,9 +626,10 @@ define([
         if (this._polygonJSON) {
             canClipGeojsons.push(this._polygonJSON);
         }
+        var clipped;
         canClipGeojsons.forEach(function (geojson) {
             turf.featureEach(geojson, function (currentFeature, currentIndex) {
-                var clipped;
+                clipped = null;
                 try {
                     clipped = turf.bboxClip(currentFeature, bbox);
                     if (clipped && clipped.geometry.coordinates.length > 0) {
@@ -645,6 +660,7 @@ define([
                 }
             })
         })
+        clipped = null;
         if (features.length > 0) {
             features = turf.featureCollection(features);
             return features;
@@ -653,24 +669,32 @@ define([
     }
 
     //绘制多边形（面或线）
-    function drawContours(context, projection, boundingRect, x, y, contours, fill, stroke) {
+    function drawContours(context, projection, boundingRect, x, y, contours, fill, stroke, style) {
+
         contours.map(function (contour) {
-            var pointIndex = 0;
-            context.beginPath();
-            contour.map(function (coordinate) {
-                var pt = projection.project(coordinate, boundingRect)
-                if (pointIndex == 0) {
-                    context.moveTo(x + pt.x, y + pt.y);
-                } else {
-                    context.lineTo(x + pt.x, y + pt.y);
+            var lineOffsets = [0];//,style.lineOffset];
+            for (var i = 0; i < lineOffsets.length; i++) {
+                var lineOffset = lineOffsets[i];
+                if (typeof lineOffset === 'number') {
+                    var pointIndex = 0;
+
+                    context.beginPath();
+                    contour.map(function (coordinate) {
+                        var pt = projection.project(coordinate, boundingRect)
+                        if (pointIndex == 0) {
+                            context.moveTo(x + pt.x, y + pt.y);
+                        } else {
+                            context.lineTo(x + pt.x, y + pt.y);
+                        }
+                        pointIndex++;
+                    })
+                    if (stroke) {
+                        context.stroke();
+                    }
+                    if (fill) {
+                        context.fill();
+                    }
                 }
-                pointIndex++;
-            })
-            if (stroke) {
-                context.stroke();
-            }
-            if (fill) {
-                context.fill();
             }
         })
     }
@@ -859,20 +883,36 @@ define([
             context.lineWidth = style.lineWidth;
             context.strokeStyle = style.outlineColor.toCssColorString();// "rgb(255,255,0)";
             context.fillStyle = style.fillColor.toCssColorString();// "rgba(0,255,255,0.0)";
+            if (style.lineDash) {
+                context.setLineDash(style.lineDash);
+            }
+
+            context.lineCap = style.lineCap;
+            if (style.shadowColor && style.shadowColor instanceof Cesium.Color) {
+                context.shadowColor = style.shadowColor.toCssColorString();
+            } else {
+                context.shadowColor = style.shadowColor;
+            }
+            context.shadowBlur = style.shadowBlur;
+            context.shadowOffsetX = style.shadowOffsetX;
+            context.shadowOffsetY = style.shadowOffsetY;
+            context.miterLimit = style.miterLimit;
+            context.lineJoin = style.lineJoin;
 
             if (currentFeature.geometry.type == "Point") {
                 drawMarker(context, projection, boundingRect, x, y, currentFeature, fill, stroke, style.labelPropertyName, makerStyle);
             }
             else if (currentFeature.geometry.type == "Polygon" && style.fill) {
                 var contours = turf.getCoords(currentFeature);
-                drawContours(context, projection, boundingRect, x, y, contours, true, false);
+                drawContours(context, projection, boundingRect, x, y, contours, true, false, style);
             } else if (currentFeature.geometry.type == "MultiPolygon" && style.fill) {
                 var polygons;
                 try {
                     polygons = turf.getCoords(currentFeature);
                     polygons.map(function (contours) {
-                        drawContours(context, projection, boundingRect, x, y, contours, true, false);
+                        drawContours(context, projection, boundingRect, x, y, contours, true, false, style);
                     })
+
                 } catch (e) {
                     //     console.log(e);
                 }
@@ -881,7 +921,8 @@ define([
 
                 } else {
                     var contours = turf.getCoords(currentFeature);
-                    drawContours(context, projection, boundingRect, x, y, contours, false, true);
+                    drawContours(context, projection, boundingRect, x, y, contours, false, true, style);
+                    contours = null;
                 }
 
             }
@@ -890,18 +931,11 @@ define([
 
                 } else {
                     var contour = turf.getCoords(currentFeature);
-                    var pointIndex = 0;
-                    context.beginPath();
-                    contour.map(function (coordinate) {
-                        var pt = projection.project(coordinate, boundingRect)
-                        if (pointIndex == 0) {
-                            context.moveTo(x + pt.x, y + pt.y);
-                        } else {
-                            context.lineTo(x + pt.x, y + pt.y);
-                        }
-                        pointIndex++;
-                    })
-                    context.stroke();
+                    var contours = [contour]
+                    drawContours(context, projection, boundingRect, x, y, contours, false, true, style);
+                    contour = null;
+                    contours = null;
+
                 }
             }
         })
@@ -932,9 +966,20 @@ define([
                     that._state = VectorTileImageryProvider.State.GEOJSONDRAWING;
                     that._createCanvas();
                     that._context.clearRect(0, 0, that._canvas.width, that._canvas.height);
+                    //if (level < 8) {
+                    //    var v = 1.5 / Math.pow(2, (level + 0));
+                    //    try {
+                    //        clippedGeojson = turf.simplify(clippedGeojson, v);
+                    //    } catch (e) {
+
+                    //    }
+                     
+                    //}
+
                     that._drawGeojson(that._context, 0, 0, clippedGeojson, boundingRect, that._tileWidth, that._tileHeight, that._fill, that._outline);
 
                     that.cache[cacheId] = that._canvas;
+                    that.cache[cacheId].srcJson = clippedGeojson;
                     that.cacheCount++;
                     VectorTileImageryProvider._currentTaskCount--;
 
@@ -960,6 +1005,12 @@ define([
             that.cacheCount = 0;
         }
         if (!that.cache || that.cacheCount > that._tileCacheSize) {
+            for (var cacheId in that.cache) {
+                if (that.cache.hasOwnProperty(cacheId)) {
+                    that.cache[cacheId].srcJson = null;
+                    delete that.cache[cacheId];
+                }
+            }
             that.cache = {};
             that.cacheCount = 0;
         }
@@ -991,6 +1042,9 @@ define([
         }
         var rectangle = this.tilingScheme.tileXYToRectangle(x, y, level);
         return this._getTileImage(x, y, level, rectangle);
+    }
+    VectorTileImageryProvider.prototype.pickFeatures = function (x, y, level, longitude, latitude) {
+        //alert(longitude+","+ latitude);
     }
     return VectorTileImageryProvider;
 })
