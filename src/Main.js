@@ -2,12 +2,14 @@
     'VectorRenderer/VectorLayer',
     'VectorRenderer/VectorRenderer',
     'VectorRenderer/VectorStyle',
-    'VectorTileImageryProvider/VectorTileImageryProvider'
+    'VectorTileImageryProvider/VectorTileImageryProvider',
+    'Util/turf'
 ], function (
     VectorLayer,
     VectorRenderer,
     VectorStyle,
-    VectorTileImageryProvider
+    VectorTileImageryProvider,
+    turf
     ) {
 
     if (typeof window!=='undefined'&&!window.Cesium) {
@@ -19,5 +21,6 @@
     Cesium.VectorTileImageryProvider = VectorTileImageryProvider;
     Cesium.VectorLayer = VectorLayer;
     Cesium.VectorStyle = VectorStyle;
+    Cesium.turf = turf;
     return Cesium;
 })

@@ -1,4 +1,5 @@
-﻿define(function () {
+﻿ 
+define(function () {
     /**
      *
      *@param {Object} options
