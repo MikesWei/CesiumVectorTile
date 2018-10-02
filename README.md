@@ -4,6 +4,7 @@
 ![](https://mikeswei.github.io/CesiumVectorTile/screenshot2.jpg)
 ![](https://mikeswei.github.io/CesiumVectorTile/screenshot3.jpg)
 ![](https://mikeswei.github.io/CesiumVectorTile/screenshot4.jpg)
+![](https://mikeswei.github.io/CesiumVectorTile/screenshot5.jpg)
 
 npm 安装
 

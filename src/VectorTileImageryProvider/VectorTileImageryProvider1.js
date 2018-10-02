@@ -7,8 +7,7 @@ define([
     //'Util/Contour/PolyLine',
     //'Util/Contour/Polygon',
     'VectorRenderer/VectorStyle'
-    //,'Core/Resources'
-], function (
+], function(
     turf,
     shp,
     LonLatProjection,
@@ -16,7 +15,6 @@ define([
     //PolyLine,
     //Polygon,
     VectorStyle
-    //,Resources
 ) {
 
         if (Cesium.Resource) {
@@ -61,14 +59,11 @@ define([
         *  </ul>  
         *@param {Object}options 参数如下：
         *@param {String|turf.FeatureCollection|Object|Array<MeteoLib.Util.Contour.PolyLine|MeteoLib.Util.Contour.Polygon|File>}options.source MeteoLib.Util.Contour.PolyLine及MeteoLib.Util.Contour.Polygon数组、矢量文件url、矢量文件列表或者geojson对象
-        *@param {Cesium.VectorStyle}[options.defaultStyle=Cesium.VectorStyle.Default] 默认样式 
+        *@param {MeteoLib.Render.VectorStyle}[options.defaultStyle=MeteoLib.Render.VectorStyle.Default] 默认样式 
         *@param {Boolean}[options.simplify=false] true则简化，默认不简化
         *@param {Boolean}[options.simplifyTolerance=0.01] 简化公差
        *@param {Boolean}[options.minimumLevel=3] 最小级别
         *@param {Boolean}[options.maximumLevel=22] 最大级别
-        *@param {Boolean}[options.showMaximumLevel=true] 当超出最大级别时是否继续显示
-        *@param {Boolean}[options.removeDuplicate=true] 是否剔除重复（有相同的坐标）的多边形
-        * 
         *@param {Cesium.VectorTileImageryProvider~StyleFilterCallback}[options.styleFilter=undefined] 样式函数
         *@constructor
         *@memberof Cesium
@@ -141,154 +136,6 @@ define([
                 }
             }))
     
-        6.配图示例
-        appConfig.map = appConfig.map ? appConfig.map : {
-            focusAdminNames: ['北京', '天津', '河北'],
-            focusPropertyName: "NAME"
-        };
-        imageryProviders.seaLandImgProvider = new VectorTileImageryProvider({
-            source: appConfig.BaseURL + 'Assets/SampleData/sealand.geojson',
-            zIndex: 999,
-            minimumLevel: 0,
-            defaultStyle: {
-                fill: true,//是否填充海陆颜色
-                outlineColor: 'rgba(138,138,138,1)',//边界颜色
-                fillColor: 'rgba(235,235,235,1)',//陆地颜色
-                backgroundColor: 'rgba(89,129,188,1)'//海区颜色
-            }
-        });
-        imageryProviders.chinaBorderImgProvider = new VectorTileImageryProvider({
-            source: appConfig.BaseURL + 'Assets/SampleData/ChinaBorder.geojson',
-            zIndex: 999,
-            minimumLevel: 0,
-            defaultStyle: {
-                lineWidth: 1.25,
-                outlineColor: 'rgba(88,88,88,1)'
-            }
-        });
-
-        imageryProviders.provinceImgProvider = new VectorTileImageryProvider({
-            source: appConfig.BaseURL + 'Assets/SampleData/Province.geojson',
-            zIndex: 998,
-            minimumLevel: 0,
-            defaultStyle: {
-                lineWidth: 1,
-                //lineDash: [1, 4],
-                fill: true,
-                outline: true,
-                shadowColor: Cesium.Color.WHITE,
-                outlineColor: 'rgba(118,118,118,1)',
-                fillColor: 'rgba(225,225,225, .5)'
-            },
-            styleFilter: function (feature, style) {
-
-                if (appConfig.map) {
-                    var highlight = false;
-                    for (var i = 0; i < appConfig.map.focusAdminNames.length; i++) {
-                        highlight = feature.properties[appConfig.map.focusPropertyName]
-                            && feature.properties[appConfig.map.focusPropertyName].indexOf(appConfig.map.focusAdminNames[i]) >= 0;
-                        if (highlight) break;
-                    }
-                    if (highlight) {
-                        style.fill = false;
-                        style.outlineColor = Cesium.Color.BLACK;
-                        style.fillColor = Cesium.Color.WHITE;
-                        style.lineWidth = 1.25;
-                        style.lineDash = null;
-                    }
-                }
-
-                return style;
-            }
-        });
-
-        imageryProviders.adminLabelImgProvider = new VectorTileImageryProvider({
-            source: appConfig.BaseURL + 'Assets/SampleData/placeName.geojson',
-            minimumLevel: 3,
-            defaultStyle: {
-                showLabel: true,
-                labelPropertyName: "name",
-                fontFamily: 'heiti',
-                showMaker: true,
-                labelOffsetY: -12,
-                pointColor: 'rgba(118,118,118,1)',
-                labelStrokeWidth: 4,
-                fontSize: 12,
-                labelStroke: true,
-                fontColor: Cesium.Color.WHITE,
-                labelStrokeColor: 'rgba(118,118,118,1)'//Cesium.Color.BLACK
-            },
-            styleFilter: function (fc, style, x, y, level) {
-                var highlight = false;
-                if (appConfig.map && fc.properties.province) {
-
-                    for (var i = 0; i < appConfig.map.focusAdminNames.length; i++) {
-                        highlight = fc.properties.province.indexOf(
-                            appConfig.map.focusAdminNames[i]
-                        ) >= 0;
-                        if (highlight) break;
-                    }
-                }
-                if (highlight) {
-                    style.pointColor = Cesium.Color.BLACK;
-                }
-                if (fc.properties.adminType == 'province') {
-                    if (level > 14) {
-                        style.show = false;
-                    }
-                    style.showMaker = false;
-                    style.labelOffsetY = 0;
-                    style.fontSize = 16;
-                    if (highlight) {
-                        style.labelStrokeColor = Cesium.Color.fromBytes(160, 99, 57);
-                    } else {
-                        style.labelStrokeColor = Cesium.Color.fromBytes(140, 89, 47);
-                    }
-                } else {
-
-                    if (fc.properties.adminType == 'city') {
-                        if (level < 6) {
-                            style.show = false;
-                        }
-                    }
-                    if (fc.properties.adminType == 'county' && level < 10) {
-                        style.show = false;
-                    }
-                    if (fc.properties.adminType == 'country') {
-                        style.show = false;
-                    }
-
-                    if (level > 14) {
-                        style.fontSize = 18;
-                    }
-
-                    if (highlight) {
-                        style.labelStrokeColor = Cesium.Color.BLACK;
-                    }
-                }
-                if (level < 6) {
-                    style.fontSize = 9;
-                }
-                if (level > 4) {
-                    style.labelPropertyName = "name";
-                } else {
-                    style.labelPropertyName = "nameabbrevation";
-                }
-
-                return style;
-            }
-        })
-        imageryProviderViewModels.push(new Cesium.ProviderViewModel({
-            name: '海陆模版',
-            iconUrl: appConfig.BaseURL + 'Assets/Images/ImageryProviders/sealand.png',
-            tooltip: '海陆模版',
-            creationFunction: function () {
-                setTimeout(function () {
-                    imageryProviderViewModels.onSelected(imageryProviders.seaLandImgProvider);
-                }, 200);
-                return imageryProviders.seaLandImgProvider;
-            }
-        }));
         */
         function VectorTileImageryProvider(options) {
             ///@param {Boolean}[options.multipleTask=true] 是否使用多个VectorTileImageryProvider实例，使用多个实例是设置该参数为true可以提高ui响应速度，使用唯一一个实例时设置该参数为false则可以提高切片速度。
@@ -323,22 +170,19 @@ define([
             this._tileWidth = Cesium.defaultValue(options.tileWidth, 256);
             this._tileHeight = Cesium.defaultValue(options.tileHeight, 256);
 
-            //if (ext && ext == '.shp') {
-            //    ext = Path.GetExtension(options.source)
-            //    this._url = options.source.replace(ext, '');
-            //} else {
-            this._url = options.source;
-            //}
+            if (ext) {
+                this._url = options.source.replace(ext, '');
+            } else {
+                this._url = options.source;
+            }
             this._fileExtension = ext;
 
-            this._removeDuplicate = Cesium.defaultValue(options.removeDuplicate, true);
             this._simplifyTolerance = Cesium.defaultValue(options.simplifyTolerance, 0.01);
             this._simplify = Cesium.defaultValue(options.simplify, false);
             //this._multipleTask = Cesium.defaultValue(options.multipleTask, true);
             //this._taskWaitTime = Cesium.defaultValue(options.taskWaitTime, 10);
             this._maximumLevel = Cesium.defaultValue(options.maximumLevel, 22)
             this._minimumLevel = Cesium.defaultValue(options.minimumLevel, 3)
-            this._showMaximumLevel = Cesium.defaultValue(options.showMaximumLevel, true)
             this._makerImage = options.makerImage;
             this._tileCacheSize = Cesium.defaultValue(options.tileCacheSize, 200);
             if (typeof options.defaultStyle == 'object' && !(options.defaultStyle instanceof VectorStyle)) {
@@ -354,7 +198,7 @@ define([
 
             this._cache = {};
             this._count = 0;
-            this.zIndex = options.zIndex;
+
             this._bbox = null;
             this._geoJSON = null;
             var that = this;
@@ -363,11 +207,11 @@ define([
             if (typeof this._makerImage == 'string') {
                 makerImagePromise = Cesium.when.defer();
                 var image = new Image();
-                image.onload = function () {
+                image.onload = function() {
                     makerImagePromise.resolve(this);
                     that._makerImageEl = this;
                 }
-                image.onerror = function (err) {
+                image.onerror = function(err) {
                     makerImagePromise.resolve(err);
                 }
                 image.src = this._makerImage;
@@ -380,21 +224,18 @@ define([
             if (ext) {
                 switch (ext) {
                     case '.shp':
-                        shp(this._url).then(onSuccess, function (err) {
+                        shp(this._url).then(onSuccess, function(err) {
                             console.log("load shp file error：" + err);
                         });
                         break;
                     case '.json':
                     case '.geojson':
                     case '.topojson':
-                        //Resources.get(this._url)
-                        Cesium.loadText(this._url)
-                            .then(function (geojson) {
-                                eval("(" + geojson + ")")
-                                onSuccess(geojson);
-                            }).otherwise(function (err) {
-                                console.log(err);
-                            })
+                        Cesium.loadText(this._url).then(function(geojson) {
+                            onSuccess(JSON.parse(geojson));
+                        }).otherwise(function(err) {
+                            console.log(err);
+                        })
                         break;
                     default:
                         throw new Cesium.DeveloperError("The file  options.source provider is not supported.");
@@ -403,7 +244,7 @@ define([
                 if (isLocalShpFile) {
                     var prms = shp.parseShpFiles(that._url);
                     if (prms) {
-                        prms.then(onSuccess).otherwise(function (err) {
+                        prms.then(onSuccess).otherwise(function(err) {
                             console.log(err);
                             throw new Cesium.DeveloperError("The file  options.source provider is not supported.");
                         });
@@ -411,7 +252,7 @@ define([
                         throw new Cesium.DeveloperError("The file  options.source provider is not supported.");
                     }
                 } else {
-                    setTimeout(function () {
+                    setTimeout(function() {
                         if (Cesium.isArray(that._url)) {
                             var contourLines = that._url;
 
@@ -420,7 +261,7 @@ define([
                                 var multiLineString = [];
                                 for (var lineNum = 0; lineNum < contourLines.length; lineNum++) {
                                     coords = [];
-                                    contourLines[lineNum].PointList.forEach(function (pt) {
+                                    contourLines[lineNum].PointList.forEach(function(pt) {
                                         coords.push(pt.getCoordArray());
                                     })
                                     multiLineString.push(coords);
@@ -433,7 +274,7 @@ define([
                                 var multiPolygon = [];
                                 for (var lineNum = 0; lineNum < contourLines.length; lineNum++) {
                                     var coords = [];
-                                    contourLines[lineNum].OutLine.PointList.forEach(function (pt) {
+                                    contourLines[lineNum].OutLine.PointList.forEach(function(pt) {
                                         coords.push(pt.getCoordArray());
                                     })
                                     var polygon = turf.polygon(coords, contourLines[0].getProperties());
@@ -458,83 +299,17 @@ define([
             this._pointGeoJSON = null;
             this._polygonJSON = null;
             this._onlyPoint = false;
-            this._lineOnly = false;
-            this._polygonOnly = false;
-
             function onSuccess(geoJSON) {
                 var tolerance = that._simplifyTolerance;
                 var lines = [], outlines = [], points = [], polygons = [];
-                var onlyPoint = true, lineOnly = true, polygonOnly = true;
+                var onlyPoint = true;
                 var simplified;
-
-                function groupByCenterLabelPropertyName(geoJSON, centerLabelPropertyName) {
-                    var dic = {};
-                    turf.featureEach(geoJSON, function (fc) {
-
-                        if ((fc.geometry.type == 'Polygon'
-                            || fc.geometry.type == 'MultiPolygon')
-                            && that._defaultStyle.showCenterLabel
-                            && that._defaultStyle.centerLabelPropertyName
-                            && fc.properties.hasOwnProperty(centerLabelPropertyName)) {
-
-                            if (!dic[fc.properties[centerLabelPropertyName]]) {
-                                dic[fc.properties[centerLabelPropertyName]] = [];
-                            }
-                            dic[fc.properties[centerLabelPropertyName]].push(fc);
-                        }
-
-                    });
-                    var keys = Object.keys(dic);
-                    for (var i = 0; i < keys.length; i++) {
-                        var fc = dic[keys[i]][0];
-                        var fcs = turf.featureCollection(dic[keys[i]]);
-                        var center = turf.center(fcs)
-                        points.push(center);
-                        center.properties = fc.properties;
-                        delete dic[keys[i]];
-                    }
-
-                }
-
-                if (that._defaultStyle.showCenterLabel
-                    && that._defaultStyle.centerLabelPropertyName) {
-                    that._defaultStyle.showLabel = true;
-                    that._defaultStyle.labelPropertyName = that._defaultStyle.centerLabelPropertyName;
-
-                    groupByCenterLabelPropertyName(geoJSON, that._defaultStyle.centerLabelPropertyName);
-                }
-
-                turf.featureEach(geoJSON, function (fc) {
-
-                    if (fc.geometry.type == 'MultiPolygon') {
-                        var polygonCoords = turf.getCoords(fc);
-                        polygonCoords.forEach(function (coords) {
-                            geoJSON.features.push(turf.polygon(coords, fc.properties));
-                        })
-                        polygonCoords = [];
-                    }
-                })
-
-                for (var i = 0; i < geoJSON.features.length; i++) {
-                    if (geoJSON.features[i].geometry.type == 'MultiPolygon') {
-                        geoJSON.features.splice(i, 1)
-                    }
-                }
-                if (that._removeDuplicate) {
-                    geoJSON = turf.removeDuplicate(geoJSON);
-                }
-
-
-                turf.featureEach(geoJSON, function (feature, index) {
+                turf.featureEach(geoJSON, function(feature, index) {
                     if (feature.geometry.type == "Point"
                         || feature.geometry.type == "MultiPoint") {
                         points.push(feature);
-                        lineOnly = false;
-                        polygonOnly = false;
                     } else if (that._defaultStyle.showCenterLabel
-                        && that._defaultStyle.centerLabelPropertyName
-                        && feature.geometry.type !== "Polygon"
-                        && feature.geometry.type !== "MultiPolygon") {
+                        && that._defaultStyle.centerLabelPropertyName) {
                         that._defaultStyle.showLabel = true;
                         that._defaultStyle.labelPropertyName = that._defaultStyle.centerLabelPropertyName;
                         var center = turf.centerOfMass(feature)
@@ -546,8 +321,6 @@ define([
                         || feature.geometry.type == "MultiPolygon") {
                         outlines = outlines.concat(turf.polygonToLineString(feature).features);
                         onlyPoint = false;
-                        lineOnly = false;
-
                         if (that._simplify) {
                             simplified = turf.simplify(feature, tolerance, false);
                             polygons.push(simplified);
@@ -572,7 +345,6 @@ define([
 
                         }
                         onlyPoint = false;
-                        polygonOnly = false;
                     }
                 })
 
@@ -582,7 +354,7 @@ define([
                 }
 
                 if (outlines.length > 0) {
-                    outlines.forEach(function (outline) {
+                    outlines.forEach(function(outline) {
                         outline.properties.isOutline = true;
                     })
                     that._outlineGeoJSON = turf.featureCollection(outlines);
@@ -599,8 +371,6 @@ define([
                     polygons = null;
                 }
 
-                that._lineOnly = lineOnly;
-                that._polygonOnly = polygonOnly;
                 that._onlyPoint = onlyPoint;
                 that._state = VectorTileImageryProvider.State.LOADED;
                 that._bbox = turf.bbox(geoJSON);
@@ -610,7 +380,7 @@ define([
                 shpPromise.resolve(that);
             }
 
-            Cesium.when.all(promises, function () {
+            Cesium.when.all(promises, function() {
                 that._ready = that._state == VectorTileImageryProvider.State.LOADED;
                 that._createCanvas();
                 VectorTileImageryProvider.instanceCount++;
@@ -623,11 +393,8 @@ define([
         *样式设置函数
         *@callback  Cesium.VectorTileImageryProvider~StyleFilterCallback
         *@param {Geojson.Feature}feature 当前要素（用Geojson.Feature存储）
-        *@param {Cesium.VectorStyle}style 即将应用与当前要素的样式，可以通过修改该参数中的各样式设置选项来针对当前要素进行特殊的样式设置。
+        *@param {MeteoLib.Render.VectorStyle}style 即将应用与当前要素的样式，可以通过修改该参数中的各样式设置选项来针对当前要素进行特殊的样式设置。
         *修改后只对当前要素有效，不会修改Cesium.VectorTileImageryProvider的默认样式
-        *@param {Number}x
-        *@param {Number}y
-        *@param {Number}level
         *@example
         */
 
@@ -643,37 +410,13 @@ define([
         }
         Cesium.defineProperties(VectorTileImageryProvider.prototype, {
             /**
-            *  
-            * @memberof Cesium.VectorTileImageryProvider.prototype
-            * @type {Cesium.VectorTileImageryProvider~StyleFilterCallback} 
-            */
-            styleFilter: {
-                get: function () {
-                    return this._styleFilter;
-                },
-                set: function (val) {
-                    this._styleFilter = val;
-                }
-            },
-            /**
-             * 
-             * @memberof Cesium.VectorTileImageryProvider.prototype
-             * @type {Cesium.VectorStyle}
-             * @readonly
-             */
-            defaultStyle: {
-                get: function () {
-                    return this._defaultStyle;
-                }
-            },
-            /**
              * Gets the proxy used by this provider.
              * @memberof Cesium.VectorTileImageryProvider.prototype
              * @type {Proxy}
              * @readonly
              */
             proxy: {
-                get: function () {
+                get: function() {
                     return undefined;
                 }
             },
@@ -686,7 +429,7 @@ define([
              * @readonly
              */
             tileWidth: {
-                get: function () {
+                get: function() {
                     return this._tileWidth;
                 }
             },
@@ -699,7 +442,7 @@ define([
              * @readonly
              */
             tileHeight: {
-                get: function () {
+                get: function() {
                     return this._tileHeight;
                 }
             },
@@ -712,8 +455,8 @@ define([
              * @readonly
              */
             maximumLevel: {
-                get: function () {
-                    return this._showMaximumLevel ? this._maximumLevel : 22;
+                get: function() {
+                    return this._maximumLevel;
                 }
             },
 
@@ -725,7 +468,7 @@ define([
              * @readonly
              */
             minimumLevel: {
-                get: function () {
+                get: function() {
                     //if (this._minimumLevel <5) {
                     //    return this._minimumLevel;
                     //}
@@ -741,7 +484,7 @@ define([
              * @readonly
              */
             tilingScheme: {
-                get: function () {
+                get: function() {
                     return this._tilingScheme;
                 }
             },
@@ -754,7 +497,7 @@ define([
              * @readonly
              */
             rectangle: {
-                get: function () {
+                get: function() {
                     return this._bbox;//_tilingScheme.rectangle;
                 }
             },
@@ -769,7 +512,7 @@ define([
              * @readonly
              */
             tileDiscardPolicy: {
-                get: function () {
+                get: function() {
                     return undefined;
                 }
             },
@@ -783,7 +526,7 @@ define([
              * @readonly
              */
             errorEvent: {
-                get: function () {
+                get: function() {
                     return this._errorEvent;
                 }
             },
@@ -795,7 +538,7 @@ define([
              * @readonly
              */
             ready: {
-                get: function () {
+                get: function() {
                     return this._ready;
                 }
             },
@@ -807,7 +550,7 @@ define([
              * @readonly
              */
             readyPromise: {
-                get: function () {
+                get: function() {
                     return this._readyPromise;
                 }
             },
@@ -820,7 +563,7 @@ define([
              * @readonly
              */
             credit: {
-                get: function () {
+                get: function() {
                     return undefined;
                 }
             },
@@ -836,193 +579,59 @@ define([
              * @readonly
              */
             hasAlphaChannel: {
-                get: function () {
+                get: function() {
                     return true;
                 }
             }
         });
 
-        VectorTileImageryProvider.prototype._createCanvas = function () {
+        VectorTileImageryProvider.prototype._createCanvas = function() {
             this._canvas = document.createElement("canvas");
             this._canvas.width = this._tileWidth;
             this._canvas.height = this._tileHeight;
             this._context = this._canvas.getContext("2d");
-            if (this._defaultStyle.backgroundColor) {
-                this._context.fillStyle = this._defaultStyle.backgroundColor.toCssColorString();
-                this._context.fillRect(0, 0, this._canvas.width, this._canvas.height);
-            }
-
             this._context.lineWidth = this._defaultStyle.lineWidth;
             this._context.strokeStyle = this._defaultStyle.outlineColor.toCssColorString();// "rgb(255,255,0)";
             this._context.fillStyle = this._defaultStyle.fillColor.toCssColorString();// "rgba(0,255,255,0.0)";
-
         }
 
         var isWorking = false;
         //用当前瓦片（Tile）矩形裁剪geojson并返回裁剪结果
-        VectorTileImageryProvider.prototype._clipGeojson = function (rectangle) {
+        VectorTileImageryProvider.prototype._clipGeojson = function(rectangle) {
             var that = this;
             var bbox = [Cesium.Math.toDegrees(rectangle.west),
             Cesium.Math.toDegrees(rectangle.south),
             Cesium.Math.toDegrees(rectangle.east),
             Cesium.Math.toDegrees(rectangle.north)];
-
-            var polygonBBox = turf.polygon([[
+            var poly = turf.polygon([[
                 [bbox[0], bbox[1]],//sw
                 [bbox[2], bbox[1]],//se
                 [bbox[2], bbox[3]],//ne
                 [bbox[0], bbox[3]],//nw
                 [bbox[0], bbox[1]],//sw
             ]]);
-            //poly = turf.featureCollection([poly]);
-
-            //var polygonBBox = turf.bboxPolygon(bbox);
-            //    turf.polygon([[
-            //    [bbox[0], bbox[1]],//sw
-            //    [bbox[2], bbox[1]],//se
-            //    [bbox[2], bbox[3]],//ne
-            //    [bbox[0], bbox[3]],//nw
-            //    [bbox[0], bbox[1]],//sw
-            //]]);
-            var pointsBBox = [
-                [bbox[0], bbox[1]],
-                [bbox[2], bbox[1]],
-                [bbox[2], bbox[3]],
-                [bbox[0], bbox[3]],
-                [bbox[0], bbox[1]]
-            ];
-            for (var i = 0; i < pointsBBox.length; i++) {
-                var point = turf.point(pointsBBox[i]);
-                pointsBBox[i] = point;
-            }
-            pointsBBox = turf.featureCollection(pointsBBox);
-
-
+            poly = turf.featureCollection([poly]);
             var features = [];
             if (this._pointGeoJSON) {
-                //为了避免出现在边界的文字只画到一半，同时把周边切片包含的点也放在本切片绘制
-                var lonW = (bbox[2] - bbox[0]) / 2, latH = (bbox[3] - bbox[1]) / 2;
-                var polygonBBox4Points =
-                    //turf.bboxPolygon([
-                    //                    bbox[0] - lonW,
-                    //                    bbox[1] - latH,
-                    //                    bbox[2] + lonW,
-                    //                    bbox[3] + latH,
-                    //                ]);
-                    turf.polygon([[
-                        [bbox[0] - lonW, bbox[1] - latH],//sw
-                        [bbox[2] + lonW, bbox[1] - latH],//se
-                        [bbox[2] + lonW, bbox[3] + latH],//ne
-                        [bbox[0] - lonW, bbox[3] + latH],//nw
-                        [bbox[0] - lonW, bbox[1] - latH],//sw
-                    ]]);
-                var fcBBox = turf.featureCollection([polygonBBox4Points]);
-                var pts = turf.within(this._pointGeoJSON, fcBBox);
+                var pts = turf.within(this._pointGeoJSON, poly);
                 features = features.concat(pts.features);
             }
             var canClipGeojsons = [];
-
-
-            if (this._polygonJSON) {
-                canClipGeojsons.push(this._polygonJSON);
-            }
             if (this._lineGeoJSON) {
                 canClipGeojsons.push(this._lineGeoJSON);
             }
             if (this._outlineGeoJSON) {
                 canClipGeojsons.push(this._outlineGeoJSON);
             }
-
-            var clipped;
-            function clippedExists() {
-                var clippedCoords = turf.getCoords(clipped);
-                var exists = false;
-                for (var i = 0; i < features.length; i++) {
-                    var keys1 = Object.keys(clipped.properties);
-                    var keys2 = Object.keys(features[i].properties);
-
-                    if (keys1.length != keys2.length) {
-                        break;
-                    }
-                    var kEquals = true;
-                    for (var k_i = 0; k_i < keys1.length; k_i++) {
-                        if (keys1[k_i] != keys2[k_i]) {
-                            kEquals = false;
-                            break;
-                        }
-                    }
-                    if (!kEquals) {
-                        break;
-                    }
-                    kEquals = true;
-                    for (var k_i = 0; k_i < keys1.length; k_i++) {
-                        if (clipped.properties[keys1[k_i]] != features[i].properties[keys1[k_i]]) {
-                            kEquals = false;
-                            break;
-                        }
-                    }
-                    if (!kEquals) {
-                        break;
-                    }
-
-                    var tempCoords = turf.getCoords(features[i]);
-
-                    if (clippedCoords.length && clippedCoords.length == tempCoords.length) {
-                        var equals = true;
-                        for (var j = 0; j < clippedCoords.length; j++) {
-                            var c1 = clippedCoords[j], c2 = tempCoords[j];
-                            if (!Cesium.isArray(c1[0])) {
-                                try {
-                                    equals = c1[0] == c2[0] && c1[1] == c2[1];
-                                } catch (e) {
-                                    console.log(e)
-                                }
-
-                            } else if (c1.length == c2.length) {
-                                for (var k = 0; k < c1.length; k++) {
-
-                                    if (c1[k][0] != c2[k][0] || c1[k][1] != c2[k][1]) {
-                                        equals = false;
-                                        break;
-                                    }
-                                }
-
-                            } else {
-                                equals = false;
-                                break;
-                            }
-                            if (equals) {
-                                break;
-                            }
-                        }
-                        if (equals) {
-                            exists = true;
-                            break;
-                        }
-                    }
-
-                }
-
-                return exists;
+            if (this._polygonJSON) {
+                canClipGeojsons.push(this._polygonJSON);
             }
-
-            canClipGeojsons.forEach(function (geojson) {
-                turf.featureEach(geojson, function (currentFeature, currentIndex) {
-
+            var clipped;
+            canClipGeojsons.forEach(function(geojson) {
+                turf.featureEach(geojson, function(currentFeature, currentIndex) {
                     clipped = null;
                     try {
-                        //if (currentFeature.geometry.type == "Polygon"
-                        //    || currentFeature.geometry.type == "MultiPolygon") {
-                        //    //var fcs = turf.featureCollection([currentFeature]);
-                        //    //if (!turf.within(pointsBBox, fcs))
-                        //    clipped = turf.intersect(currentFeature, polygonBBox);
-                        //    //else
-                        //    //    clipped = polygonBBox;
-                        //    //fcs = null;
-                        //}
-                        if (!clipped) {
-                            clipped = turf.bboxClip(currentFeature, bbox);
-                        }
+                        clipped = turf.bboxClip(currentFeature, bbox);
                         if (clipped && clipped.geometry.coordinates.length > 0) {
                             var empty = true;
                             for (var i = 0; i < clipped.geometry.coordinates.length; i++) {
@@ -1032,26 +641,13 @@ define([
                                 }
                             }
                             if (!empty) {
-
-                                // if (!clippedExists()) {
                                 features.push(clipped);
-                                //}
-                            } else {
-                                //clipped = turf.intersect(currentFeature, polygonBBox);
-                                //if (clipped) {
-                                //    features.push(clipped);
-                                //}
-                                //var fcs = turf.featureCollection([currentFeature]);
-                                //if (turf.within(pointsBBox, fcs)) {
-                                //    features.push(polygonBBox);
-                                //}
-                                //fcs = null;
                             }
 
                         }
                     } catch (e) {
                         var coordinates = [];
-                        currentFeature.geometry.coordinates.forEach(function (contour) {
+                        currentFeature.geometry.coordinates.forEach(function(contour) {
                             if (contour.length > 3) {
                                 coordinates.push(contour);
                             }
@@ -1059,17 +655,13 @@ define([
                         currentFeature.geometry.coordinates = coordinates;
                         clipped = turf.bboxClip(currentFeature, bbox);
                         if (clipped && clipped.geometry.coordinates.length > 0) {
-
-                            //if (!clippedExists()) {
                             features.push(clipped);
-                            //}
                         }
                     }
                 })
             })
             clipped = null;
             if (features.length > 0) {
-
                 features = turf.featureCollection(features);
                 return features;
             }
@@ -1077,14 +669,14 @@ define([
         }
 
         /**
-            * 挖孔
-            * @param {any} context
-            * @param {any} projection
-            * @param {any} boundingRect
-            * @param {any} x
-            * @param {any} y
-            * @param {any} holes
-            */
+        * 挖孔
+        * @param {any} context
+        * @param {any} projection
+        * @param {any} boundingRect
+        * @param {any} x
+        * @param {any} y
+        * @param {any} holes
+        */
         function createHoles(context, projection, boundingRect, x, y, holes) {
             var tileCanvas = context.canvas;
             var imgData = context.getImageData(0, 0, tileCanvas.width, tileCanvas.height);
@@ -1095,11 +687,11 @@ define([
             var holeMaskCtx = holeMaskCanvas.getContext("2d");
 
             var mask = [];
-            holes.map(function (hole) {
+            holes.map(function(hole) {
                 holeMaskCtx.clearRect(0, 0, holeMaskCanvas.width, holeMaskCanvas.height);
                 holeMaskCtx.beginPath();
                 var pointIndex = 0;
-                hole.map(function (coordinate) {
+                hole.map(function(coordinate) {
                     var pt = projection.project(coordinate, boundingRect)
                     if (pointIndex == 0) {
                         holeMaskCtx.moveTo(x + pt.x, y + pt.y);
@@ -1129,11 +721,11 @@ define([
 
             var count = 0;
             var holes = [];
-            contours.map(function (contour) {
+            contours.map(function(contour) {
                 if (!fill || count <= 0) {
                     var pointIndex = 0;
                     context.beginPath();
-                    contour.map(function (coordinate) {
+                    contour.map(function(coordinate) {
                         var pt = projection.project(coordinate, boundingRect)
                         if (pointIndex == 0) {
                             context.moveTo(x + pt.x, y + pt.y);
@@ -1142,13 +734,12 @@ define([
                         }
                         pointIndex++;
                     })
-
-                    if (fill) {
-                        context.closePath();
-                        context.fill(); //context.stroke();
-                    }
                     if (stroke) {
                         context.stroke();
+                    }
+                    if (fill) {
+                        context.closePath();
+                        context.fill();
                     }
 
                 } else {
@@ -1162,8 +753,7 @@ define([
                 holes = null;
             }
         }
-
-
+      
         //画点
         function drawMarker(context, projection, boundingRect, x, y, pointFeature, fill, stroke, labelPropertyName, makerStyle) {
             if (typeof labelPropertyName == 'undefined') {
@@ -1188,52 +778,47 @@ define([
 
             context.font = style.fontSize + 'px ' + style.fontFamily + ' bold'
 
-            var coordinate = pointFeature.geometry.coordinates
+            var pt = projection.project(pointFeature.geometry.coordinates, boundingRect)
 
-            var percentX = (coordinate[0] - boundingRect.xMin) / (boundingRect.xMax - boundingRect.xMin);
-            var percentY = (coordinate[1] - boundingRect.yMax) / (boundingRect.yMin - boundingRect.yMax);
-
-            var pt = { x: percentX * context.canvas.width, y: percentY * context.canvas.height };
 
             if (style.showMaker) {
 
                 var px = pt.x + x,
                     py = pt.y + y;
-                //if (px + style.pointSize > context.canvas.width) {
-                //    px -= style.pointSize * 2;
-                //}
-                //if (px >= 0 && px - style.pointSize <= 0) {
-                //    px += style.pointSize;
-                //}
+                if (px + style.pointSize > context.canvas.width) {
+                    px -= style.pointSize * 2;
+                }
+                if (px >= 0 && px - style.pointSize <= 0) {
+                    px += style.pointSize;
+                }
 
-                //if (py + style.pointSize > context.canvas.width) {
-                //    py -= style.pointSize * 2;
-                //}
-                //if (py >= 0 && py - style.pointSize <= 0) {
-                //    py += style.pointSize;
-                //}
+                if (py + style.pointSize > context.canvas.width) {
+                    py -= style.pointSize * 2;
+                }
+                if (py >= 0 && py - style.pointSize <= 0) {
+                    py += style.pointSize;
+                }
 
                 if (style.markerSymbol && style.markerSymbol instanceof Image) {
-                    //if (px - style.markerSymbol.width / 2 < 0) {
-                    //    px += style.markerSymbol.width / 2;
-                    //}
-                    //if (py - style.markerSymbol.width / 2 < 0) {
-                    //    py += style.markerSymbol.width / 2;
-                    //}
+                    if (px - style.markerSymbol.width / 2 < 0) {
+                        px += style.markerSymbol.width / 2;
+                    }
+                    if (py - style.markerSymbol.width / 2 < 0) {
+                        py += style.markerSymbol.width / 2;
+                    }
 
-                    //if (px + style.markerSymbol.width / 2 > context.canvas.width) {
-                    //    px -= style.markerSymbol.width / 2;
-                    //}
-                    //if (py + style.markerSymbol.width / 2 > context.canvas.height) {
-                    //    py -= style.markerSymbol.width / 2;
-                    //}
-                    px -= style.markerSymbol.width / 2;
-                    py -= style.markerSymbol.height / 2;
+                    if (px + style.markerSymbol.width / 2 > context.canvas.width) {
+                        px -= style.markerSymbol.width / 2;
+                    }
+                    if (py + style.markerSymbol.width / 2 > context.canvas.height) {
+                        py -= style.markerSymbol.width / 2;
+                    }
+
                     context.drawImage(style.markerSymbol, px, py);//, style.pointSize, style.pointSize);
-
                 } else {
-                    px -= style.pointSize;
-                    py -= style.pointSize;
+
+
+
                     context.fillStyle = style.backgroundColor
                     context.beginPath();
                     context.arc(px, py, style.pointSize, 0, Math.PI * 2);
@@ -1257,51 +842,21 @@ define([
             if (style.showLabel) {
                 if (typeof pointFeature.properties[labelPropertyName] === 'string') {
                     context.fillStyle = style.color;
-                    var px = pt.x + x + style.labelOffsetX;//+ 4,
-                    py = pt.y + y + style.labelOffsetY;// + style.fontSize / 2;
+                    var px = pt.x + x + style.labelOffsetX + 4,
+                        py = pt.y + y + style.labelOffsetY + style.fontSize / 2;
 
                     var text = pointFeature.properties[labelPropertyName];
                     if (text) {
                         text = text.trim();
-                        var textImg = Cesium.writeTextToCanvas(text, {
-                            fill: true,
-                            font: style.fontSize + 'px ' + style.fontFamily,
-                            stroke: style.labelStroke,
-                            strokeWidth: style.labelStrokeWidth,
-                            strokeColor: style.labelStrokeColor,
-                            fillColor: Cesium.Color.fromCssColorString(style.color)
-                        })
+                        var textWidth = context.measureText(text).width;
+                        if (px + textWidth > context.canvas.width) {
+                            px -= (textWidth + style.pointSize + 6);
+                        }
 
-                        var textHeight = textImg.height;
-                        var textWidth = textImg.width;//context.measureText(text).width;
-                        px -= textWidth / 2 + style.pointSize;
-                        py -= textHeight / 2 + style.pointSize;
-                        //if (px + textWidth > context.canvas.width) {
-                        //    var delt = px + textWidth - context.canvas.width;
-                        //    px -= delt + style.pointSize;//(textWidth + style.pointSize + 6) / 2.0;
-                        //} else if (px - textWidth / 2 < 0) {
-                        //    px = 0;
-                        //} else {
-                        //    px -= textWidth / 2;
-                        //}
-
-                        //if (py + textHeight * 2.5 > context.canvas.height) {
-                        //    py = py - style.labelOffsetY - textHeight;
-                        //} else if (py < textHeight * 1.8) {
-                        //    py = pt.y + textHeight / 2.0 - style.labelOffsetY;
-                        //} else {
-                        //    py += textHeight / 2.0;
-                        //}
-
-                        //if (py + style.fontSize * 2.5 > context.canvas.height) {
-                        //    py = py - style.labelOffsetY - style.fontSize;
-                        //} else if (py < style.fontSize * 1.8) {
-                        //    py = pt.y + style.fontSize / 2.0 - style.labelOffsetY;
-                        //} else {
-                        //    py += style.fontSize / 2.0;
-                        //}
-                        context.drawImage(textImg, px, py)
-                        //context.fillText(text, px, py);
+                        if (py + style.fontSize > context.canvas.height) {
+                            py -= style.labelOffsetY + style.fontSize / 2;
+                        }
+                        context.fillText(text, px, py);
                     }
                 }
             }
@@ -1320,7 +875,7 @@ define([
          *@param {Object}[stroke=true] 
          *@private
          */
-        VectorTileImageryProvider.prototype._drawGeojson = function (context, x, y, geojson, boundingRect, width, height, fill, stroke, row, col, level) {
+        VectorTileImageryProvider.prototype._drawGeojson = function(context, x, y, geojson, boundingRect, width, height, fill, stroke) {
             var that = this;
             if (typeof fill == 'undefined') {
                 fill = true;
@@ -1343,9 +898,6 @@ define([
             var style = this._defaultStyle;
 
             var makerStyle = {
-                labelStroke: style.labelStroke,
-                labelStrokeWidth: style.labelStrokeWidth,
-                labelStrokeColor: style.labelStrokeColor,
                 pointSize: style.pointSize,
                 fontSize: style.fontSize,
                 fontFamily: style.fontFamily,
@@ -1361,37 +913,12 @@ define([
                 markerSymbol: style.makerImage instanceof Image ? style.makerImage : style.makerImageEl
             };
             var holes = [];
-            if (that._styleFilter) {
-                turf.featureEach(geojson, function (currentFeature, currentFeatureIndex) {
-                    if (that._styleFilter) {
-                        style = that._defaultStyle.clone();
-                        that._styleFilter(currentFeature, style, row, col, level);
-                        currentFeature.style = style;
-                    }
-                });
-                geojson.features.sort(function (a, b) {
-                    if (a.style && a.style.lineDash) {
-                        return 1;
-                    }
-                    if (b.style && b.style.lineDash) {
-                        return -1;
-                    }
-                    return 0;
-                })
-            }
-
-            function drawFeature(currentFeature, currentFeatureIndex) {
+            turf.featureEach(geojson, function(currentFeature, currentFeatureIndex) {
 
                 if (that._styleFilter) {
-                    style = currentFeature.style;
-                    if (style.show == false) {
-                        return;
-                    }
-
+                    style = that._defaultStyle.clone();
+                    that._styleFilter(currentFeature, style);
                     makerStyle = {
-                        labelStroke: style.labelStroke,
-                        labelStrokeWidth: style.labelStrokeWidth,
-                        labelStrokeColor: style.labelStrokeColor,
                         pointSize: style.pointSize,
                         fontSize: style.fontSize,
                         fontFamily: style.fontFamily,
@@ -1406,8 +933,6 @@ define([
                         labelOffsetY: style.labelOffsetY,
                         markerSymbol: style.makerImage instanceof Image ? style.makerImage : style.makerImageEl
                     };
-                } else {
-                    style = that._defaultStyle;
                 }
 
                 context.lineWidth = style.lineWidth;
@@ -1433,29 +958,25 @@ define([
                     drawMarker(context, projection, boundingRect, x, y, currentFeature, fill, stroke, style.labelPropertyName, makerStyle);
                 }
                 else if (currentFeature.geometry.type == "Polygon" && style.fill) {
-
                     var contours = turf.getCoords(currentFeature);
                     var tempHoles = drawContours(context, projection, boundingRect, x, y, contours, true, false, style);
                     if (tempHoles) {
-                        tempHoles.map(function (hole) {
+                        tempHoles.map(function(hole) {
                             hole.style = style;
                             holes.push(hole);
                         })
                     }
-                    //drawContours(context, projection, boundingRect, x, y, contours, true, false, style);
                 } else if (currentFeature.geometry.type == "MultiPolygon" && style.fill) {
                     var polygons;
                     try {
-
                         polygons = turf.getCoords(currentFeature);
-                        polygons.map(function (contours) {
+                        polygons.map(function(contours) {
                             var tempHoles = drawContours(context, projection, boundingRect, x, y, contours, true, false, style);
                             if (tempHoles) {
-                                tempHoles.map(function (hole) {
+                                tempHoles.map(function(hole) {
                                     hole.style = style;
                                     holes.push(hole);
                                 })
-
                             }
                         })
 
@@ -1484,30 +1005,14 @@ define([
 
                     }
                 }
-            }
-
-            turf.featureEach(geojson, function (fc, idx) {
-                if (fc.geometry.type == "Polygon" || fc.geometry.type == "MultiPolygon") {
-                    drawFeature(fc, idx)
-                } 
             })
             if (holes && holes.length) {
-                createHoles(context, projection, boundingRect, x, y, holes)
+                createHoles(context, projection, boundingRect, x, y, holes);
+                holes = null;
             }
-            turf.featureEach(geojson, function (fc, idx) {
-                if (fc.geometry.type == "LineString" || fc.geometry.type == "MultiLineString") {
-                    drawFeature(fc, idx)
-                }
-            })
-            turf.featureEach(geojson, function (fc, idx) {
-                if (fc.geometry.type == "Point" || fc.geometry.type == "MultiPoint") {
-                    drawFeature(fc, idx)
-                }
-            })
-            
         }
 
-        VectorTileImageryProvider.prototype._createTileImage = function (x, y, level, rectangle, defer) {
+        VectorTileImageryProvider.prototype._createTileImage = function(x, y, level, rectangle, defer) {
 
             var that = this;
             var cacheId = x + "," + y + "," + level;
@@ -1519,27 +1024,19 @@ define([
                 yMax: Cesium.Math.toDegrees(rectangle.north)
             };
             this._state = VectorTileImageryProvider.State.CLIPPING;
-            Cesium.requestAnimationFrame(function () {
+            Cesium.requestAnimationFrame(function() {
                 var clippedGeojson = that._clipGeojson(rectangle);
 
                 if (!clippedGeojson) {
-                    if (that._onlyPoint) {
-                        defer.resolve(getEmpty(that._defaultStyle.backgroundColor));
-                    }
-                    else {
-                        defer.resolve(undefined);
-                    }
+                    defer.resolve(undefined);
                     that._state = VectorTileImageryProvider.State.COMPELTED;
                     VectorTileImageryProvider._currentTaskCount--;
                 } else {
 
-                    Cesium.requestAnimationFrame(function () {
+                    Cesium.requestAnimationFrame(function() {
                         that._state = VectorTileImageryProvider.State.GEOJSONDRAWING;
                         that._createCanvas();
-                        if (!that._defaultStyle.backgroundColor) {
-                            that._context.clearRect(0, 0, that._canvas.width, that._canvas.height);
-                        }
-
+                        that._context.clearRect(0, 0, that._canvas.width, that._canvas.height);
                         //if (level < 8) {
                         //    var v = 1.5 / Math.pow(2, (level + 0));
                         //    try {
@@ -1550,7 +1047,7 @@ define([
 
                         //}
 
-                        that._drawGeojson(that._context, 0, 0, clippedGeojson, boundingRect, that._tileWidth, that._tileHeight, that._fill, that._outline, x, y, level);
+                        that._drawGeojson(that._context, 0, 0, clippedGeojson, boundingRect, that._tileWidth, that._tileHeight, that._fill, that._outline);
 
                         that.cache[cacheId] = that._canvas;
                         that.cache[cacheId].srcJson = clippedGeojson;
@@ -1559,7 +1056,7 @@ define([
 
                         defer.resolve(that._canvas);
 
-                        Cesium.requestAnimationFrame(function () {
+                        Cesium.requestAnimationFrame(function() {
                             that._state = VectorTileImageryProvider.State.COMPELTED;
                         });
                     });
@@ -1568,7 +1065,7 @@ define([
             });
         }
 
-        VectorTileImageryProvider.prototype._getTileImage = function (x, y, level, rectangle) {
+        VectorTileImageryProvider.prototype._getTileImage = function(x, y, level, rectangle) {
 
             var defer = Cesium.when.defer();
             var that = this;
@@ -1598,30 +1095,14 @@ define([
             }
             VectorTileImageryProvider._currentTaskCount++;
             that._state = VectorTileImageryProvider.State.READY;
-            setTimeout(function () {
+            setTimeout(function() {
                 return that._createTileImage(x, y, level, rectangle, defer)
             }, 1);
             return defer;
         }
 
-        var emptycv;
-
-        function getEmpty(bgColor) {
-            if (!emptycv) {
-
-                emptycv = document.createElement("canvas");
-                emptycv.width = 256;
-                emptycv.height = 256;
-            }
-            if (bgColor) {
-                var ctx = emptycv.getContex('2d');
-                ctx.fillStyle = bgColor.toCssColorString();
-                ctx.fillRect(0, 0, emptycv.width, emptycv.height);
-            }
-            return emptycv;
-        }
         var scratchRectangleIntersection = new Cesium.Rectangle();
-        VectorTileImageryProvider.prototype.requestImage = function (x, y, level, distance) {
+        VectorTileImageryProvider.prototype.requestImage = function(x, y, level, distance) {
             if (!this._ready || this._state != VectorTileImageryProvider.State.COMPELTED) {
                 return undefined;
             }
@@ -1629,13 +1110,11 @@ define([
                 this._createCanvas();
                 this._context.clearRect(0, 0, this._tileWidth, this._tileHeight);
                 return this._canvas;
-            } else if (level > this._maximumLevel) {
-                return getEmpty(this._defaultStyle.backgroundColor)
             }
             var rectangle = this.tilingScheme.tileXYToRectangle(x, y, level);
             return this._getTileImage(x, y, level, rectangle);
         }
-        VectorTileImageryProvider.prototype.pickFeatures = function (x, y, level, longitude, latitude) {
+        VectorTileImageryProvider.prototype.pickFeatures = function(x, y, level, longitude, latitude) {
             //alert(longitude+","+ latitude);
         }
         return VectorTileImageryProvider;

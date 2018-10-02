@@ -1,20 +1,16 @@
-﻿define(function () {
+﻿ 
+define(function () {
     /**
      *
      *@param {Object} options
      *@param {Cesium.Color|String}[options.outlineColor=Cesium.Color.YELLOW] 线或边颜色，仅线、面数据有效。
      *@param {Cesium.Color|String}[options.fillColor=Cesium.Color.fromBytes(0, 255, 255, 30)] 填充颜色，仅面数据有效。
-     *@param {Cesium.Color|String}[options.backgroundColor] 背景色
      *@param {Number}[options.lineWidth=1.5] 线宽，仅线数据有效。
      *@param {Boolean}[options.outline=true] 是否显示边，仅面数据有效。
      *@param {Boolean}[options.fill=true] 是否填充，仅面数据有效。
      *@param {Cesium.Color|String}[options.fontColor=Cesium.Color.BLACK] 注记文本颜色
      *@param {Number}[options.fontSize=16] 注记文本字体大小，仅在数据有点时有效。
      *@param {String}[options.fontFamily="宋体"] 注记文本字体名称，仅在数据有点时有效。
-     *@param {Boolean}[options.labelStroke] 是否显示注记文本轮廓线，仅在数据有点时有效。
-     *@param {String}[options.labelStrokeWidth=1] 注记文本轮廓线宽，仅在数据有点时有效。
-     *@param {Cesium.Color|String}[options.labelStrokeColor] 注记文本轮廓线颜色，仅在数据有点时有效。
-     * 
      *@param {Number}[options.pointSize=4] 注记点大小，仅在数据有点时有效。
      *@param {Cesium.Color|String}[options.pointColor=Cesium.Color.YELLOW] 注记点颜色，仅在数据有点时有效。
      *@param {String}[options.labelPropertyName='NAME'] 注记文本属性名称，仅在数据有点时有效。
@@ -24,8 +20,8 @@
      *@param {Number}[options.circleLineWidth=2] 注记点样式为Circle时，圆形线宽
      *@param {Boolean}[options.showMaker=true] 是否显示注记点，仅在数据有点时有效。
      *@param {Boolean}[options.showLabel=true] 是否显示文本，仅在数据有点时有效。
-     *@param {Boolean}[options.showCenterLabel=true] 是否显示文本，仅对线和面数据有效。
-     *@param {String}[options.centerLabelPropertyName] 几何中心注记文本属性名称，仅对线和面数据有效。
+     *@param {Boolean}[options.showCentroidLabel=true] 是否显示文本，仅对线和面数据有效。
+     *@param {String}[options.centroidLabelPropertyName] 几何中心注记文本属性名称，仅对线和面数据有效。
      *@param {Number}[options.labelOffsetX=10] 标注文本x方向偏移量，仅在数据有点时有效。以屏幕为参考，左上角为0，向右为正，单位为像素
      *@param {Number}[options.labelOffsetY=5] 标注文本y方向偏移量，仅在数据有点时有效。以屏幕为参考，左上角为0，向下为正，单位为像素 
      *@param {Array.<Number>}[options.lineDash=undefined] 虚线样式，不设置则为实线
@@ -53,20 +49,10 @@
         }
         this.fill = Cesium.defaultValue(options.fill, true);
 
-        this.labelStroke = options.labelStroke;
-        this.labelStrokeWidth = Cesium.defaultValue(options.labelStrokeWidth, 1);
-        this.labelStrokeColor = Cesium.defaultValue(options.labelStrokeColor, Cesium.Color.fromBytes(160, 99, 57));
-        if (typeof this.labelStrokeColor == 'string') {
-            this.labelStrokeColor = Cesium.Color.fromCssColorString(this.labelStrokeColor);
-        }
         //线样式
         this.outlineColor = Cesium.defaultValue(options.outlineColor, Cesium.Color.YELLOW);
         if (typeof this.outlineColor == 'string') {
             this.outlineColor = Cesium.Color.fromCssColorString(this.outlineColor);
-        }
-        this.backgroundColor = options.backgroundColor;
-        if (typeof this.backgroundColor == 'string') {
-            this.backgroundColor = Cesium.Color.fromCssColorString(this.backgroundColor);
         }
 
         this.lineWidth = Cesium.defaultValue(options.lineWidth, 1.5);
