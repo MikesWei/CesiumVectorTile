@@ -1179,6 +1179,22 @@ define([
             }
         }
 
+        if (!Object.assign) {
+            Object.assign = function (target, source) {
+                var result = {};
+                for (var key in target) {
+                    if (target.hasOwnProperty(key)) {
+                        result[key] = target[key];
+                    }
+                }
+                for (var key in source) {
+                    if (source.hasOwnProperty(key)) {
+                        result[key] = source[key];
+                    }
+                }
+                return target;
+            }
+        }
 
         //画点
         function drawMarker(context, projection, boundingRect, x, y, pointFeature, fill, stroke, labelPropertyName, makerStyle) {
@@ -1796,7 +1812,7 @@ define([
             this.clearCache()
             for (var key in this) {
                 if (this.hasOwnProperty(key)) {
-                    delete this[key]; 
+                    delete this[key];
                 }
             }
         }
