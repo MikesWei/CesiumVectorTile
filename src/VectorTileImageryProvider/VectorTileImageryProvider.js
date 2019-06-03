@@ -68,6 +68,7 @@ define([
         *@param {Boolean}[options.maximumLevel=22] 最大级别
         *@param {Boolean}[options.showMaximumLevel=true] 当超出最大级别时是否继续显示
         *@param {Boolean}[options.removeDuplicate=true] 是否剔除重复（有相同的坐标）的多边形
+        *@param {Boolean}[options.allowPick=false] 是否支持要素查询，如果支持要素查询则保留原始的geojson，会多占用系统内存
         * 
         *@param {Cesium.VectorTileImageryProvider~StyleFilterCallback}[options.styleFilter=undefined] 样式函数
         *@constructor
@@ -332,6 +333,7 @@ define([
             this._fileExtension = ext;
 
             this._removeDuplicate = Cesium.defaultValue(options.removeDuplicate, true);
+            this._allowPick = Cesium.defaultValue(options.allowPick, false);
             this._simplifyTolerance = Cesium.defaultValue(options.simplifyTolerance, 0.01);
             this._simplify = Cesium.defaultValue(options.simplify, false);
             //this._multipleTask = Cesium.defaultValue(options.multipleTask, true);
@@ -347,7 +349,9 @@ define([
             this._defaultStyle = Cesium.defaultValue(options.defaultStyle, VectorStyle.Default.clone());
             this._styleFilter = typeof options.styleFilter == 'function' ? options.styleFilter : undefined;
 
+
             this._errorEvent = new Cesium.Event();
+            this._featuresPicked = new Cesium.Event();
             this._readyPromise = Cesium.when.defer();
             this._ready = false;
             this._state = VectorTileImageryProvider.State.READY;
@@ -462,6 +466,8 @@ define([
             this._polygonOnly = false;
 
             function onSuccess(geoJSON) {
+                if (that._allowPick)
+                    that._geoJSON = geoJSON;
                 var tolerance = that._simplifyTolerance;
                 var lines = [], outlines = [], points = [], polygons = [];
                 var onlyPoint = true, lineOnly = true, polygonOnly = true;
@@ -787,7 +793,17 @@ define([
                     return this._errorEvent;
                 }
             },
-
+            /**
+             * 要素查询时触发事件（如果允许执行要素查询的话）
+             * @memberof Cesium.VectorTileImageryProvider.prototype
+             * @type {Event}
+             * @readonly
+             */
+            featuresPicked: {
+                get: function () {
+                    return this._featuresPicked;
+                }
+            },
             /**
              * Gets a value indicating whether or not the provider is ready for use.
              * @memberof Cesium.VectorTileImageryProvider.prototype
@@ -1489,7 +1505,7 @@ define([
             turf.featureEach(geojson, function (fc, idx) {
                 if (fc.geometry.type == "Polygon" || fc.geometry.type == "MultiPolygon") {
                     drawFeature(fc, idx)
-                } 
+                }
             })
             if (holes && holes.length) {
                 createHoles(context, projection, boundingRect, x, y, holes)
@@ -1504,7 +1520,7 @@ define([
                     drawFeature(fc, idx)
                 }
             })
-            
+
         }
 
         VectorTileImageryProvider.prototype._createTileImage = function (x, y, level, rectangle, defer) {
@@ -1637,6 +1653,152 @@ define([
         }
         VectorTileImageryProvider.prototype.pickFeatures = function (x, y, level, longitude, latitude) {
             //alert(longitude+","+ latitude);
+        }
+
+
+
+        var scratchRect = new Cesium.Rectangle();
+        /**
+         * 重写此函数，实现：要素被点击时准备好并返回要素查询结果信息。
+         * @param {Feature}feature geojson要素
+         * @param {Number}x 当前点所在tms瓦片编号x部分
+         * @param {Number}y 当前点所在tms瓦片编号y部分
+         * @param {Number}level 当前点所在tms瓦片级别
+         * @param {Number}longitude 当前点击的点经度（单位是弧度）
+         * @param {Number}latitude 当前点击的点纬度（单位是弧度）
+         * @return {Promise.<Cesium.ImageryLayerFeatureInfo>|Cesium.ImageryLayerFeatureInfo}
+         */
+        VectorTileImageryProvider.prototype.prepareFeatureInfo = function (feature, x, y, level, longitude, latitude) {
+            return undefined;
+        }
+        /**
+         * 实现Cesium.ImageryProvidery要素查询（拾取）接口，除了返回结果可以在Cesium内置的InfoBox显示之外，还触发featuresPicked事件。
+         * @param {Number}x
+         * @param {Number}y
+         * @param {Number}level
+         * @param {Number}longitude
+         * @param {Number}latitude
+         */
+        VectorTileImageryProvider.prototype.pickFeatures = function (x, y, level, longitude, latitude) {
+            if (!this._allowPick || !this._geoJSON) {
+                this._featuresPicked.raiseEvent(this, undefined);
+                return undefined;
+            }
+            this.tilingScheme.tileXYToRectangle(x, y, level, scratchRect);
+            var res = turf.radiansToLength(scratchRect.width / 256, 'kilometers');//分辨率，单位公里，即当前视图下一个像素点边长所表示距离
+
+            var pt = turf.point([Cesium.Math.toDegrees(longitude), Cesium.Math.toDegrees(latitude)]);
+
+            var pickedFeatures = [];
+            var style = this.defaultStyle;
+            var that = this;
+            turf.featureEach(this._geoJSON, function (fc) {
+                var srcFc = fc;
+                var found = false;
+                if (style.fill && (fc.geometry.type == 'Polygon' || fc.geometry.type == 'MultiPolygon')) {
+                    // if (turf.pointInPolygon(pt, fc)) { //
+                    if (turf.booleanPointInPolygon(pt, fc)) {
+                        found = true;
+                    }
+                } else {
+                    var dist = turf.pointToFeatureDistance(pt, fc, {
+                        units: "kilometers"
+                    })
+
+                    if ((style.outline && (fc.geometry.type == 'Polygon' || fc.geometry.type == 'MultiPolygon'))
+                        || (fc.geometry.type == "LineString" || fc.geometry.type == "MultiLineString")
+                    ) {
+                        found = dist <= res * 2.0;
+                    } else if (style.showMarker && (fc.geometry.type == 'Point' || fc.geometry.type == 'MultiPoint')) {
+
+                        switch (style.pointStyle) {
+                            case "Solid":
+                                found = dist <= style.pointSize * 2.0;
+                                break;
+                            case "Ring":
+                            case "Circle": found = dist <= (style.circleLineWidth + style.ringRadius) * 2.0;
+                                break;
+                        }
+                    }
+                }
+
+                if (found) {//查找成功
+                    var fcInfo;
+                    if (typeof that.prepareFeatureInfo == 'function') {
+                        fcInfo = that.prepareFeatureInfo(srcFc, x, y, level, longitude, latitude)
+                    }
+                    if (!fcInfo) {
+                        var fcInfo = new Cesium.ImageryLayerFeatureInfo();
+                        fcInfo.data = srcFc;
+                        fcInfo.description = JSON.stringify(srcFc.properties, null, 2);
+                        if (style.labelPropertyName) {
+                            fcInfo.name = srcFc.properties[style.labelPropertyName]
+                        }
+                        else if (style.centerLabelPropertyName) {
+                            fcInfo.name = srcFc.properties[style.centerLabelPropertyName]
+                        }
+
+                        if (srcFc.geometry.type == 'Point' || srcFc.geometry.type == 'MultiPoint') {
+                            fcInfo.position = new Cesium.Cartographic(longitude, latitude)
+                        } else {
+                            var centroidPt = turf.centroid(srcFc);
+                            var coord = turf.getCoords(centroidPt);
+                            fcInfo.position = Cesium.Cartographic.fromDegrees(coord[0], coord[1])
+                        }
+                    }
+                    pickedFeatures.push(fcInfo)
+                }
+            })
+            if (pickedFeatures.length) {
+                var df = Cesium.when.defer();
+                var startTime = new Date();
+                Cesium.when.all(pickedFeatures, function (pickedFeatures) {
+                    var timespan = new Date() - startTime;
+                    if (timespan < 100) {
+                        setTimeout(function () {
+                            that._featuresPicked.raiseEvent(that, pickedFeatures);
+                            df.resolve(pickedFeatures);
+                        }, 100);
+                    } else {
+                        that._featuresPicked.raiseEvent(that, pickedFeatures);
+                        df.resolve(pickedFeatures);
+                    }
+                }, function (err) {
+                    console.error(err);
+                    that._featuresPicked.raiseEvent(that, undefined);
+                })
+                return df.promise;
+            } else {
+                that._featuresPicked.raiseEvent(that, undefined);
+            }
+        }
+        /**
+         * @callback Cesium.VectorTileImageryProvider~featuresPickedCallback
+         * @param {Cesium.VectorTileImageryProvider}ImageryProvider
+         * @param {Array.<Cesium.ImageryLayerFeatureInfo>}pickedFeatures
+         */
+
+        /**
+         * 
+         */
+        VectorTileImageryProvider.prototype.clearCache = function () {
+            for (var key in this.cache) {
+                if (this.cache.hasOwnProperty(key)) {
+                    delete this.cache[key];
+                }
+            }
+            this.cache = {}
+        }
+        /**
+         * 
+         */
+        VectorTileImageryProvider.prototype.destroy = function () {
+            this.clearCache()
+            for (var key in this) {
+                if (this.hasOwnProperty(key)) {
+                    delete this[key]; 
+                }
+            }
         }
         return VectorTileImageryProvider;
     })

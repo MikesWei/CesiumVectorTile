@@ -5,6 +5,7 @@
 ![](https://mikeswei.github.io/CesiumVectorTile/screenshot3.jpg)
 ![](https://mikeswei.github.io/CesiumVectorTile/screenshot4.jpg)
 ![](https://mikeswei.github.io/CesiumVectorTile/screenshot5.jpg)
+![](https://mikeswei.github.io/CesiumVectorTile/screenshot6.png)
 
 npm 安装
 
@@ -69,6 +70,9 @@ npm 安装
 * [text-encoding](https://github.com/inexorabletash/text-encoding)
 * [geojson-topojson](https://github.com/JeffPaine/geojson-topojson)
 #####  更新
+
+###### 2019.06.03
+* 1、支持要素查询：增加构造函数可选参数allowPick，事件featuresPicked
 
 ###### 2018.07.15：
 * 1、支持虚线和阴影
