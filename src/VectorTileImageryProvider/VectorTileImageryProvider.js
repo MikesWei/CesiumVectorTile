@@ -647,7 +647,7 @@ define([
             GEOJSONDRAWING: 4,
             COMPELTED: 5
         }
-        Cesium.defineProperties(VectorTileImageryProvider.prototype, {
+        Object.defineProperties(VectorTileImageryProvider.prototype, {
             /**
             *  
             * @memberof Cesium.VectorTileImageryProvider.prototype
