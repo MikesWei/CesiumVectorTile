@@ -71,6 +71,13 @@ npm 安装
 * [geojson-topojson](https://github.com/JeffPaine/geojson-topojson)
 #####  更新
 
+###### 2020.04.15
+* 1、增加TypeScript定义CesiumVectorTile.d.ts；
+
+###### 2020.03.17
+* 1、支持leaflet（仅支持EPSG4326）；
+* 2、解决与第三方库（如Vue）结合的一些问题。
+
 ###### 2019.06.03
 * 1、支持要素查询：增加构造函数可选参数allowPick，事件featuresPicked
 

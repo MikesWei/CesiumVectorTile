@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>MeteoLib参考文档: 类: GeographicProjection</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">类: GeographicProjection</h1>
+
+    
+
+
+
+
+<section>
+
+<header>
+    
+        <h2>
+        GeographicProjection
+        </h2>
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+
+    
+
+    <h4 class="name" id="GeographicProjection"><span class="type-signature"></span>new GeographicProjection<span class="signature">(ellipsoid<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    A simple map projection where longitude and latitude are linearly mapped to X and Y by multiplying
+them by the <a href="Ellipsoid.html#maximumRadius">Ellipsoid#maximumRadius</a>.  This projection
+is commonly known as geographic, equirectangular, equidistant cylindrical, or plate carrée.  It
+is also known as EPSG:4326.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>ellipsoid</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="Ellipsoid.html">Ellipsoid</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    Ellipsoid.WGS84
+                
+                </td>
+            
+
+            <td class="description last">The ellipsoid.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="CesiumVectorTile.pure.js.html">CesiumVectorTile.pure.js</a>, <a href="CesiumVectorTile.pure.js.html#line9303">line 9303</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+    <dt class="tag-see">See:</dt>
+    <dd class="tag-see">
+        <ul>
+            <li><a href="WebMercatorProjection.html">WebMercatorProjection</a></li>
+        </ul>
+    </dd>
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    </div>
+
+    
+
+    
+
+    
+
+     
+
+    
+
+    
+        <h3 class="subsection-title">Members</h3>
+
+        
+            
+<h4 class="name" id="ellipsoid"><span class="type-signature">(readonly) </span>ellipsoid<span class="type-signature"> :<a href="Ellipsoid.html">Ellipsoid</a></span></h4>
+
+
+
+
+<div class="description">
+    Gets the <a href="Ellipsoid.html">Ellipsoid</a>.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type"><a href="Ellipsoid.html">Ellipsoid</a></span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="CesiumVectorTile.pure.js.html">CesiumVectorTile.pure.js</a>, <a href="CesiumVectorTile.pure.js.html#line9318">line 9318</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+
+    
+
+    <h4 class="name" id="project"><span class="type-signature"></span>project<span class="signature">(cartographic, result<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {<a href="Cartesian3.html">Cartesian3</a>}</span></h4>
+
+    
+
+
+
+<div class="description">
+    Projects a set of <a href="Cartographic.html">Cartographic</a> coordinates, in radians, to map coordinates, in meters.
+X and Y are the longitude and latitude, respectively, multiplied by the maximum radius of the
+ellipsoid.  Z is the unmodified height.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>cartographic</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="Cartographic.html">Cartographic</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">The coordinates to project.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>result</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="Cartesian3.html">Cartesian3</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">An instance into which to copy the result.  If this parameter is
+       undefined, a new instance is created and returned.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="CesiumVectorTile.pure.js.html">CesiumVectorTile.pure.js</a>, <a href="CesiumVectorTile.pure.js.html#line9337">line 9337</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    The projected coordinates.  If the result parameter is not undefined, the
+         coordinates are copied there and that instance is returned.  Otherwise, a new instance is
+         created and returned.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="Cartesian3.html">Cartesian3</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="unproject"><span class="type-signature"></span>unproject<span class="signature">(cartesian, result<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {<a href="Cartographic.html">Cartographic</a>}</span></h4>
+
+    
+
+
+
+<div class="description">
+    Unprojects a set of projected <a href="Cartesian3.html">Cartesian3</a> coordinates, in meters, to <a href="Cartographic.html">Cartographic</a>
+coordinates, in radians.  Longitude and Latitude are the X and Y coordinates, respectively,
+divided by the maximum radius of the ellipsoid.  Height is the unmodified Z coordinate.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>cartesian</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="Cartesian3.html">Cartesian3</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">The Cartesian position to unproject with height (z) in meters.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>result</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="Cartographic.html">Cartographic</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">An instance into which to copy the result.  If this parameter is
+       undefined, a new instance is created and returned.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="CesiumVectorTile.pure.js.html">CesiumVectorTile.pure.js</a>, <a href="CesiumVectorTile.pure.js.html#line9366">line 9366</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    The unprojected coordinates.  If the result parameter is not undefined, the
+         coordinates are copied there and that instance is returned.  Otherwise, a new instance is
+         created and returned.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="Cartographic.html">Cartographic</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">主页</a></h2><h3>命名空间</h3><ul><li><a href="Cesium.html">Cesium</a></li><li><a href="Fullscreen.html">Fullscreen</a></li></ul><h3>类</h3><ul><li><h5><a href="Cesium.html">Cesium</a></h5></li><li><a href="Cesium.Path.html">Path</a></li><li><a href="Cesium.VectorStyle.html">VectorStyle</a></li><li><a href="Cesium.VectorTileImageryProvider.html">VectorTileImageryProvider</a></li></ul><h3>Modules</h3><ul><li><a href="module-clone.html">clone</a></li><li><a href="module-combine.html">combine</a></li><li><a href="module-defaultValue.html">defaultValue</a></li><li><a href="module-defined.html">defined</a></li><li><a href="module-destroyObject.html">destroyObject</a></li><li><a href="module-FeatureDetection.html">FeatureDetection</a></li><li><a href="module-getAbsoluteUri.html">getAbsoluteUri</a></li><li><a href="module-getBaseUri.html">getBaseUri</a></li><li><a href="module-getExtensionFromUri.html">getExtensionFromUri</a></li><li><a href="module-isArray.html">isArray</a></li><li><a href="module-Math.html">Math</a></li><li><a href="module-objectToQuery.html">objectToQuery</a></li><li><a href="module-queryToObject.html">queryToObject</a></li><li><a href="module-Request.html">Request</a></li><li><a href="module-RequestState.html">RequestState</a></li><li><a href="module-RequestType.html">RequestType</a></li><li><a href="module-TrustedServers.html">TrustedServers</a></li><li><a href="module-writeTextToCanvas.html">writeTextToCanvas</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Fri Jul 23 2021 23:41:58 GMT+0800 (GMT+08:00)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

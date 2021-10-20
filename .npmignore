@@ -2,3 +2,16 @@ node_modules/
 .git/
 .vs/
 *.sln
+Assets/
+build/
+Document/
+example/
+ThirdParty/
+src-old
+screenshot*.jpg
+screenshot*.png
+Web.config
+.gitignore
+appConfig.js
+index.html
+requirejs.config.js

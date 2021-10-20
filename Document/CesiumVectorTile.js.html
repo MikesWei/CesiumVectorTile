@@ -32817,7 +32817,7 @@ define('Util/shp',[
     /**
     * 提供shapefile格式矢量文件解析相关工具
     *@class  shp
-    *@memberof MeteoLib.Util
+    *@memberof Cesium.Util
     */
 
     /**
@@ -32827,7 +32827,7 @@ define('Util/shp',[
      * @method 
      * @name groupFiles
      * @static
-     * @memberof MeteoLib.Util.shp
+     * @memberof Cesium.Util.shp
      */
     shp.groupFiles = function (files) {
         var shpFile, dbfFile, prjFile;
@@ -32848,7 +32848,7 @@ define('Util/shp',[
     * @method 
     * @name parseShpFiles
     * @static
-    * @memberof MeteoLib.Util.shp
+    * @memberof Cesium.Util.shp
     */
 
     shp.parseShpFiles = function (files, toTopojson) {
@@ -33142,7 +33142,7 @@ define('VectorRenderer/VectorLayer',[
     /**
     *
     *@param {Object} options
-    *@param {String|turf.FeatureCollection|Object|Array&lt;MeteoLib.Util.Contour.PolyLine>|Array&lt;MeteoLib.Util.Contour.Polygon>}options.source 矢量文件url或者geojson对象    
+    *@param {String|turf.FeatureCollection|Object|Array&lt;Cesium.Util.Contour.PolyLine>|Array&lt;Cesium.Util.Contour.Polygon>}options.source 矢量文件url或者geojson对象    
     *@param {Cesium.VectorStyle}[options.style=new VectorStyle()] 矢量文件url或者geojson对象    
     *@param {Boolean}[options.simplify=false] true则简化，默认不简化
     *@param {Boolean}[options.simplifyTolerance=0.01] 简化公差
@@ -33402,7 +33402,7 @@ define('Util/Shp',[
     /**
     * 提供shapefile格式矢量文件解析相关工具
     *@class  shp
-    *@memberof MeteoLib.Util
+    *@memberof Cesium.Util
     */
 
     /**
@@ -33412,7 +33412,7 @@ define('Util/Shp',[
      * @method 
      * @name groupFiles
      * @static
-     * @memberof MeteoLib.Util.shp
+     * @memberof Cesium.Util.shp
      */
     shp.groupFiles = function (files) {
         var shpFile, dbfFile, prjFile;
@@ -33433,7 +33433,7 @@ define('Util/Shp',[
     * @method 
     * @name parseShpFiles
     * @static
-    * @memberof MeteoLib.Util.shp
+    * @memberof Cesium.Util.shp
     */
 
     shp.parseShpFiles = function (files, toTopojson) {
@@ -39902,7 +39902,7 @@ define('VectorRenderer/VectorRenderer',[
 
 
         /**
-        *矢量渲染器，支持esri shapefile、geojson文件，也可以直接加载geojson对象或MeteoLib.Contour.Polygon、MeteoLib.Contour.Polyline集合
+        *矢量渲染器，支持esri shapefile、geojson文件，也可以直接加载geojson对象或MeteoLib.Contour.Polygon、Cesium.Contour.Polyline集合
         *@param {Object}options 参数如下：
         *@param {Object}options.width
         *@param {Object}options.height
@@ -40592,8 +40592,8 @@ define('VectorTileImageryProvider/VectorTileImageryProvider',[
         *       &lt;li>&lt;a href="https://mikeswei.github.io/CesiumVectorTile/" target="_blank">VectorTileImageryProviderDemo&lt;/a>&lt;/li>
         *  &lt;/ul>  
         *@param {Object}options 参数如下：
-        *@param {String|turf.FeatureCollection|Object|Array&lt;MeteoLib.Util.Contour.PolyLine|MeteoLib.Util.Contour.Polygon|File>}options.source MeteoLib.Util.Contour.PolyLine及MeteoLib.Util.Contour.Polygon数组、矢量文件url、矢量文件列表或者geojson对象
-        *@param {MeteoLib.Render.VectorStyle}[options.defaultStyle=MeteoLib.Render.VectorStyle.Default] 默认样式 
+        *@param {String|turf.FeatureCollection|Object|Array&lt;Cesium.Util.Contour.PolyLine|Cesium.Util.Contour.Polygon|File>}options.source Cesium.Util.Contour.PolyLine及MeteoLib.Util.Contour.Polygon数组、矢量文件url、矢量文件列表或者geojson对象
+        *@param {Cesium.VectorStyle}[options.defaultStyle=Cesium.VectorStyle.Default] 默认样式 
         *@param {Boolean}[options.simplify=false] true则简化，默认不简化
         *@param {Boolean}[options.simplifyTolerance=0.01] 简化公差
        *@param {Boolean}[options.minimumLevel=3] 最小级别
@@ -40927,7 +40927,7 @@ define('VectorTileImageryProvider/VectorTileImageryProvider',[
         *样式设置函数
         *@callback  Cesium.VectorTileImageryProvider~StyleFilterCallback
         *@param {Geojson.Feature}feature 当前要素（用Geojson.Feature存储）
-        *@param {MeteoLib.Render.VectorStyle}style 即将应用与当前要素的样式，可以通过修改该参数中的各样式设置选项来针对当前要素进行特殊的样式设置。
+        *@param {Cesium.VectorStyle}style 即将应用与当前要素的样式，可以通过修改该参数中的各样式设置选项来针对当前要素进行特殊的样式设置。
         *修改后只对当前要素有效，不会修改Cesium.VectorTileImageryProvider的默认样式
         *@example
         */

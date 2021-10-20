@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>MeteoLib参考文档: Module: getAbsoluteUri</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Module: getAbsoluteUri</h1>
+
+    
+
+
+
+
+<section>
+
+<header>
+    
+        
+            
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+            <div class="description">Given a relative Uri and a base Uri, returns the absolute Uri of the relative Uri.</div>
+        
+
+        
+            
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>relative</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">The relative Uri.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>base</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">The base Uri.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="CesiumVectorTile.pure.js.html">CesiumVectorTile.pure.js</a>, <a href="CesiumVectorTile.pure.js.html#line16520">line 16520</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    The absolute Uri of the given relative Uri.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">String</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>//absolute Uri will be "https://test.com/awesome.png";
+var absoluteUri = Cesium.getAbsoluteUri('awesome.png', 'https://test.com');</code></pre>
+
+
+
+        
+    
+    </div>
+
+    
+
+    
+
+    
+
+     
+
+    
+
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">主页</a></h2><h3>命名空间</h3><ul><li><a href="Cesium.html">Cesium</a></li><li><a href="Fullscreen.html">Fullscreen</a></li></ul><h3>类</h3><ul><li><h5><a href="Cesium.html">Cesium</a></h5></li><li><a href="Cesium.Path.html">Path</a></li><li><a href="Cesium.VectorStyle.html">VectorStyle</a></li><li><a href="Cesium.VectorTileImageryProvider.html">VectorTileImageryProvider</a></li></ul><h3>Modules</h3><ul><li><a href="module-clone.html">clone</a></li><li><a href="module-combine.html">combine</a></li><li><a href="module-defaultValue.html">defaultValue</a></li><li><a href="module-defined.html">defined</a></li><li><a href="module-destroyObject.html">destroyObject</a></li><li><a href="module-FeatureDetection.html">FeatureDetection</a></li><li><a href="module-getAbsoluteUri.html">getAbsoluteUri</a></li><li><a href="module-getBaseUri.html">getBaseUri</a></li><li><a href="module-getExtensionFromUri.html">getExtensionFromUri</a></li><li><a href="module-isArray.html">isArray</a></li><li><a href="module-Math.html">Math</a></li><li><a href="module-objectToQuery.html">objectToQuery</a></li><li><a href="module-queryToObject.html">queryToObject</a></li><li><a href="module-Request.html">Request</a></li><li><a href="module-RequestState.html">RequestState</a></li><li><a href="module-RequestType.html">RequestType</a></li><li><a href="module-TrustedServers.html">TrustedServers</a></li><li><a href="module-writeTextToCanvas.html">writeTextToCanvas</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Fri Jul 23 2021 23:41:58 GMT+0800 (GMT+08:00)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

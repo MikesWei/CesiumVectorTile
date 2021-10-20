@@ -1,0 +1,66 @@
+{
+  "_from": "@types/cesium@ts3.5",
+  "_id": "@types/cesium@1.54.5",
+  "_inBundle": false,
+  "_integrity": "sha512-j8xgg0D+EjUiTafOAd+oP7mFycE/rIOpKZD2Cngmco7M3+Xw5a//SeyerYHc7uCERHXBH+58uvzofI9UpKn2hg==",
+  "_location": "/@types/cesium",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "tag",
+    "registry": true,
+    "raw": "@types/cesium@ts3.5",
+    "name": "@types/cesium",
+    "escapedName": "@types%2fcesium",
+    "scope": "@types",
+    "rawSpec": "ts3.5",
+    "saveSpec": null,
+    "fetchSpec": "ts3.5"
+  },
+  "_requiredBy": [
+    "#DEV:/",
+    "#USER"
+  ],
+  "_resolved": "https://registry.npmjs.org/@types/cesium/-/cesium-1.54.5.tgz",
+  "_shasum": "8e540ce8df86002b73cf85ad583621acecf84e10",
+  "_spec": "@types/cesium@ts3.5",
+  "_where": "/Users/xiuyongwei/Library/Caches/typescript/3.5",
+  "bugs": {
+    "url": "https://github.com/DefinitelyTyped/DefinitelyTyped/issues"
+  },
+  "bundleDependencies": false,
+  "contributors": [
+    {
+      "name": "Aigars Zeiza",
+      "url": "https://github.com/Zuzon"
+    },
+    {
+      "name": "Harry Nicholls",
+      "url": "https://github.com/hnipps"
+    },
+    {
+      "name": "Jared Szechy",
+      "url": "https://github.com/szechyjs"
+    },
+    {
+      "name": "Radek Goláň jr.",
+      "url": "https://github.com/golyalpha"
+    }
+  ],
+  "dependencies": {},
+  "deprecated": false,
+  "description": "TypeScript definitions for cesium",
+  "homepage": "https://github.com/DefinitelyTyped/DefinitelyTyped#readme",
+  "license": "MIT",
+  "main": "",
+  "name": "@types/cesium",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DefinitelyTyped/DefinitelyTyped.git",
+    "directory": "types/cesium"
+  },
+  "scripts": {},
+  "typeScriptVersion": "3.0",
+  "types": "index",
+  "typesPublisherContentHash": "e7cb03274f29783f44293819170f710bd8a126b02cc738962626abfddbf51037",
+  "version": "1.54.5"
+}
