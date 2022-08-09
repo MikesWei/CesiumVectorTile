@@ -1,7 +1,7 @@
 ﻿
-VectorTileImageryProvider = Cesium.VectorTileImageryProvider;
+var VectorTileImageryProvider = Cesium.VectorTileImageryProvider;
 
-viewer = new Cesium.Viewer("cesiumContainer");
+var viewer = new Cesium.Viewer("cesiumContainer");
 var imageryProviderViewModels = viewer.baseLayerPicker.viewModel.imageryProviderViewModels;
 var terrainProviderViewModels = viewer.baseLayerPicker.viewModel.terrainProviderViewModels;
 viewer.baseLayerPicker.viewModel.selectedImagery = imageryProviderViewModels[imageryProviderViewModels.length - 1];
@@ -212,7 +212,7 @@ var shpPromises2 = [
     Cesium.Resource.fetchBlob("Assets/Data/shp/world/国家简化边界.dbf"),
     Cesium.Resource.fetchBlob("Assets/Data/shp/world/国家简化边界.prj"),
 ];
-Cesium.when.all(shpPromises2, function (files) {
+Promise.all(shpPromises2, function (files) {
 
     files[0].name = "国家简化边界.shp";
     files[1].name = "国家简化边界.dbf";

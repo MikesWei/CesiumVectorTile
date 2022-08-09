@@ -28292,14 +28292,11 @@ var shpFuncObj = {
 function makeParseCoord(trans) {
   if (trans) {
     return function(data, offset) {
-      var coord=[data.readDoubleLE(offset), data.readDoubleLE(offset + 8)]
-      if(isNaN(coord[0])||isNaN(coord[1]))return coord;
-      return trans.inverse(coord);
+      return trans.inverse([data.readDoubleLE(offset), data.readDoubleLE(offset + 8)]);
     };
   } else {
     return function(data, offset) {
-      var coord=[data.readDoubleLE(offset), data.readDoubleLE(offset + 8)]
-      return coord;
+      return [data.readDoubleLE(offset), data.readDoubleLE(offset + 8)];
     };
   }
 }
@@ -34933,69 +34930,58 @@ module.exports = LonLatProjection;
 },{}],120:[function(require,module,exports){
 
 var shp = require('shpjs/lib/index.js');
-var when = require('when');
 var readAsArrayBuffer = require('./utils/readAsArrayBuffer');
 var readAsText = require('./utils/readAsText');
 var Path = require('./utils/Path');
 
-shp.groupFiles = function (files) {
-    var group = {};
-    for (var i = 0; i < files.length; i++) {
-        var name = Path.ChangeExtension(files[i].name, "");
-        if (!group[name]) {
-            group[name] = [];
-        }
-        group[name].push(files[i]);
-    }
-    return group;
-}
-
-shp.parseShpFiles = function (files, encoding) {
-    if (!files || files.length > 0) {
-        var df = when.defer();
-        var promise = df.promise;
-        var shpFile, dbfFile, prjFile;
+var Shp = Object.assign(shp, {
+    groupFiles: function (files) {
+        var group = {};
         for (var i = 0; i < files.length; i++) {
-            if (files[i].name.toLocaleLowerCase().indexOf(".shp") > 0) {
-                shpFile = files[i];
+            var name = Path.ChangeExtension(files[i].name, "");
+            if (!group[name]) {
+                group[name] = [];
             }
-            if (files[i].name.toLocaleLowerCase().indexOf(".prj") > 0) {
-                prjFile = files[i];
-            }
-            if (files[i].name.toLocaleLowerCase().indexOf(".dbf") > 0) {
-                dbfFile = files[i];
-            }
+            group[name].push(files[i]);
         }
-        if (!shpFile || !prjFile || !dbfFile) {
-            // throw new Error("打开文件失败,请通过ctrl+同时选择shp、prj、dbf三个文件");
-            df.reject(new Error("打开文件失败,请通过ctrl+同时选择shp、prj、dbf三个文件"));
-            return promise;
-        }
-        readAsArrayBuffer(shpFile).then(function (shpBuffer) {
-            readAsText(prjFile).then(function (prjBuffer) {
-                readAsArrayBuffer(dbfFile).then(function (dbfBuffer) {
-                    var parsed = shp.combine([shp.parseShp(shpBuffer, prjBuffer), shp.parseDbf(dbfBuffer, encoding)]);
-                    parsed.fileName = shpFile.name.toLocaleLowerCase();
+        return group;
+    },
+    parseShpFiles: function (files, encoding) {
+        if (!files || files.length > 0) {
+            var shpFile, dbfFile, prjFile;
+            for (var i = 0; i < files.length; i++) {
+                if (files[i].name.toLocaleLowerCase().indexOf(".shp") > 0) {
+                    shpFile = files[i];
+                }
+                if (files[i].name.toLocaleLowerCase().indexOf(".prj") > 0) {
+                    prjFile = files[i];
+                }
+                if (files[i].name.toLocaleLowerCase().indexOf(".dbf") > 0) {
+                    dbfFile = files[i];
+                }
+            }
+            if (!shpFile || !prjFile || !dbfFile) {
+                // throw new Error("打开文件失败,请通过ctrl+同时选择shp、prj、dbf三个文件");
+                return Promise.reject(new Error("打开文件失败,请通过ctrl+同时选择shp、prj、dbf三个文件"));
+            }
 
-                    df.resolve(parsed);
-                }).otherwise(function (err) {
-                    df.reject(err);
+            return readAsArrayBuffer(shpFile).then(function (shpBuffer) {
+                return readAsText(prjFile).then(function (prjBuffer) {
+                    return readAsArrayBuffer(dbfFile).then(function (dbfBuffer) {
+                        var parsed = shp.combine([shp.parseShp(shpBuffer, prjBuffer), shp.parseDbf(dbfBuffer, encoding)]);
+                        parsed.fileName = shpFile.name.toLocaleLowerCase();
+                        return parsed;
+                    })
                 })
-            }).otherwise(function (err) {
-                df.reject(err);
             })
-        }).otherwise(function (err) {
-            df.reject(err);
-        })
-  
-        return promise;
-    } else {
-        throw new Error("文件列表不能为空");
+        } else {
+            return Promise.reject(new Error("文件列表不能为空"));
+        }
     }
-}
+});
 
-module.exports = shp;
-},{"./utils/Path":182,"./utils/readAsArrayBuffer":185,"./utils/readAsText":186,"shpjs/lib/index.js":91,"when":118}],121:[function(require,module,exports){
+module.exports = Shp;
+},{"./utils/Path":182,"./utils/readAsArrayBuffer":185,"./utils/readAsText":186,"shpjs/lib/index.js":91}],121:[function(require,module,exports){
 var defaultValue = require('./cesium/Core/defaultValue');
 var defined = require('./cesium/Core/defined');
 var when = require('when');
@@ -35185,7 +35171,6 @@ var defineProperties = require('./cesium/Core/defineProperties')
 var defined = require('./cesium/Core/defined');
 var defaultValue = require('./cesium/Core/defaultValue');
 var Event = require('./cesium/Core/Event');
-var when = require('when');
 var CesiumMath = require('./cesium/Core/Math');
 
 var turf = require('./turf-light')
@@ -35598,9 +35583,11 @@ function VectorTileImageryProvider(options) {
     this._errorEvent = new Event();
     this._featuresPicked = new Event();
 
-    var readyDf = when.defer();
-
-    this._readyPromise = readyDf.promise; //Cesium.when.defer();
+    var readyDf = {};
+    this._readyPromise = new Promise(function (resolve, reject) {
+        readyDf.resolve = resolve
+        readyDf.reject = reject
+    });
     this._ready = false;
     this._state = VectorTileImageryProvider.State.READY;
 
@@ -35616,21 +35603,25 @@ function VectorTileImageryProvider(options) {
     var that = this;
     var promises = [];
     if (typeof this._makerImage == 'string') {
-        var makerImageDf = when.defer();
-        var image = new Image();
-        image.onload = function () {
-            makerImageDf.resolve(this);
-            that._makerImageEl = this;
-        }
-        image.onerror = function (err) {
-            makerImageDf.resolve(err);
-        }
-        image.src = this._makerImage;
-        promises.push(makerImageDf.promise);
+
+        promises.push(new Promise(function (resolve, reject) {
+            var image = new Image();
+            image.onload = function () {
+                resolve(this);
+                that._makerImageEl = this;
+            }
+            image.onerror = function (err) {
+                reject(err);
+            }
+            image.src = that._makerImage
+        }));
     }
 
-    var shpDf = when.defer();
-    promises.push(shpDf.promise);
+    var shpDf = {};
+    promises.push(new Promise(function (resolve, reject) {
+        shpDf.resolve = resolve
+        shpDf.reject = reject
+    }));
     this._state = VectorTileImageryProvider.State.SHPLOADING;
     if (ext) {
         switch (ext) {
@@ -35647,7 +35638,7 @@ function VectorTileImageryProvider(options) {
                     if (typeof VectorTileImageryProvider.shp == 'function') {
                         VectorTileImageryProvider.shp(url, undefined, "gbk").then(onSuccess, function (err) {
                             console.log("load shp file error：" + err);
-                            that.readyPromise.reject(err)
+                            readyDf.reject(err)
                         });
                     } else {
                         throw new Error('找不到shp()方法，请确认是否引用了shpjs')
@@ -35662,7 +35653,7 @@ function VectorTileImageryProvider(options) {
                 loadJson(this._url)
                     .then(function (geojson) {
                         onSuccess(geojson);
-                    }).otherwise(function (err) {
+                    }).catch(function (err) {
                         console.log(err);
                     })
                 break;
@@ -35671,16 +35662,17 @@ function VectorTileImageryProvider(options) {
         }
     } else {
         if (isLocalShpFile) {
-            if (typeof shp == 'undefined') {
-                if (typeof VectorTileImageryProvider.shp == 'function') {
-                    shp = VectorTileImageryProvider.shp;
-                } else {
-                    throw new Error('找不到shp()方法，请确认是否引用了shpjs')
-                }
+            var prms
+            if (typeof shp == 'function') {
+                prms = shp.parseShpFiles(that._url);
+            } else if (typeof VectorTileImageryProvider.shp == 'function') {
+                prms = VectorTileImageryProvider.shp.parseShpFiles(that._url);
+            } else {
+                throw new Error('找不到shp()方法，请确认是否引用了shpjs')
             }
-            var prms = shp.parseShpFiles(that._url);
+
             if (prms) {
-                prms.then(onSuccess).otherwise(function (err) {
+                prms.then(onSuccess).catch(function (err) {
                     readyDf.reject(err);
                     //console.log(err);
                     //throw new Error("The file  options.source provider is not supported.");
@@ -35888,13 +35880,13 @@ function VectorTileImageryProvider(options) {
         shpDf.resolve(that);
     }
 
-    when.all(promises).then(function () {
+    Promise.all(promises).then(function () {
         that._ready = that._state == VectorTileImageryProvider.State.LOADED;
         that._createCanvas();
         VectorTileImageryProvider.instanceCount++;
         readyDf.resolve(true);
         that._state = VectorTileImageryProvider.State.COMPELTED;
-    }).otherwise(function (err) {
+    }).catch(function (err) {
         readyDf.reject(err);
     });
 }
@@ -36905,7 +36897,7 @@ VectorTileImageryProvider.prototype._createTileImage = function (x, y, level, re
             VectorTileImageryProvider._currentTaskCount--;
         } else {
 
-            Cesium.requestAnimationFrame(function () {
+            requestAnimationFrame(function () {
                 that._state = VectorTileImageryProvider.State.GEOJSONDRAWING;
                 that._createCanvas();
                 if (!that._defaultStyle.backgroundColor) {
@@ -36931,7 +36923,7 @@ VectorTileImageryProvider.prototype._createTileImage = function (x, y, level, re
 
                 defer.resolve(that._canvas);
 
-                Cesium.requestAnimationFrame(function () {
+                requestAnimationFrame(function () {
                     that._state = VectorTileImageryProvider.State.COMPELTED;
                 });
             });
@@ -36957,7 +36949,6 @@ VectorTileImageryProvider.prototype.clearCache = function () {
 
 VectorTileImageryProvider.prototype._getTileImage = function (x, y, level, rectangle) {
 
-    var defer = when.defer();
     var that = this;
 
     //从缓存中查询
@@ -36976,13 +36967,20 @@ VectorTileImageryProvider.prototype._getTileImage = function (x, y, level, recta
         that.cacheCount = 0;
     }
     if (that.cache[cacheId]) {
-        return that.cache[cacheId]
+        return Promise.resolve(that.cache[cacheId])
     }
 
     //处理并发
     if (VectorTileImageryProvider._maxTaskCount < VectorTileImageryProvider._currentTaskCount) {
         return undefined;
     }
+
+    var defer = {};
+    defer.promise = new Promise(function (resolve, reject) {
+        defer.resolve = resolve
+        defer.reject = reject
+    })
+
     VectorTileImageryProvider._currentTaskCount++;
     that._state = VectorTileImageryProvider.State.READY;
     setTimeout(function () {
@@ -37028,9 +37026,9 @@ VectorTileImageryProvider.prototype.requestImage = function (x, y, level, distan
     if (level < this._minimumLevel) {
         this._createCanvas();
         this._context.clearRect(0, 0, this._tileWidth, this._tileHeight);
-        return this._canvas;
+        return Promise.resolve(this._canvas);
     } else if (level > this._maximumLevel) {
-        return getEmpty(this._defaultStyle.backgroundColor)
+        return Promise.resolve(getEmpty(this._defaultStyle.backgroundColor))
     }
     var rectangle = this.tilingScheme.tileXYToRectangle(x, y, level);
     return this._getTileImage(x, y, level, rectangle);
@@ -37198,9 +37196,14 @@ VectorTileImageryProvider.prototype.pickFeatures = function (x, y, level, longit
         }
     })
     if (pickedFeatures.length) {
-        var df = when.defer();
+        var df = {};
+        df.promise = new Promise(function (resolve, reject) {
+            df.resolve = resolve
+            df.reject = reject
+        })
+
         var startTime = new Date();
-        when.all(pickedFeatures).then(function (pickedFeatures) {
+        Promise.all(pickedFeatures).then(function (pickedFeatures) {
             var timespan = new Date() - startTime;
             if (timespan < 100) {
                 setTimeout(function () {
@@ -37211,7 +37214,7 @@ VectorTileImageryProvider.prototype.pickFeatures = function (x, y, level, longit
                 that._featuresPicked.raiseEvent(that, pickedFeatures);
                 df.resolve(pickedFeatures);
             }
-        }).otherwise(function (err) {
+        }).catch(function (err) {
             console.error(err);
             that._featuresPicked.raiseEvent(that, undefined);
         })
@@ -37287,7 +37290,7 @@ if (typeof L != 'undefined' && L.GridLayer && L.GridLayer.extend) {
 }
 module.exports = VectorTileImageryProvider;
 
-},{"./LonLatProjection":119,"./VectorStyle":121,"./cesium/Core/Event":133,"./cesium/Core/Math":139,"./cesium/Core/Rectangle":140,"./cesium/Core/Resource":146,"./cesium/Core/defaultValue":158,"./cesium/Core/defineProperties":159,"./cesium/Core/defined":160,"./turf-light":181,"./utils/Path":182,"./utils/drawText":184,"when":118}],123:[function(require,module,exports){
+},{"./LonLatProjection":119,"./VectorStyle":121,"./cesium/Core/Event":133,"./cesium/Core/Math":139,"./cesium/Core/Rectangle":140,"./cesium/Core/Resource":146,"./cesium/Core/defaultValue":158,"./cesium/Core/defineProperties":159,"./cesium/Core/defined":160,"./turf-light":181,"./utils/Path":182,"./utils/drawText":184}],123:[function(require,module,exports){
 //增加对shp格式的支持
 /**
    * 
@@ -53137,14 +53140,20 @@ module.exports = g.Cesium;
 
 },{"./VectorTileImageryProvider":123,"./cesium-core":124,"proj4":82}],181:[function(require,module,exports){
 
-var turf = require('@turf/helpers');
-turf = Object.assign(turf, {
+var turfHelpers = require('@turf/helpers'); 
+var turf = Object.assign(turfHelpers,   {
     bbox: require('@turf/bbox').default,
     bboxPolygon: require('@turf/bbox-polygon').default,
     bboxClip: require('@turf/bbox-clip').default,
     polygonToLine: require('@turf/polygon-to-line').default,
     pointToLineDistance: require('@turf/point-to-line-distance').default,
     booleanPointInPolygon: require('@turf/boolean-point-in-polygon').default,
+    simplify: require('@turf/simplify'),
+    polygonToLineString: require('@turf/polygon-to-line').default,
+    center: require('@turf/center').default,
+    centerOfMass: require('@turf/center-of-mass').default,
+    centroid: require('@turf/centroid').default,
+    within: require('@turf/within'),
     featureEach: function (geojson, callback) {
         if (geojson.type === 'Feature') {
             callback(geojson, 0);
@@ -53162,11 +53171,6 @@ turf = Object.assign(turf, {
             features: features
         }
     },
-    simplify: require('@turf/simplify').default,
-    polygonToLineString: require('@turf/polygon-to-line').default,
-    center: require('@turf/center').default,
-    centerOfMass: require('@turf/center-of-mass').default,
-    centroid: require('@turf/centroid').default,
     lineEquals: function (coords1, coords2) {
         var equals = coords1.length == coords2.length;
         if (equals) {
@@ -53222,8 +53226,7 @@ turf = Object.assign(turf, {
         fcs = turf.featureCollection(fcs);
 
         return fcs;
-    },
-    within: require('@turf/within')
+    }
 })
 turf = Object.assign(turf, require('@turf/invariant'))
 turf.distance = require('@turf/distance').default
@@ -53539,42 +53542,41 @@ function drawText(text, options) {
 
 module.exports = drawText; 
 },{"../cesium/Core/writeTextToCanvas":177,"./drawRoundedRect":183}],185:[function(require,module,exports){
-var when = require('when');
 
-function readAsArrayBuffer(file) {
-    var df = when.defer();
-    var fr = new FileReader();
-    fr.onload = function (e) {
-        df.resolve(e.target.result);
-    }
-    fr.onprogress = function (e) {
-        if (df.progress) df.progress(e.target.result);
-    }
-    fr.onerror = function (e) {
-        df.reject(e.error);
-    }
-    fr.readAsArrayBuffer(file);
-    return df.promise;
+function readAsArrayBuffer(file, onProgress) {
+    return new Promise(function (resolve, reject) {
+        var fr = new FileReader();
+        fr.onload = function (e) {
+            resolve(e.target.result);
+        }
+        fr.onprogress = function (e) {
+            if (onProgress) onProgress(e.target.result);
+        }
+        fr.onerror = function (e) {
+            reject(e.error);
+        }
+        fr.readAsArrayBuffer(file);
+    })
 }
 module.exports = readAsArrayBuffer;
-},{"when":118}],186:[function(require,module,exports){
-var when = require('when');
-function readAsText(file) {
-    var df = when.defer();
-    var fr = new FileReader();
-    fr.onload = function (e) {
-        df.resolve(e.target.result);
-    }
-    fr.onprogress = function (e) {
-        if (df.progress) df.progress(e.target.result);
-    }
-    fr.onerror = function (e) {
-        df.reject(e.error);
-    }
-    fr.readAsText(file);
-    return df.promise;
+},{}],186:[function(require,module,exports){
+
+function readAsText(file, onProgress) {
+    return new Promise(function (resolve, reject) {
+        var fr = new FileReader();
+        fr.onload = function (e) {
+            resolve(e.target.result);
+        }
+        fr.onprogress = function (e) {
+            if (onProgress) onProgress(e.target.result);
+        }
+        fr.onerror = function (e) {
+            reject(e.error);
+        }
+        fr.readAsText(file);
+    })
 }
 module.exports = readAsText;
-},{"when":118}]},{},[180])(180)
+},{}]},{},[180])(180)
 });
 //# sourceMappingURL=CesiumVectorTile.js.map

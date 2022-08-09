@@ -1,0 +1,2 @@
+import VectorTileImageryProvider from './VectorTileImageryProvider'
+export default VectorTileImageryProvider

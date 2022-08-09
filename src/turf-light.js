@@ -1,12 +1,18 @@
 
-var turf = require('@turf/helpers');
-turf = Object.assign(turf, {
+var turfHelpers = require('@turf/helpers'); 
+var turf = Object.assign(turfHelpers,   {
     bbox: require('@turf/bbox').default,
     bboxPolygon: require('@turf/bbox-polygon').default,
     bboxClip: require('@turf/bbox-clip').default,
     polygonToLine: require('@turf/polygon-to-line').default,
     pointToLineDistance: require('@turf/point-to-line-distance').default,
     booleanPointInPolygon: require('@turf/boolean-point-in-polygon').default,
+    simplify: require('@turf/simplify'),
+    polygonToLineString: require('@turf/polygon-to-line').default,
+    center: require('@turf/center').default,
+    centerOfMass: require('@turf/center-of-mass').default,
+    centroid: require('@turf/centroid').default,
+    within: require('@turf/within'),
     featureEach: function (geojson, callback) {
         if (geojson.type === 'Feature') {
             callback(geojson, 0);
@@ -24,11 +30,6 @@ turf = Object.assign(turf, {
             features: features
         }
     },
-    simplify: require('@turf/simplify').default,
-    polygonToLineString: require('@turf/polygon-to-line').default,
-    center: require('@turf/center').default,
-    centerOfMass: require('@turf/center-of-mass').default,
-    centroid: require('@turf/centroid').default,
     lineEquals: function (coords1, coords2) {
         var equals = coords1.length == coords2.length;
         if (equals) {
@@ -84,8 +85,7 @@ turf = Object.assign(turf, {
         fcs = turf.featureCollection(fcs);
 
         return fcs;
-    },
-    within: require('@turf/within')
+    }
 })
 turf = Object.assign(turf, require('@turf/invariant'))
 turf.distance = require('@turf/distance').default

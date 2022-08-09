@@ -1,4 +1,24 @@
 {
+  "name": "cesiumvectortile",
+  "version": "1.2.3",
+  "description": "Cesium VectorTileImageryProvider",
+  "author": {
+    "name": "weixiuyong",
+    "url": "https://github.com/MikesWei"
+  },
+  "main": "./src/index.js",
+  "scripts": {
+    "start": "mesh3d start -p=8023",
+    "build": "node src/bundle.js",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "Cesium",
+    "VectorTile",
+    "geojson",
+    "shape file",
+    "shp"
+  ],
   "dependencies": {
     "@turf/bbox": "^6.0.1",
     "@turf/bbox-clip": "^6.0.3",
@@ -20,26 +40,8 @@
   },
   "devDependencies": {
     "browserify": "^16.5.0",
+    "cesium": "^1.96.0",
     "exorcist": "^1.0.1",
     "uglify-js": "^2.8.13"
-  },
-  "description": "Cesium VectorTileImageryProvider",
-  "author": {
-    "name": "weixiuyong",
-    "url": "https://github.com/MikesWei"
-  },
-  "main": "./dist/CesiumVectorTile.js",
-  "scripts": {
-    "build":"node src/bundle.js",
-    "prepublishOnly": "npm run build"
-  },
-  "keywords": [
-    "Cesium",
-    "VectorTile",
-    "geojson",
-    "shape file",
-    "shp"
-  ],
-  "name": "cesiumvectortile",
-  "version": "1.2.2"
+  }
 }

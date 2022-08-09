@@ -9,7 +9,6 @@ var defineProperties = require('./cesium/Core/defineProperties')
 var defined = require('./cesium/Core/defined');
 var defaultValue = require('./cesium/Core/defaultValue');
 var Event = require('./cesium/Core/Event');
-var when = require('when');
 var CesiumMath = require('./cesium/Core/Math');
 
 var turf = require('./turf-light')
@@ -422,9 +421,11 @@ function VectorTileImageryProvider(options) {
     this._errorEvent = new Event();
     this._featuresPicked = new Event();
 
-    var readyDf = when.defer();
-
-    this._readyPromise = readyDf.promise; //Cesium.when.defer();
+    var readyDf = {};
+    this._readyPromise = new Promise(function (resolve, reject) {
+        readyDf.resolve = resolve
+        readyDf.reject = reject
+    });
     this._ready = false;
     this._state = VectorTileImageryProvider.State.READY;
 
@@ -440,21 +441,25 @@ function VectorTileImageryProvider(options) {
     var that = this;
     var promises = [];
     if (typeof this._makerImage == 'string') {
-        var makerImageDf = when.defer();
-        var image = new Image();
-        image.onload = function () {
-            makerImageDf.resolve(this);
-            that._makerImageEl = this;
-        }
-        image.onerror = function (err) {
-            makerImageDf.resolve(err);
-        }
-        image.src = this._makerImage;
-        promises.push(makerImageDf.promise);
+
+        promises.push(new Promise(function (resolve, reject) {
+            var image = new Image();
+            image.onload = function () {
+                resolve(this);
+                that._makerImageEl = this;
+            }
+            image.onerror = function (err) {
+                reject(err);
+            }
+            image.src = that._makerImage
+        }));
     }
 
-    var shpDf = when.defer();
-    promises.push(shpDf.promise);
+    var shpDf = {};
+    promises.push(new Promise(function (resolve, reject) {
+        shpDf.resolve = resolve
+        shpDf.reject = reject
+    }));
     this._state = VectorTileImageryProvider.State.SHPLOADING;
     if (ext) {
         switch (ext) {
@@ -471,7 +476,7 @@ function VectorTileImageryProvider(options) {
                     if (typeof VectorTileImageryProvider.shp == 'function') {
                         VectorTileImageryProvider.shp(url, undefined, "gbk").then(onSuccess, function (err) {
                             console.log("load shp file error：" + err);
-                            that.readyPromise.reject(err)
+                            readyDf.reject(err)
                         });
                     } else {
                         throw new Error('找不到shp()方法，请确认是否引用了shpjs')
@@ -486,7 +491,7 @@ function VectorTileImageryProvider(options) {
                 loadJson(this._url)
                     .then(function (geojson) {
                         onSuccess(geojson);
-                    }).otherwise(function (err) {
+                    }).catch(function (err) {
                         console.log(err);
                     })
                 break;
@@ -495,16 +500,17 @@ function VectorTileImageryProvider(options) {
         }
     } else {
         if (isLocalShpFile) {
-            if (typeof shp == 'undefined') {
-                if (typeof VectorTileImageryProvider.shp == 'function') {
-                    shp = VectorTileImageryProvider.shp;
-                } else {
-                    throw new Error('找不到shp()方法，请确认是否引用了shpjs')
-                }
+            var prms
+            if (typeof shp == 'function') {
+                prms = shp.parseShpFiles(that._url);
+            } else if (typeof VectorTileImageryProvider.shp == 'function') {
+                prms = VectorTileImageryProvider.shp.parseShpFiles(that._url);
+            } else {
+                throw new Error('找不到shp()方法，请确认是否引用了shpjs')
             }
-            var prms = shp.parseShpFiles(that._url);
+
             if (prms) {
-                prms.then(onSuccess).otherwise(function (err) {
+                prms.then(onSuccess).catch(function (err) {
                     readyDf.reject(err);
                     //console.log(err);
                     //throw new Error("The file  options.source provider is not supported.");
@@ -712,13 +718,13 @@ function VectorTileImageryProvider(options) {
         shpDf.resolve(that);
     }
 
-    when.all(promises).then(function () {
+    Promise.all(promises).then(function () {
         that._ready = that._state == VectorTileImageryProvider.State.LOADED;
         that._createCanvas();
         VectorTileImageryProvider.instanceCount++;
         readyDf.resolve(true);
         that._state = VectorTileImageryProvider.State.COMPELTED;
-    }).otherwise(function (err) {
+    }).catch(function (err) {
         readyDf.reject(err);
     });
 }
@@ -1729,7 +1735,7 @@ VectorTileImageryProvider.prototype._createTileImage = function (x, y, level, re
             VectorTileImageryProvider._currentTaskCount--;
         } else {
 
-            Cesium.requestAnimationFrame(function () {
+            requestAnimationFrame(function () {
                 that._state = VectorTileImageryProvider.State.GEOJSONDRAWING;
                 that._createCanvas();
                 if (!that._defaultStyle.backgroundColor) {
@@ -1755,7 +1761,7 @@ VectorTileImageryProvider.prototype._createTileImage = function (x, y, level, re
 
                 defer.resolve(that._canvas);
 
-                Cesium.requestAnimationFrame(function () {
+                requestAnimationFrame(function () {
                     that._state = VectorTileImageryProvider.State.COMPELTED;
                 });
             });
@@ -1781,7 +1787,6 @@ VectorTileImageryProvider.prototype.clearCache = function () {
 
 VectorTileImageryProvider.prototype._getTileImage = function (x, y, level, rectangle) {
 
-    var defer = when.defer();
     var that = this;
 
     //从缓存中查询
@@ -1800,13 +1805,20 @@ VectorTileImageryProvider.prototype._getTileImage = function (x, y, level, recta
         that.cacheCount = 0;
     }
     if (that.cache[cacheId]) {
-        return that.cache[cacheId]
+        return Promise.resolve(that.cache[cacheId])
     }
 
     //处理并发
     if (VectorTileImageryProvider._maxTaskCount < VectorTileImageryProvider._currentTaskCount) {
         return undefined;
     }
+
+    var defer = {};
+    defer.promise = new Promise(function (resolve, reject) {
+        defer.resolve = resolve
+        defer.reject = reject
+    })
+
     VectorTileImageryProvider._currentTaskCount++;
     that._state = VectorTileImageryProvider.State.READY;
     setTimeout(function () {
@@ -1852,9 +1864,9 @@ VectorTileImageryProvider.prototype.requestImage = function (x, y, level, distan
     if (level < this._minimumLevel) {
         this._createCanvas();
         this._context.clearRect(0, 0, this._tileWidth, this._tileHeight);
-        return this._canvas;
+        return Promise.resolve(this._canvas);
     } else if (level > this._maximumLevel) {
-        return getEmpty(this._defaultStyle.backgroundColor)
+        return Promise.resolve(getEmpty(this._defaultStyle.backgroundColor))
     }
     var rectangle = this.tilingScheme.tileXYToRectangle(x, y, level);
     return this._getTileImage(x, y, level, rectangle);
@@ -2022,9 +2034,14 @@ VectorTileImageryProvider.prototype.pickFeatures = function (x, y, level, longit
         }
     })
     if (pickedFeatures.length) {
-        var df = when.defer();
+        var df = {};
+        df.promise = new Promise(function (resolve, reject) {
+            df.resolve = resolve
+            df.reject = reject
+        })
+
         var startTime = new Date();
-        when.all(pickedFeatures).then(function (pickedFeatures) {
+        Promise.all(pickedFeatures).then(function (pickedFeatures) {
             var timespan = new Date() - startTime;
             if (timespan < 100) {
                 setTimeout(function () {
@@ -2035,7 +2052,7 @@ VectorTileImageryProvider.prototype.pickFeatures = function (x, y, level, longit
                 that._featuresPicked.raiseEvent(that, pickedFeatures);
                 df.resolve(pickedFeatures);
             }
-        }).otherwise(function (err) {
+        }).catch(function (err) {
             console.error(err);
             that._featuresPicked.raiseEvent(that, undefined);
         })

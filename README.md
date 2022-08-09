@@ -13,9 +13,9 @@ npm 安装
 
 示例：
 ```javascript 
-        VectorTileImageryProvider = Cesium.VectorTileImageryProvider;
+        var VectorTileImageryProvider = Cesium.VectorTileImageryProvider;
 
-        viewer = new Cesium.Viewer("cesiumContainer");
+        var viewer = new Cesium.Viewer("cesiumContainer");
         var imageryProviderViewModels = viewer.baseLayerPicker.viewModel.imageryProviderViewModels;
         viewer.baseLayerPicker.viewModel.selectedImagery = imageryProviderViewModels[imageryProviderViewModels.length - 1];
         viewer.scene.debugShowFramesPerSecond = true;
@@ -70,6 +70,9 @@ npm 安装
 * [text-encoding](https://github.com/inexorabletash/text-encoding)
 * [geojson-topojson](https://github.com/JeffPaine/geojson-topojson)
 #####  更新
+
+###### 2022.08.10
+* 使用原生Promise替代when.js，适配Cesium-1.92及以上版本
 
 ###### 2020.04.15
 * 1、增加TypeScript定义CesiumVectorTile.d.ts；

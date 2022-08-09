@@ -872,6 +872,7 @@ declare namespace CesiumVectorTile {
                 level: number
             ) => VectorStyle
         })
+        readyPromise:Promise<this>
         /**
          * @callback (provider:VectorTileImageryProvider,features:object[])=>void
          */

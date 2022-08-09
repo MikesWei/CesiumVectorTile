@@ -1,7 +1,9 @@
 /**
+ * @license
  * Cesium - https://github.com/CesiumGS/cesium
+ * Version 1.96
  *
- * Copyright 2011-2020 Cesium Contributors
+ * Copyright 2011-2022 Cesium Contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +20,6 @@
  * Columbus View (Pat. Pend.)
  *
  * Portions licensed separately.
- * See https://github.com/CesiumGS/cesium/blob/master/LICENSE.md for full licensing details.
+ * See https://github.com/CesiumGS/cesium/blob/main/LICENSE.md for full licensing details.
  */
-define(["./when-a55a8a4c"],function(i){"use strict";return function(a){var s;return function(e){var r=e.data,n=[],t={id:r.id,result:void 0,error:void 0};return i.when(function(e,r,n){try{return e(r,n)}catch(e){return i.when.reject(e)}}(a,r.parameters,n)).then(function(e){t.result=e}).otherwise(function(e){e instanceof Error?t.error={name:e.name,message:e.message,stack:e.stack}:t.error=e}).always(function(){i.defined(s)||(s=i.defaultValue(self.webkitPostMessage,self.postMessage)),r.canTransferArrayBuffer||(n.length=0);try{s(t,n)}catch(e){t.result=void 0,t.error="postMessage failed with error: "+function(e){var r,n=e.name,t=e.message;r=i.defined(n)&&i.defined(t)?n+": "+t:e.toString();var a=e.stack;return i.defined(a)&&(r+="\n"+a),r}(e)+"\n  with responseMessage: "+JSON.stringify(t),s(t)}})}}});
+define(["./defaultValue-4607806f"],(function(e){"use strict";return function(r){let t;return function(n){const s=n.data,a=[],i={id:s.id,result:void 0,error:void 0};return Promise.resolve(function(e,r,t){let n;try{return n=e(r,t),n}catch(e){return Promise.reject(e)}}(r,s.parameters,a)).then((function(e){i.result=e})).catch((function(e){e instanceof Error?i.error={name:e.name,message:e.message,stack:e.stack}:i.error=e})).finally((function(){e.defined(t)||(t=e.defaultValue(self.webkitPostMessage,self.postMessage)),s.canTransferArrayBuffer||(a.length=0);try{t(i,a)}catch(r){i.result=void 0,i.error=`postMessage failed with error: ${function(r){let t;const n=r.name,s=r.message;t=e.defined(n)&&e.defined(s)?`${n}: ${s}`:r.toString();const a=r.stack;return e.defined(a)&&(t+=`\n${a}`),t}(r)}\n  with responseMessage: ${JSON.stringify(i)}`,t(i)}}))}}}));

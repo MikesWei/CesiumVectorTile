@@ -47,7 +47,7 @@ function bundleMain() {
             fs.writeFileSync(minMapfile, result.map);
         }
 
-        buildDoc();
+        // buildDoc();
 
     })
 }

@@ -1,7 +1,9 @@
 /**
+ * @license
  * Cesium - https://github.com/CesiumGS/cesium
+ * Version 1.96
  *
- * Copyright 2011-2020 Cesium Contributors
+ * Copyright 2011-2022 Cesium Contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +20,6 @@
  * Columbus View (Pat. Pend.)
  *
  * Portions licensed separately.
- * See https://github.com/CesiumGS/cesium/blob/master/LICENSE.md for full licensing details.
+ * See https://github.com/CesiumGS/cesium/blob/main/LICENSE.md for full licensing details.
  */
-define(["./when-a55a8a4c","./Check-bc1d37d9","./Math-73a8bd13","./Cartesian2-8c9f79ed","./Transforms-7a81c8c2","./RuntimeError-7c184ac0","./WebGLConstants-4c11ee5f","./ComponentDatatype-c2c50230","./GeometryAttribute-f9641809","./GeometryAttributes-1c7ce91d","./IndexDatatype-486e7786","./GeometryOffsetAttribute-9ecab91f","./VertexFormat-e1477d0a","./EllipsoidGeometry-232477be"],function(r,e,t,a,c,n,o,i,d,s,f,m,u,y){"use strict";return function(e,t){return r.defined(t)&&(e=y.EllipsoidGeometry.unpack(e,t)),y.EllipsoidGeometry.createGeometry(e)}});
+define(["./defaultValue-4607806f","./EllipsoidGeometry-b2dd57d2","./Transforms-c450597e","./Matrix2-21f90abf","./RuntimeError-cef79f54","./ComponentDatatype-4028c72d","./WebGLConstants-f100e3dd","./_commonjsHelpers-a32ac251","./combine-fc59ba59","./GeometryAttribute-3c090c07","./GeometryAttributes-acac33d2","./GeometryOffsetAttribute-3e5f3e97","./IndexDatatype-20e78e57","./VertexFormat-75e8069c"],(function(e,t,r,o,a,n,c,i,f,d,m,s,u,l){"use strict";return function(r,o){return e.defined(o)&&(r=t.EllipsoidGeometry.unpack(r,o)),t.EllipsoidGeometry.createGeometry(r)}}));
