@@ -1,6 +1,6 @@
 
-var turfHelpers = require('@turf/helpers'); 
-var turf = Object.assign(turfHelpers,   {
+var turfHelpers = require('@turf/helpers');
+var turf = Object.assign({}, turfHelpers, {
     bbox: require('@turf/bbox').default,
     bboxPolygon: require('@turf/bbox-polygon').default,
     bboxClip: require('@turf/bbox-clip').default,

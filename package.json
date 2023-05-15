@@ -1,6 +1,6 @@
 {
   "name": "cesiumvectortile",
-  "version": "1.2.3",
+  "version": "1.2.4",
   "description": "Cesium VectorTileImageryProvider",
   "author": {
     "name": "weixiuyong",
@@ -8,9 +8,7 @@
   },
   "main": "./src/index.js",
   "scripts": {
-    "start": "mesh3d start -p=8023",
-    "build": "node src/bundle.js",
-    "prepublishOnly": "npm run build"
+    "build": "node src/bundle.js"
   },
   "keywords": [
     "Cesium",

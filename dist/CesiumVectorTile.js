@@ -1,16 +1,9 @@
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.CesiumVectorTile = f()}})(function(){var define,module,exports;return (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
 "use strict";
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
-    return result;
-}
 Object.defineProperty(exports, "__esModule", { value: true });
 var helpers_1 = require("@turf/helpers");
 var invariant_1 = require("@turf/invariant");
-var lineclip = __importStar(require("./lib/lineclip"));
+var lineclip_1 = require("./lib/lineclip");
 /**
  * Takes a {@link Feature} and a bbox and clips the feature to the bbox using
  * [lineclip](https://github.com/mapbox/lineclip).
@@ -36,18 +29,19 @@ function bboxClip(feature, bbox) {
     var coords = geom.coordinates;
     switch (type) {
         case "LineString":
-        case "MultiLineString":
+        case "MultiLineString": {
             var lines_1 = [];
             if (type === "LineString") {
                 coords = [coords];
             }
             coords.forEach(function (line) {
-                lineclip.polyline(line, bbox, lines_1);
+                lineclip_1.lineclip(line, bbox, lines_1);
             });
             if (lines_1.length === 1) {
                 return helpers_1.lineString(lines_1[0], properties);
             }
             return helpers_1.multiLineString(lines_1, properties);
+        }
         case "Polygon":
             return helpers_1.polygon(clipPolygon(coords, bbox), properties);
         case "MultiPolygon":
@@ -63,9 +57,10 @@ function clipPolygon(rings, bbox) {
     var outRings = [];
     for (var _i = 0, rings_1 = rings; _i < rings_1.length; _i++) {
         var ring = rings_1[_i];
-        var clipped = lineclip.polygon(ring, bbox);
+        var clipped = lineclip_1.polygonclip(ring, bbox);
         if (clipped.length > 0) {
-            if (clipped[0][0] !== clipped[clipped.length - 1][0] || clipped[0][1] !== clipped[clipped.length - 1][1]) {
+            if (clipped[0][0] !== clipped[clipped.length - 1][0] ||
+                clipped[0][1] !== clipped[clipped.length - 1][1]) {
                 clipped.push(clipped[0]);
             }
             if (clipped.length >= 4) {
@@ -77,129 +72,115 @@ function clipPolygon(rings, bbox) {
 }
 
 },{"./lib/lineclip":2,"@turf/helpers":14,"@turf/invariant":17}],2:[function(require,module,exports){
-'use strict';
-
-module.exports = lineclip;
-module.exports.default = lineclip;
-
-lineclip.polyline = lineclip;
-lineclip.polygon = polygonclip;
-
-
-// Cohen-Sutherland line clippign algorithm, adapted to efficiently
+"use strict";
+// Cohen-Sutherland line clipping algorithm, adapted to efficiently
 // handle polylines rather than just segments
-
+Object.defineProperty(exports, "__esModule", { value: true });
 function lineclip(points, bbox, result) {
-
-    var len = points.length,
-        codeA = bitCode(points[0], bbox),
-        part = [],
-        i, a, b, codeB, lastCode;
-
-    if (!result) result = [];
-
+    var len = points.length, codeA = bitCode(points[0], bbox), part = [], i, codeB, lastCode;
+    var a;
+    var b;
+    if (!result)
+        result = [];
     for (i = 1; i < len; i++) {
         a = points[i - 1];
         b = points[i];
         codeB = lastCode = bitCode(b, bbox);
-
         while (true) {
-
-            if (!(codeA | codeB)) { // accept
+            if (!(codeA | codeB)) {
+                // accept
                 part.push(a);
-
-                if (codeB !== lastCode) { // segment went outside
+                if (codeB !== lastCode) {
+                    // segment went outside
                     part.push(b);
-
-                    if (i < len - 1) { // start a new line
+                    if (i < len - 1) {
+                        // start a new line
                         result.push(part);
                         part = [];
                     }
-                } else if (i === len - 1) {
+                }
+                else if (i === len - 1) {
                     part.push(b);
                 }
                 break;
-
-            } else if (codeA & codeB) { // trivial reject
+            }
+            else if (codeA & codeB) {
+                // trivial reject
                 break;
-
-            } else if (codeA) { // a outside, intersect with clip edge
+            }
+            else if (codeA) {
+                // a outside, intersect with clip edge
                 a = intersect(a, b, codeA, bbox);
                 codeA = bitCode(a, bbox);
-
-            } else { // b outside
+            }
+            else {
+                // b outside
                 b = intersect(a, b, codeB, bbox);
                 codeB = bitCode(b, bbox);
             }
         }
-
         codeA = lastCode;
     }
-
-    if (part.length) result.push(part);
-
+    if (part.length)
+        result.push(part);
     return result;
 }
-
+exports.lineclip = lineclip;
 // Sutherland-Hodgeman polygon clipping algorithm
-
 function polygonclip(points, bbox) {
-
     var result, edge, prev, prevInside, i, p, inside;
-
     // clip against each side of the clip rectangle
     for (edge = 1; edge <= 8; edge *= 2) {
         result = [];
         prev = points[points.length - 1];
         prevInside = !(bitCode(prev, bbox) & edge);
-
         for (i = 0; i < points.length; i++) {
             p = points[i];
             inside = !(bitCode(p, bbox) & edge);
-
             // if segment goes through the clip window, add an intersection
-            if (inside !== prevInside) result.push(intersect(prev, p, edge, bbox));
-
-            if (inside) result.push(p); // add a point if it's inside
-
+            if (inside !== prevInside)
+                result.push(intersect(prev, p, edge, bbox));
+            if (inside)
+                result.push(p); // add a point if it's inside
             prev = p;
             prevInside = inside;
         }
-
         points = result;
-
-        if (!points.length) break;
+        if (!points.length)
+            break;
     }
-
     return result;
 }
-
+exports.polygonclip = polygonclip;
 // intersect a segment against one of the 4 lines that make up the bbox
-
 function intersect(a, b, edge, bbox) {
-    return edge & 8 ? [a[0] + (b[0] - a[0]) * (bbox[3] - a[1]) / (b[1] - a[1]), bbox[3]] : // top
-           edge & 4 ? [a[0] + (b[0] - a[0]) * (bbox[1] - a[1]) / (b[1] - a[1]), bbox[1]] : // bottom
-           edge & 2 ? [bbox[2], a[1] + (b[1] - a[1]) * (bbox[2] - a[0]) / (b[0] - a[0])] : // right
-           edge & 1 ? [bbox[0], a[1] + (b[1] - a[1]) * (bbox[0] - a[0]) / (b[0] - a[0])] : // left
-           null;
+    return edge & 8
+        ? [a[0] + ((b[0] - a[0]) * (bbox[3] - a[1])) / (b[1] - a[1]), bbox[3]] // top
+        : edge & 4
+            ? [a[0] + ((b[0] - a[0]) * (bbox[1] - a[1])) / (b[1] - a[1]), bbox[1]] // bottom
+            : edge & 2
+                ? [bbox[2], a[1] + ((b[1] - a[1]) * (bbox[2] - a[0])) / (b[0] - a[0])] // right
+                : edge & 1
+                    ? [bbox[0], a[1] + ((b[1] - a[1]) * (bbox[0] - a[0])) / (b[0] - a[0])] // left
+                    : null;
 }
-
 // bit code reflects the point position relative to the bbox:
-
 //         left  mid  right
 //    top  1001  1000  1010
 //    mid  0001  0000  0010
 // bottom  0101  0100  0110
-
 function bitCode(p, bbox) {
     var code = 0;
-
-    if (p[0] < bbox[0]) code |= 1; // left
-    else if (p[0] > bbox[2]) code |= 2; // right
-
-    if (p[1] < bbox[1]) code |= 4; // bottom
-    else if (p[1] > bbox[3]) code |= 8; // top
-
+    if (p[0] < bbox[0])
+        code |= 1;
+    // left
+    else if (p[0] > bbox[2])
+        code |= 2; // right
+    if (p[1] < bbox[1])
+        code |= 4;
+    // bottom
+    else if (p[1] > bbox[3])
+        code |= 8; // top
     return code;
 }
 
@@ -240,13 +221,7 @@ function bboxPolygon(bbox, options) {
     var topLeft = [west, north];
     var topRight = [east, north];
     var lowRight = [east, south];
-    return helpers_1.polygon([[
-            lowLeft,
-            lowRight,
-            topRight,
-            topLeft,
-            lowLeft,
-        ]], options.properties, { bbox: bbox, id: options.id });
+    return helpers_1.polygon([[lowLeft, lowRight, topRight, topLeft, lowLeft]], options.properties, { bbox: bbox, id: options.id });
 }
 exports.default = bboxPolygon;
 
@@ -286,6 +261,7 @@ function bbox(geojson) {
     });
     return result;
 }
+bbox["default"] = bbox;
 exports.default = bbox;
 
 },{"@turf/meta":18}],5:[function(require,module,exports){
@@ -373,7 +349,8 @@ exports.default = booleanPointInPolygon;
  */
 function inRing(pt, ring, ignoreBoundary) {
     var isInside = false;
-    if (ring[0][0] === ring[ring.length - 1][0] && ring[0][1] === ring[ring.length - 1][1]) {
+    if (ring[0][0] === ring[ring.length - 1][0] &&
+        ring[0][1] === ring[ring.length - 1][1]) {
         ring = ring.slice(0, ring.length - 1);
     }
     for (var i = 0, j = ring.length - 1; i < ring.length; j = i++) {
@@ -381,13 +358,14 @@ function inRing(pt, ring, ignoreBoundary) {
         var yi = ring[i][1];
         var xj = ring[j][0];
         var yj = ring[j][1];
-        var onBoundary = (pt[1] * (xi - xj) + yi * (xj - pt[0]) + yj * (pt[0] - xi) === 0) &&
-            ((xi - pt[0]) * (xj - pt[0]) <= 0) && ((yi - pt[1]) * (yj - pt[1]) <= 0);
+        var onBoundary = pt[1] * (xi - xj) + yi * (xj - pt[0]) + yj * (pt[0] - xi) === 0 &&
+            (xi - pt[0]) * (xj - pt[0]) <= 0 &&
+            (yi - pt[1]) * (yj - pt[1]) <= 0;
         if (onBoundary) {
             return !ignoreBoundary;
         }
-        var intersect = ((yi > pt[1]) !== (yj > pt[1])) &&
-            (pt[0] < (xj - xi) * (pt[1] - yi) / (yj - yi) + xi);
+        var intersect = yi > pt[1] !== yj > pt[1] &&
+            pt[0] < ((xj - xi) * (pt[1] - yi)) / (yj - yi) + xi;
         if (intersect) {
             isInside = !isInside;
         }
@@ -403,17 +381,17 @@ function inRing(pt, ring, ignoreBoundary) {
  * @returns {boolean} true/false if point is inside BBox
  */
 function inBBox(pt, bbox) {
-    return bbox[0] <= pt[0] &&
-        bbox[1] <= pt[1] &&
-        bbox[2] >= pt[0] &&
-        bbox[3] >= pt[1];
+    return (bbox[0] <= pt[0] && bbox[1] <= pt[1] && bbox[2] >= pt[0] && bbox[3] >= pt[1]);
 }
 
 },{"@turf/invariant":17}],6:[function(require,module,exports){
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-var convex_1 = require("@turf/convex");
-var centroid_1 = require("@turf/centroid");
+var convex_1 = __importDefault(require("@turf/convex"));
+var centroid_1 = __importDefault(require("@turf/centroid"));
 var helpers_1 = require("@turf/helpers");
 var invariant_1 = require("@turf/invariant");
 var meta_1 = require("@turf/meta");
@@ -436,9 +414,9 @@ var meta_1 = require("@turf/meta");
 function centerOfMass(geojson, options) {
     if (options === void 0) { options = {}; }
     switch (invariant_1.getType(geojson)) {
-        case 'Point':
-            return geojson;
-        case 'Polygon':
+        case "Point":
+            return helpers_1.point(invariant_1.getCoord(geojson), options.properties);
+        case "Polygon":
             var coords = [];
             meta_1.coordEach(geojson, function (coord) {
                 coords.push(coord);
@@ -452,10 +430,7 @@ function centerOfMass(geojson, options) {
             var sArea = 0;
             var i, pi, pj, xi, xj, yi, yj, a;
             var neutralizedPoints = coords.map(function (point) {
-                return [
-                    point[0] - translation[0],
-                    point[1] - translation[1]
-                ];
+                return [point[0] - translation[0], point[1] - translation[1]];
             });
             for (i = 0; i < coords.length - 1; i++) {
                 // pi is the current point
@@ -483,16 +458,14 @@ function centerOfMass(geojson, options) {
                 var area = sArea * 0.5;
                 var areaFactor = 1 / (6 * area);
                 // Compute the final coordinates, adding back the values that have been neutralized
-                return helpers_1.point([
-                    translation[0] + areaFactor * sx,
-                    translation[1] + areaFactor * sy
-                ], options.properties);
+                return helpers_1.point([translation[0] + areaFactor * sx, translation[1] + areaFactor * sy], options.properties);
             }
         default:
             // Not a polygon: Compute the convex hull and work with that
             var hull = convex_1.default(geojson);
             if (hull)
                 return centerOfMass(hull, { properties: options.properties });
+            // Hull is empty: fallback on the centroid
             else
                 return centroid_1.default(geojson, { properties: options.properties });
     }
@@ -501,8 +474,11 @@ exports.default = centerOfMass;
 
 },{"@turf/centroid":8,"@turf/convex":12,"@turf/helpers":14,"@turf/invariant":17,"@turf/meta":18}],7:[function(require,module,exports){
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-var bbox_1 = require("@turf/bbox");
+var bbox_1 = __importDefault(require("@turf/bbox"));
 var helpers_1 = require("@turf/helpers");
 /**
  * Takes a {@link Feature} or {@link FeatureCollection} and returns the absolute center point of all features.
@@ -568,7 +544,7 @@ function centroid(geojson, options) {
         xSum += coord[0];
         ySum += coord[1];
         len++;
-    });
+    }, true);
     return helpers_1.point([xSum / len, ySum / len], options.properties);
 }
 exports.default = centroid;
@@ -1734,7 +1710,7 @@ exports.getType = getType;
 "use strict";
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
-}
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 var helpers_1 = require("@turf/helpers");
 var meta_1 = require("@turf/meta");
@@ -1801,8 +1777,8 @@ var helpers_1 = require("@turf/helpers");
  * This uses the [Haversine formula](http://en.wikipedia.org/wiki/Haversine_formula) to account for global curvature.
  *
  * @name distance
- * @param {Coord} from origin point
- * @param {Coord} to destination point
+ * @param {Coord | Point} from origin point or coordinate
+ * @param {Coord | Point} to destination point or coordinate
  * @param {Object} [options={}] Optional parameters
  * @param {string} [options.units='kilometers'] can be degrees, radians, miles, or kilometers
  * @returns {number} distance between the two points
@@ -1822,8 +1798,8 @@ function distance(from, to, options) {
     if (options === void 0) { options = {}; }
     var coordinates1 = invariant_1.getCoord(from);
     var coordinates2 = invariant_1.getCoord(to);
-    var dLat = helpers_1.degreesToRadians((coordinates2[1] - coordinates1[1]));
-    var dLon = helpers_1.degreesToRadians((coordinates2[0] - coordinates1[0]));
+    var dLat = helpers_1.degreesToRadians(coordinates2[1] - coordinates1[1]);
+    var dLon = helpers_1.degreesToRadians(coordinates2[0] - coordinates1[0]);
     var lat1 = helpers_1.degreesToRadians(coordinates1[1]);
     var lat2 = helpers_1.degreesToRadians(coordinates2[1]);
     var a = Math.pow(Math.sin(dLat / 2), 2) +
@@ -1856,7 +1832,7 @@ exports.factors = {
     centimetres: exports.earthRadius * 100,
     degrees: exports.earthRadius / 111325,
     feet: exports.earthRadius * 3.28084,
-    inches: exports.earthRadius * 39.370,
+    inches: exports.earthRadius * 39.37,
     kilometers: exports.earthRadius / 1000,
     kilometres: exports.earthRadius / 1000,
     meters: exports.earthRadius,
@@ -1866,7 +1842,7 @@ exports.factors = {
     millimetres: exports.earthRadius * 1000,
     nauticalmiles: exports.earthRadius / 1852,
     radians: 1,
-    yards: exports.earthRadius / 1.0936,
+    yards: exports.earthRadius * 1.0936,
 };
 /**
  * Units of measurement factors based on 1 meter.
@@ -1879,7 +1855,7 @@ exports.unitsFactors = {
     centimetres: 100,
     degrees: 1 / 111325,
     feet: 3.28084,
-    inches: 39.370,
+    inches: 39.37,
     kilometers: 1 / 1000,
     kilometres: 1 / 1000,
     meters: 1,
@@ -1889,7 +1865,7 @@ exports.unitsFactors = {
     millimetres: 1000,
     nauticalmiles: 1 / 1852,
     radians: 1 / exports.earthRadius,
-    yards: 1 / 1.0936,
+    yards: 1.0936133,
 };
 /**
  * Area of measurement factors based on 1 square meter.
@@ -1902,6 +1878,7 @@ exports.areaFactors = {
     centimeters: 10000,
     centimetres: 10000,
     feet: 10.763910417,
+    hectares: 0.0001,
     inches: 1550.003100006,
     kilometers: 0.000001,
     kilometres: 0.000001,
@@ -1961,16 +1938,23 @@ exports.feature = feature;
  * var geometry = turf.geometry(type, coordinates);
  * // => geometry
  */
-function geometry(type, coordinates, options) {
-    if (options === void 0) { options = {}; }
+function geometry(type, coordinates, _options) {
+    if (_options === void 0) { _options = {}; }
     switch (type) {
-        case "Point": return point(coordinates).geometry;
-        case "LineString": return lineString(coordinates).geometry;
-        case "Polygon": return polygon(coordinates).geometry;
-        case "MultiPoint": return multiPoint(coordinates).geometry;
-        case "MultiLineString": return multiLineString(coordinates).geometry;
-        case "MultiPolygon": return multiPolygon(coordinates).geometry;
-        default: throw new Error(type + " is invalid");
+        case "Point":
+            return point(coordinates).geometry;
+        case "LineString":
+            return lineString(coordinates).geometry;
+        case "Polygon":
+            return polygon(coordinates).geometry;
+        case "MultiPoint":
+            return multiPoint(coordinates).geometry;
+        case "MultiLineString":
+            return multiLineString(coordinates).geometry;
+        case "MultiPolygon":
+            return multiPolygon(coordinates).geometry;
+        default:
+            throw new Error(type + " is invalid");
     }
 }
 exports.geometry = geometry;
@@ -1991,6 +1975,18 @@ exports.geometry = geometry;
  */
 function point(coordinates, properties, options) {
     if (options === void 0) { options = {}; }
+    if (!coordinates) {
+        throw new Error("coordinates is required");
+    }
+    if (!Array.isArray(coordinates)) {
+        throw new Error("coordinates must be an Array");
+    }
+    if (coordinates.length < 2) {
+        throw new Error("coordinates must be at least 2 numbers long");
+    }
+    if (!isNumber(coordinates[0]) || !isNumber(coordinates[1])) {
+        throw new Error("coordinates must contain numbers");
+    }
     var geom = {
         type: "Point",
         coordinates: coordinates,
@@ -2310,7 +2306,7 @@ exports.round = round;
  *
  * @name radiansToLength
  * @param {number} radians in radians across the sphere
- * @param {string} [units="kilometers"] can be degrees, radians, miles, or kilometers inches, yards, metres,
+ * @param {string} [units="kilometers"] can be degrees, radians, miles, inches, yards, metres,
  * meters, kilometres, kilometers.
  * @returns {number} distance
  */
@@ -2329,7 +2325,7 @@ exports.radiansToLength = radiansToLength;
  *
  * @name lengthToRadians
  * @param {number} distance in real units
- * @param {string} [units="kilometers"] can be degrees, radians, miles, or kilometers inches, yards, metres,
+ * @param {string} [units="kilometers"] can be degrees, radians, miles, inches, yards, metres,
  * meters, kilometres, kilometers.
  * @returns {number} radians
  */
@@ -2348,7 +2344,7 @@ exports.lengthToRadians = lengthToRadians;
  *
  * @name lengthToDegrees
  * @param {number} distance in real units
- * @param {string} [units="kilometers"] can be degrees, radians, miles, or kilometers inches, yards, metres,
+ * @param {string} [units="kilometers"] can be degrees, radians, miles, inches, yards, metres,
  * meters, kilometres, kilometers.
  * @returns {number} degrees
  */
@@ -2381,7 +2377,7 @@ exports.bearingToAzimuth = bearingToAzimuth;
  */
 function radiansToDegrees(radians) {
     var degrees = radians % (2 * Math.PI);
-    return degrees * 180 / Math.PI;
+    return (degrees * 180) / Math.PI;
 }
 exports.radiansToDegrees = radiansToDegrees;
 /**
@@ -2393,7 +2389,7 @@ exports.radiansToDegrees = radiansToDegrees;
  */
 function degreesToRadians(degrees) {
     var radians = degrees % 360;
-    return radians * Math.PI / 180;
+    return (radians * Math.PI) / 180;
 }
 exports.degreesToRadians = degreesToRadians;
 /**
@@ -2416,11 +2412,11 @@ function convertLength(length, originalUnit, finalUnit) {
 exports.convertLength = convertLength;
 /**
  * Converts a area to the requested unit.
- * Valid units: kilometers, kilometres, meters, metres, centimetres, millimeters, acres, miles, yards, feet, inches
+ * Valid units: kilometers, kilometres, meters, metres, centimetres, millimeters, acres, miles, yards, feet, inches, hectares
  * @param {number} area to be converted
  * @param {Units} [originalUnit="meters"] of the distance
  * @param {Units} [finalUnit="kilometers"] returned unit
- * @returns {number} the converted distance
+ * @returns {number} the converted area
  */
 function convertArea(area, originalUnit, finalUnit) {
     if (originalUnit === void 0) { originalUnit = "meters"; }
@@ -2451,7 +2447,7 @@ exports.convertArea = convertArea;
  * //=false
  */
 function isNumber(num) {
-    return !isNaN(num) && num !== null && !Array.isArray(num) && !/^\s*$/.test(num);
+    return !isNaN(num) && num !== null && !Array.isArray(num);
 }
 exports.isNumber = isNumber;
 /**
@@ -2466,7 +2462,7 @@ exports.isNumber = isNumber;
  * //=false
  */
 function isObject(input) {
-    return (!!input) && (input.constructor === Object);
+    return !!input && input.constructor === Object;
 }
 exports.isObject = isObject;
 /**
@@ -2537,35 +2533,6 @@ function validateId(id) {
     }
 }
 exports.validateId = validateId;
-// Deprecated methods
-function radians2degrees() {
-    throw new Error("method has been renamed to `radiansToDegrees`");
-}
-exports.radians2degrees = radians2degrees;
-function degrees2radians() {
-    throw new Error("method has been renamed to `degreesToRadians`");
-}
-exports.degrees2radians = degrees2radians;
-function distanceToDegrees() {
-    throw new Error("method has been renamed to `lengthToDegrees`");
-}
-exports.distanceToDegrees = distanceToDegrees;
-function distanceToRadians() {
-    throw new Error("method has been renamed to `lengthToRadians`");
-}
-exports.distanceToRadians = distanceToRadians;
-function radiansToDistance() {
-    throw new Error("method has been renamed to `radiansToLength`");
-}
-exports.radiansToDistance = radiansToDistance;
-function bearingToAngle() {
-    throw new Error("method has been renamed to `bearingToAzimuth`");
-}
-exports.bearingToAngle = bearingToAngle;
-function convertDistance() {
-    throw new Error("method has been renamed to `convertLength`");
-}
-exports.convertDistance = convertDistance;
 
 },{}],15:[function(require,module,exports){
 var invariant = require('@turf/invariant');
@@ -2903,14 +2870,19 @@ function getCoord(coord) {
         throw new Error("coord is required");
     }
     if (!Array.isArray(coord)) {
-        if (coord.type === "Feature" && coord.geometry !== null && coord.geometry.type === "Point") {
+        if (coord.type === "Feature" &&
+            coord.geometry !== null &&
+            coord.geometry.type === "Point") {
             return coord.geometry.coordinates;
         }
         if (coord.type === "Point") {
             return coord.coordinates;
         }
     }
-    if (Array.isArray(coord) && coord.length >= 2 && !Array.isArray(coord[0]) && !Array.isArray(coord[1])) {
+    if (Array.isArray(coord) &&
+        coord.length >= 2 &&
+        !Array.isArray(coord[0]) &&
+        !Array.isArray(coord[1])) {
         return coord;
     }
     throw new Error("coord must be GeoJSON Point or an Array of numbers");
@@ -2955,7 +2927,9 @@ exports.getCoords = getCoords;
  * @returns {boolean} true if Array contains a number
  */
 function containsNumber(coordinates) {
-    if (coordinates.length > 1 && helpers_1.isNumber(coordinates[0]) && helpers_1.isNumber(coordinates[1])) {
+    if (coordinates.length > 1 &&
+        helpers_1.isNumber(coordinates[0]) &&
+        helpers_1.isNumber(coordinates[1])) {
         return true;
     }
     if (Array.isArray(coordinates[0]) && coordinates[0].length) {
@@ -2978,7 +2952,12 @@ function geojsonType(value, type, name) {
         throw new Error("type and name required");
     }
     if (!value || value.type !== type) {
-        throw new Error("Invalid input to " + name + ": must be a " + type + ", given " + value.type);
+        throw new Error("Invalid input to " +
+            name +
+            ": must be a " +
+            type +
+            ", given " +
+            value.type);
     }
 }
 exports.geojsonType = geojsonType;
@@ -3003,7 +2982,12 @@ function featureOf(feature, type, name) {
         throw new Error("Invalid input to " + name + ", Feature with geometry required");
     }
     if (!feature.geometry || feature.geometry.type !== type) {
-        throw new Error("Invalid input to " + name + ": must be a " + type + ", given " + feature.geometry.type);
+        throw new Error("Invalid input to " +
+            name +
+            ": must be a " +
+            type +
+            ", given " +
+            feature.geometry.type);
     }
 }
 exports.featureOf = featureOf;
@@ -3033,7 +3017,12 @@ function collectionOf(featureCollection, type, name) {
             throw new Error("Invalid input to " + name + ", Feature with geometry required");
         }
         if (!feature.geometry || feature.geometry.type !== type) {
-            throw new Error("Invalid input to " + name + ": must be a " + type + ", given " + feature.geometry.type);
+            throw new Error("Invalid input to " +
+                name +
+                ": must be a " +
+                type +
+                ", given " +
+                feature.geometry.type);
         }
     }
 }
@@ -3067,7 +3056,7 @@ exports.getGeom = getGeom;
  * Get GeoJSON object's type, Geometry type is prioritize.
  *
  * @param {GeoJSON} geojson GeoJSON object
- * @param {string} [name="geojson"] name of the variable to display in error message
+ * @param {string} [name="geojson"] name of the variable to display in error message (unused)
  * @returns {string} GeoJSON type
  * @example
  * var point = {
@@ -3081,7 +3070,7 @@ exports.getGeom = getGeom;
  * var geom = turf.getType(point)
  * //="Point"
  */
-function getType(geojson, name) {
+function getType(geojson, _name) {
     if (geojson.type === "FeatureCollection") {
         return "FeatureCollection";
     }
@@ -3136,100 +3125,157 @@ var helpers = require('@turf/helpers');
  * });
  */
 function coordEach(geojson, callback, excludeWrapCoord) {
-    // Handles null Geometry -- Skips this GeoJSON
-    if (geojson === null) return;
-    var j, k, l, geometry, stopG, coords,
-        geometryMaybeCollection,
-        wrapShrink = 0,
-        coordIndex = 0,
-        isGeometryCollection,
-        type = geojson.type,
-        isFeatureCollection = type === 'FeatureCollection',
-        isFeature = type === 'Feature',
-        stop = isFeatureCollection ? geojson.features.length : 1;
+  // Handles null Geometry -- Skips this GeoJSON
+  if (geojson === null) return;
+  var j,
+    k,
+    l,
+    geometry,
+    stopG,
+    coords,
+    geometryMaybeCollection,
+    wrapShrink = 0,
+    coordIndex = 0,
+    isGeometryCollection,
+    type = geojson.type,
+    isFeatureCollection = type === "FeatureCollection",
+    isFeature = type === "Feature",
+    stop = isFeatureCollection ? geojson.features.length : 1;
 
-    // This logic may look a little weird. The reason why it is that way
-    // is because it's trying to be fast. GeoJSON supports multiple kinds
-    // of objects at its root: FeatureCollection, Features, Geometries.
-    // This function has the responsibility of handling all of them, and that
-    // means that some of the `for` loops you see below actually just don't apply
-    // to certain inputs. For instance, if you give this just a
-    // Point geometry, then both loops are short-circuited and all we do
-    // is gradually rename the input until it's called 'geometry'.
-    //
-    // This also aims to allocate as few resources as possible: just a
-    // few numbers and booleans, rather than any temporary arrays as would
-    // be required with the normalization approach.
-    for (var featureIndex = 0; featureIndex < stop; featureIndex++) {
-        geometryMaybeCollection = (isFeatureCollection ? geojson.features[featureIndex].geometry :
-            (isFeature ? geojson.geometry : geojson));
-        isGeometryCollection = (geometryMaybeCollection) ? geometryMaybeCollection.type === 'GeometryCollection' : false;
-        stopG = isGeometryCollection ? geometryMaybeCollection.geometries.length : 1;
+  // This logic may look a little weird. The reason why it is that way
+  // is because it's trying to be fast. GeoJSON supports multiple kinds
+  // of objects at its root: FeatureCollection, Features, Geometries.
+  // This function has the responsibility of handling all of them, and that
+  // means that some of the `for` loops you see below actually just don't apply
+  // to certain inputs. For instance, if you give this just a
+  // Point geometry, then both loops are short-circuited and all we do
+  // is gradually rename the input until it's called 'geometry'.
+  //
+  // This also aims to allocate as few resources as possible: just a
+  // few numbers and booleans, rather than any temporary arrays as would
+  // be required with the normalization approach.
+  for (var featureIndex = 0; featureIndex < stop; featureIndex++) {
+    geometryMaybeCollection = isFeatureCollection
+      ? geojson.features[featureIndex].geometry
+      : isFeature
+      ? geojson.geometry
+      : geojson;
+    isGeometryCollection = geometryMaybeCollection
+      ? geometryMaybeCollection.type === "GeometryCollection"
+      : false;
+    stopG = isGeometryCollection
+      ? geometryMaybeCollection.geometries.length
+      : 1;
 
-        for (var geomIndex = 0; geomIndex < stopG; geomIndex++) {
-            var multiFeatureIndex = 0;
-            var geometryIndex = 0;
-            geometry = isGeometryCollection ?
-                geometryMaybeCollection.geometries[geomIndex] : geometryMaybeCollection;
+    for (var geomIndex = 0; geomIndex < stopG; geomIndex++) {
+      var multiFeatureIndex = 0;
+      var geometryIndex = 0;
+      geometry = isGeometryCollection
+        ? geometryMaybeCollection.geometries[geomIndex]
+        : geometryMaybeCollection;
 
-            // Handles null Geometry -- Skips this geometry
-            if (geometry === null) continue;
-            coords = geometry.coordinates;
-            var geomType = geometry.type;
+      // Handles null Geometry -- Skips this geometry
+      if (geometry === null) continue;
+      coords = geometry.coordinates;
+      var geomType = geometry.type;
 
-            wrapShrink = (excludeWrapCoord && (geomType === 'Polygon' || geomType === 'MultiPolygon')) ? 1 : 0;
+      wrapShrink =
+        excludeWrapCoord &&
+        (geomType === "Polygon" || geomType === "MultiPolygon")
+          ? 1
+          : 0;
 
-            switch (geomType) {
-            case null:
-                break;
-            case 'Point':
-                if (callback(coords, coordIndex, featureIndex, multiFeatureIndex, geometryIndex) === false) return false;
-                coordIndex++;
-                multiFeatureIndex++;
-                break;
-            case 'LineString':
-            case 'MultiPoint':
-                for (j = 0; j < coords.length; j++) {
-                    if (callback(coords[j], coordIndex, featureIndex, multiFeatureIndex, geometryIndex) === false) return false;
-                    coordIndex++;
-                    if (geomType === 'MultiPoint') multiFeatureIndex++;
-                }
-                if (geomType === 'LineString') multiFeatureIndex++;
-                break;
-            case 'Polygon':
-            case 'MultiLineString':
-                for (j = 0; j < coords.length; j++) {
-                    for (k = 0; k < coords[j].length - wrapShrink; k++) {
-                        if (callback(coords[j][k], coordIndex, featureIndex, multiFeatureIndex, geometryIndex) === false) return false;
-                        coordIndex++;
-                    }
-                    if (geomType === 'MultiLineString') multiFeatureIndex++;
-                    if (geomType === 'Polygon') geometryIndex++;
-                }
-                if (geomType === 'Polygon') multiFeatureIndex++;
-                break;
-            case 'MultiPolygon':
-                for (j = 0; j < coords.length; j++) {
-                    geometryIndex = 0;
-                    for (k = 0; k < coords[j].length; k++) {
-                        for (l = 0; l < coords[j][k].length - wrapShrink; l++) {
-                            if (callback(coords[j][k][l], coordIndex, featureIndex, multiFeatureIndex, geometryIndex) === false) return false;
-                            coordIndex++;
-                        }
-                        geometryIndex++;
-                    }
-                    multiFeatureIndex++;
-                }
-                break;
-            case 'GeometryCollection':
-                for (j = 0; j < geometry.geometries.length; j++)
-                    if (coordEach(geometry.geometries[j], callback, excludeWrapCoord) === false) return false;
-                break;
-            default:
-                throw new Error('Unknown Geometry Type');
+      switch (geomType) {
+        case null:
+          break;
+        case "Point":
+          if (
+            callback(
+              coords,
+              coordIndex,
+              featureIndex,
+              multiFeatureIndex,
+              geometryIndex
+            ) === false
+          )
+            return false;
+          coordIndex++;
+          multiFeatureIndex++;
+          break;
+        case "LineString":
+        case "MultiPoint":
+          for (j = 0; j < coords.length; j++) {
+            if (
+              callback(
+                coords[j],
+                coordIndex,
+                featureIndex,
+                multiFeatureIndex,
+                geometryIndex
+              ) === false
+            )
+              return false;
+            coordIndex++;
+            if (geomType === "MultiPoint") multiFeatureIndex++;
+          }
+          if (geomType === "LineString") multiFeatureIndex++;
+          break;
+        case "Polygon":
+        case "MultiLineString":
+          for (j = 0; j < coords.length; j++) {
+            for (k = 0; k < coords[j].length - wrapShrink; k++) {
+              if (
+                callback(
+                  coords[j][k],
+                  coordIndex,
+                  featureIndex,
+                  multiFeatureIndex,
+                  geometryIndex
+                ) === false
+              )
+                return false;
+              coordIndex++;
             }
-        }
+            if (geomType === "MultiLineString") multiFeatureIndex++;
+            if (geomType === "Polygon") geometryIndex++;
+          }
+          if (geomType === "Polygon") multiFeatureIndex++;
+          break;
+        case "MultiPolygon":
+          for (j = 0; j < coords.length; j++) {
+            geometryIndex = 0;
+            for (k = 0; k < coords[j].length; k++) {
+              for (l = 0; l < coords[j][k].length - wrapShrink; l++) {
+                if (
+                  callback(
+                    coords[j][k][l],
+                    coordIndex,
+                    featureIndex,
+                    multiFeatureIndex,
+                    geometryIndex
+                  ) === false
+                )
+                  return false;
+                coordIndex++;
+              }
+              geometryIndex++;
+            }
+            multiFeatureIndex++;
+          }
+          break;
+        case "GeometryCollection":
+          for (j = 0; j < geometry.geometries.length; j++)
+            if (
+              coordEach(geometry.geometries[j], callback, excludeWrapCoord) ===
+              false
+            )
+              return false;
+          break;
+        default:
+          throw new Error("Unknown Geometry Type");
+      }
     }
+  }
 }
 
 /**
@@ -3283,12 +3329,31 @@ function coordEach(geojson, callback, excludeWrapCoord) {
  * });
  */
 function coordReduce(geojson, callback, initialValue, excludeWrapCoord) {
-    var previousValue = initialValue;
-    coordEach(geojson, function (currentCoord, coordIndex, featureIndex, multiFeatureIndex, geometryIndex) {
-        if (coordIndex === 0 && initialValue === undefined) previousValue = currentCoord;
-        else previousValue = callback(previousValue, currentCoord, coordIndex, featureIndex, multiFeatureIndex, geometryIndex);
-    }, excludeWrapCoord);
-    return previousValue;
+  var previousValue = initialValue;
+  coordEach(
+    geojson,
+    function (
+      currentCoord,
+      coordIndex,
+      featureIndex,
+      multiFeatureIndex,
+      geometryIndex
+    ) {
+      if (coordIndex === 0 && initialValue === undefined)
+        previousValue = currentCoord;
+      else
+        previousValue = callback(
+          previousValue,
+          currentCoord,
+          coordIndex,
+          featureIndex,
+          multiFeatureIndex,
+          geometryIndex
+        );
+    },
+    excludeWrapCoord
+  );
+  return previousValue;
 }
 
 /**
@@ -3318,19 +3383,18 @@ function coordReduce(geojson, callback, initialValue, excludeWrapCoord) {
  * });
  */
 function propEach(geojson, callback) {
-    var i;
-    switch (geojson.type) {
-    case 'FeatureCollection':
-        for (i = 0; i < geojson.features.length; i++) {
-            if (callback(geojson.features[i].properties, i) === false) break;
-        }
-        break;
-    case 'Feature':
-        callback(geojson.properties, 0);
-        break;
-    }
+  var i;
+  switch (geojson.type) {
+    case "FeatureCollection":
+      for (i = 0; i < geojson.features.length; i++) {
+        if (callback(geojson.features[i].properties, i) === false) break;
+      }
+      break;
+    case "Feature":
+      callback(geojson.properties, 0);
+      break;
+  }
 }
-
 
 /**
  * Callback for propReduce
@@ -3377,12 +3441,14 @@ function propEach(geojson, callback) {
  * });
  */
 function propReduce(geojson, callback, initialValue) {
-    var previousValue = initialValue;
-    propEach(geojson, function (currentProperties, featureIndex) {
-        if (featureIndex === 0 && initialValue === undefined) previousValue = currentProperties;
-        else previousValue = callback(previousValue, currentProperties, featureIndex);
-    });
-    return previousValue;
+  var previousValue = initialValue;
+  propEach(geojson, function (currentProperties, featureIndex) {
+    if (featureIndex === 0 && initialValue === undefined)
+      previousValue = currentProperties;
+    else
+      previousValue = callback(previousValue, currentProperties, featureIndex);
+  });
+  return previousValue;
 }
 
 /**
@@ -3413,13 +3479,13 @@ function propReduce(geojson, callback, initialValue) {
  * });
  */
 function featureEach(geojson, callback) {
-    if (geojson.type === 'Feature') {
-        callback(geojson, 0);
-    } else if (geojson.type === 'FeatureCollection') {
-        for (var i = 0; i < geojson.features.length; i++) {
-            if (callback(geojson.features[i], i) === false) break;
-        }
+  if (geojson.type === "Feature") {
+    callback(geojson, 0);
+  } else if (geojson.type === "FeatureCollection") {
+    for (var i = 0; i < geojson.features.length; i++) {
+      if (callback(geojson.features[i], i) === false) break;
     }
+  }
 }
 
 /**
@@ -3465,12 +3531,13 @@ function featureEach(geojson, callback) {
  * });
  */
 function featureReduce(geojson, callback, initialValue) {
-    var previousValue = initialValue;
-    featureEach(geojson, function (currentFeature, featureIndex) {
-        if (featureIndex === 0 && initialValue === undefined) previousValue = currentFeature;
-        else previousValue = callback(previousValue, currentFeature, featureIndex);
-    });
-    return previousValue;
+  var previousValue = initialValue;
+  featureEach(geojson, function (currentFeature, featureIndex) {
+    if (featureIndex === 0 && initialValue === undefined)
+      previousValue = currentFeature;
+    else previousValue = callback(previousValue, currentFeature, featureIndex);
+  });
+  return previousValue;
 }
 
 /**
@@ -3489,11 +3556,11 @@ function featureReduce(geojson, callback, initialValue) {
  * //= [[26, 37], [36, 53]]
  */
 function coordAll(geojson) {
-    var coords = [];
-    coordEach(geojson, function (coord) {
-        coords.push(coord);
-    });
-    return coords;
+  var coords = [];
+  coordEach(geojson, function (coord) {
+    coords.push(coord);
+  });
+  return coords;
 }
 
 /**
@@ -3529,74 +3596,121 @@ function coordAll(geojson) {
  * });
  */
 function geomEach(geojson, callback) {
-    var i, j, g, geometry, stopG,
-        geometryMaybeCollection,
-        isGeometryCollection,
-        featureProperties,
-        featureBBox,
-        featureId,
-        featureIndex = 0,
-        isFeatureCollection = geojson.type === 'FeatureCollection',
-        isFeature = geojson.type === 'Feature',
-        stop = isFeatureCollection ? geojson.features.length : 1;
+  var i,
+    j,
+    g,
+    geometry,
+    stopG,
+    geometryMaybeCollection,
+    isGeometryCollection,
+    featureProperties,
+    featureBBox,
+    featureId,
+    featureIndex = 0,
+    isFeatureCollection = geojson.type === "FeatureCollection",
+    isFeature = geojson.type === "Feature",
+    stop = isFeatureCollection ? geojson.features.length : 1;
 
-    // This logic may look a little weird. The reason why it is that way
-    // is because it's trying to be fast. GeoJSON supports multiple kinds
-    // of objects at its root: FeatureCollection, Features, Geometries.
-    // This function has the responsibility of handling all of them, and that
-    // means that some of the `for` loops you see below actually just don't apply
-    // to certain inputs. For instance, if you give this just a
-    // Point geometry, then both loops are short-circuited and all we do
-    // is gradually rename the input until it's called 'geometry'.
-    //
-    // This also aims to allocate as few resources as possible: just a
-    // few numbers and booleans, rather than any temporary arrays as would
-    // be required with the normalization approach.
-    for (i = 0; i < stop; i++) {
+  // This logic may look a little weird. The reason why it is that way
+  // is because it's trying to be fast. GeoJSON supports multiple kinds
+  // of objects at its root: FeatureCollection, Features, Geometries.
+  // This function has the responsibility of handling all of them, and that
+  // means that some of the `for` loops you see below actually just don't apply
+  // to certain inputs. For instance, if you give this just a
+  // Point geometry, then both loops are short-circuited and all we do
+  // is gradually rename the input until it's called 'geometry'.
+  //
+  // This also aims to allocate as few resources as possible: just a
+  // few numbers and booleans, rather than any temporary arrays as would
+  // be required with the normalization approach.
+  for (i = 0; i < stop; i++) {
+    geometryMaybeCollection = isFeatureCollection
+      ? geojson.features[i].geometry
+      : isFeature
+      ? geojson.geometry
+      : geojson;
+    featureProperties = isFeatureCollection
+      ? geojson.features[i].properties
+      : isFeature
+      ? geojson.properties
+      : {};
+    featureBBox = isFeatureCollection
+      ? geojson.features[i].bbox
+      : isFeature
+      ? geojson.bbox
+      : undefined;
+    featureId = isFeatureCollection
+      ? geojson.features[i].id
+      : isFeature
+      ? geojson.id
+      : undefined;
+    isGeometryCollection = geometryMaybeCollection
+      ? geometryMaybeCollection.type === "GeometryCollection"
+      : false;
+    stopG = isGeometryCollection
+      ? geometryMaybeCollection.geometries.length
+      : 1;
 
-        geometryMaybeCollection = (isFeatureCollection ? geojson.features[i].geometry :
-            (isFeature ? geojson.geometry : geojson));
-        featureProperties = (isFeatureCollection ? geojson.features[i].properties :
-            (isFeature ? geojson.properties : {}));
-        featureBBox = (isFeatureCollection ? geojson.features[i].bbox :
-            (isFeature ? geojson.bbox : undefined));
-        featureId = (isFeatureCollection ? geojson.features[i].id :
-            (isFeature ? geojson.id : undefined));
-        isGeometryCollection = (geometryMaybeCollection) ? geometryMaybeCollection.type === 'GeometryCollection' : false;
-        stopG = isGeometryCollection ? geometryMaybeCollection.geometries.length : 1;
+    for (g = 0; g < stopG; g++) {
+      geometry = isGeometryCollection
+        ? geometryMaybeCollection.geometries[g]
+        : geometryMaybeCollection;
 
-        for (g = 0; g < stopG; g++) {
-            geometry = isGeometryCollection ?
-                geometryMaybeCollection.geometries[g] : geometryMaybeCollection;
-
-            // Handle null Geometry
-            if (geometry === null) {
-                if (callback(null, featureIndex, featureProperties, featureBBox, featureId) === false) return false;
-                continue;
-            }
-            switch (geometry.type) {
-            case 'Point':
-            case 'LineString':
-            case 'MultiPoint':
-            case 'Polygon':
-            case 'MultiLineString':
-            case 'MultiPolygon': {
-                if (callback(geometry, featureIndex, featureProperties, featureBBox, featureId) === false) return false;
-                break;
-            }
-            case 'GeometryCollection': {
-                for (j = 0; j < geometry.geometries.length; j++) {
-                    if (callback(geometry.geometries[j], featureIndex, featureProperties, featureBBox, featureId) === false) return false;
-                }
-                break;
-            }
-            default:
-                throw new Error('Unknown Geometry Type');
-            }
+      // Handle null Geometry
+      if (geometry === null) {
+        if (
+          callback(
+            null,
+            featureIndex,
+            featureProperties,
+            featureBBox,
+            featureId
+          ) === false
+        )
+          return false;
+        continue;
+      }
+      switch (geometry.type) {
+        case "Point":
+        case "LineString":
+        case "MultiPoint":
+        case "Polygon":
+        case "MultiLineString":
+        case "MultiPolygon": {
+          if (
+            callback(
+              geometry,
+              featureIndex,
+              featureProperties,
+              featureBBox,
+              featureId
+            ) === false
+          )
+            return false;
+          break;
         }
-        // Only increase `featureIndex` per each feature
-        featureIndex++;
+        case "GeometryCollection": {
+          for (j = 0; j < geometry.geometries.length; j++) {
+            if (
+              callback(
+                geometry.geometries[j],
+                featureIndex,
+                featureProperties,
+                featureBBox,
+                featureId
+              ) === false
+            )
+              return false;
+          }
+          break;
+        }
+        default:
+          throw new Error("Unknown Geometry Type");
+      }
     }
+    // Only increase `featureIndex` per each feature
+    featureIndex++;
+  }
 }
 
 /**
@@ -3648,12 +3762,30 @@ function geomEach(geojson, callback) {
  * });
  */
 function geomReduce(geojson, callback, initialValue) {
-    var previousValue = initialValue;
-    geomEach(geojson, function (currentGeometry, featureIndex, featureProperties, featureBBox, featureId) {
-        if (featureIndex === 0 && initialValue === undefined) previousValue = currentGeometry;
-        else previousValue = callback(previousValue, currentGeometry, featureIndex, featureProperties, featureBBox, featureId);
-    });
-    return previousValue;
+  var previousValue = initialValue;
+  geomEach(
+    geojson,
+    function (
+      currentGeometry,
+      featureIndex,
+      featureProperties,
+      featureBBox,
+      featureId
+    ) {
+      if (featureIndex === 0 && initialValue === undefined)
+        previousValue = currentGeometry;
+      else
+        previousValue = callback(
+          previousValue,
+          currentGeometry,
+          featureIndex,
+          featureProperties,
+          featureBBox,
+          featureId
+        );
+    }
+  );
+  return previousValue;
 }
 
 /**
@@ -3685,42 +3817,57 @@ function geomReduce(geojson, callback, initialValue) {
  * });
  */
 function flattenEach(geojson, callback) {
-    geomEach(geojson, function (geometry, featureIndex, properties, bbox, id) {
-        // Callback for single geometry
-        var type = (geometry === null) ? null : geometry.type;
-        switch (type) {
-        case null:
-        case 'Point':
-        case 'LineString':
-        case 'Polygon':
-            if (callback(helpers.feature(geometry, properties, {bbox: bbox, id: id}), featureIndex, 0) === false) return false;
-            return;
-        }
+  geomEach(geojson, function (geometry, featureIndex, properties, bbox, id) {
+    // Callback for single geometry
+    var type = geometry === null ? null : geometry.type;
+    switch (type) {
+      case null:
+      case "Point":
+      case "LineString":
+      case "Polygon":
+        if (
+          callback(
+            helpers.feature(geometry, properties, { bbox: bbox, id: id }),
+            featureIndex,
+            0
+          ) === false
+        )
+          return false;
+        return;
+    }
 
-        var geomType;
+    var geomType;
 
-        // Callback for multi-geometry
-        switch (type) {
-        case 'MultiPoint':
-            geomType = 'Point';
-            break;
-        case 'MultiLineString':
-            geomType = 'LineString';
-            break;
-        case 'MultiPolygon':
-            geomType = 'Polygon';
-            break;
-        }
+    // Callback for multi-geometry
+    switch (type) {
+      case "MultiPoint":
+        geomType = "Point";
+        break;
+      case "MultiLineString":
+        geomType = "LineString";
+        break;
+      case "MultiPolygon":
+        geomType = "Polygon";
+        break;
+    }
 
-        for (var multiFeatureIndex = 0; multiFeatureIndex < geometry.coordinates.length; multiFeatureIndex++) {
-            var coordinate = geometry.coordinates[multiFeatureIndex];
-            var geom = {
-                type: geomType,
-                coordinates: coordinate
-            };
-            if (callback(helpers.feature(geom, properties), featureIndex, multiFeatureIndex) === false) return false;
-        }
-    });
+    for (
+      var multiFeatureIndex = 0;
+      multiFeatureIndex < geometry.coordinates.length;
+      multiFeatureIndex++
+    ) {
+      var coordinate = geometry.coordinates[multiFeatureIndex];
+      var geom = {
+        type: geomType,
+        coordinates: coordinate,
+      };
+      if (
+        callback(helpers.feature(geom, properties), featureIndex, multiFeatureIndex) ===
+        false
+      )
+        return false;
+    }
+  });
 }
 
 /**
@@ -3768,12 +3915,26 @@ function flattenEach(geojson, callback) {
  * });
  */
 function flattenReduce(geojson, callback, initialValue) {
-    var previousValue = initialValue;
-    flattenEach(geojson, function (currentFeature, featureIndex, multiFeatureIndex) {
-        if (featureIndex === 0 && multiFeatureIndex === 0 && initialValue === undefined) previousValue = currentFeature;
-        else previousValue = callback(previousValue, currentFeature, featureIndex, multiFeatureIndex);
-    });
-    return previousValue;
+  var previousValue = initialValue;
+  flattenEach(
+    geojson,
+    function (currentFeature, featureIndex, multiFeatureIndex) {
+      if (
+        featureIndex === 0 &&
+        multiFeatureIndex === 0 &&
+        initialValue === undefined
+      )
+        previousValue = currentFeature;
+      else
+        previousValue = callback(
+          previousValue,
+          currentFeature,
+          featureIndex,
+          multiFeatureIndex
+        );
+    }
+  );
+  return previousValue;
 }
 
 /**
@@ -3814,36 +3975,65 @@ function flattenReduce(geojson, callback, initialValue) {
  * });
  */
 function segmentEach(geojson, callback) {
-    flattenEach(geojson, function (feature, featureIndex, multiFeatureIndex) {
-        var segmentIndex = 0;
+  flattenEach(geojson, function (feature, featureIndex, multiFeatureIndex) {
+    var segmentIndex = 0;
 
-        // Exclude null Geometries
-        if (!feature.geometry) return;
-        // (Multi)Point geometries do not contain segments therefore they are ignored during this operation.
-        var type = feature.geometry.type;
-        if (type === 'Point' || type === 'MultiPoint') return;
+    // Exclude null Geometries
+    if (!feature.geometry) return;
+    // (Multi)Point geometries do not contain segments therefore they are ignored during this operation.
+    var type = feature.geometry.type;
+    if (type === "Point" || type === "MultiPoint") return;
 
-        // Generate 2-vertex line segments
-        var previousCoords;
-        var previousFeatureIndex = 0;
-        var previousMultiIndex = 0;
-        var prevGeomIndex = 0;
-        if (coordEach(feature, function (currentCoord, coordIndex, featureIndexCoord, multiPartIndexCoord, geometryIndex) {
-            // Simulating a meta.coordReduce() since `reduce` operations cannot be stopped by returning `false`
-            if (previousCoords === undefined || featureIndex > previousFeatureIndex || multiPartIndexCoord > previousMultiIndex || geometryIndex > prevGeomIndex) {
-                previousCoords = currentCoord;
-                previousFeatureIndex = featureIndex;
-                previousMultiIndex = multiPartIndexCoord;
-                prevGeomIndex = geometryIndex;
-                segmentIndex = 0;
-                return;
-            }
-            var currentSegment = helpers.lineString([previousCoords, currentCoord], feature.properties);
-            if (callback(currentSegment, featureIndex, multiFeatureIndex, geometryIndex, segmentIndex) === false) return false;
-            segmentIndex++;
+    // Generate 2-vertex line segments
+    var previousCoords;
+    var previousFeatureIndex = 0;
+    var previousMultiIndex = 0;
+    var prevGeomIndex = 0;
+    if (
+      coordEach(
+        feature,
+        function (
+          currentCoord,
+          coordIndex,
+          featureIndexCoord,
+          multiPartIndexCoord,
+          geometryIndex
+        ) {
+          // Simulating a meta.coordReduce() since `reduce` operations cannot be stopped by returning `false`
+          if (
+            previousCoords === undefined ||
+            featureIndex > previousFeatureIndex ||
+            multiPartIndexCoord > previousMultiIndex ||
+            geometryIndex > prevGeomIndex
+          ) {
             previousCoords = currentCoord;
-        }) === false) return false;
-    });
+            previousFeatureIndex = featureIndex;
+            previousMultiIndex = multiPartIndexCoord;
+            prevGeomIndex = geometryIndex;
+            segmentIndex = 0;
+            return;
+          }
+          var currentSegment = helpers.lineString(
+            [previousCoords, currentCoord],
+            feature.properties
+          );
+          if (
+            callback(
+              currentSegment,
+              featureIndex,
+              multiFeatureIndex,
+              geometryIndex,
+              segmentIndex
+            ) === false
+          )
+            return false;
+          segmentIndex++;
+          previousCoords = currentCoord;
+        }
+      ) === false
+    )
+      return false;
+  });
 }
 
 /**
@@ -3888,7 +4078,7 @@ function segmentEach(geojson, callback) {
  *   //= featureIndex
  *   //= multiFeatureIndex
  *   //= geometryIndex
- *   //= segmentInex
+ *   //= segmentIndex
  *   return currentSegment
  * });
  *
@@ -3900,14 +4090,32 @@ function segmentEach(geojson, callback) {
  * }, initialValue);
  */
 function segmentReduce(geojson, callback, initialValue) {
-    var previousValue = initialValue;
-    var started = false;
-    segmentEach(geojson, function (currentSegment, featureIndex, multiFeatureIndex, geometryIndex, segmentIndex) {
-        if (started === false && initialValue === undefined) previousValue = currentSegment;
-        else previousValue = callback(previousValue, currentSegment, featureIndex, multiFeatureIndex, geometryIndex, segmentIndex);
-        started = true;
-    });
-    return previousValue;
+  var previousValue = initialValue;
+  var started = false;
+  segmentEach(
+    geojson,
+    function (
+      currentSegment,
+      featureIndex,
+      multiFeatureIndex,
+      geometryIndex,
+      segmentIndex
+    ) {
+      if (started === false && initialValue === undefined)
+        previousValue = currentSegment;
+      else
+        previousValue = callback(
+          previousValue,
+          currentSegment,
+          featureIndex,
+          multiFeatureIndex,
+          geometryIndex,
+          segmentIndex
+        );
+      started = true;
+    }
+  );
+  return previousValue;
 }
 
 /**
@@ -3941,24 +4149,37 @@ function segmentReduce(geojson, callback, initialValue) {
  * });
  */
 function lineEach(geojson, callback) {
-    // validation
-    if (!geojson) throw new Error('geojson is required');
+  // validation
+  if (!geojson) throw new Error("geojson is required");
 
-    flattenEach(geojson, function (feature, featureIndex, multiFeatureIndex) {
-        if (feature.geometry === null) return;
-        var type = feature.geometry.type;
-        var coords = feature.geometry.coordinates;
-        switch (type) {
-        case 'LineString':
-            if (callback(feature, featureIndex, multiFeatureIndex, 0, 0) === false) return false;
-            break;
-        case 'Polygon':
-            for (var geometryIndex = 0; geometryIndex < coords.length; geometryIndex++) {
-                if (callback(helpers.lineString(coords[geometryIndex], feature.properties), featureIndex, multiFeatureIndex, geometryIndex) === false) return false;
-            }
-            break;
+  flattenEach(geojson, function (feature, featureIndex, multiFeatureIndex) {
+    if (feature.geometry === null) return;
+    var type = feature.geometry.type;
+    var coords = feature.geometry.coordinates;
+    switch (type) {
+      case "LineString":
+        if (callback(feature, featureIndex, multiFeatureIndex, 0, 0) === false)
+          return false;
+        break;
+      case "Polygon":
+        for (
+          var geometryIndex = 0;
+          geometryIndex < coords.length;
+          geometryIndex++
+        ) {
+          if (
+            callback(
+              helpers.lineString(coords[geometryIndex], feature.properties),
+              featureIndex,
+              multiFeatureIndex,
+              geometryIndex
+            ) === false
+          )
+            return false;
         }
-    });
+        break;
+    }
+  });
 }
 
 /**
@@ -4008,12 +4229,23 @@ function lineEach(geojson, callback) {
  * });
  */
 function lineReduce(geojson, callback, initialValue) {
-    var previousValue = initialValue;
-    lineEach(geojson, function (currentLine, featureIndex, multiFeatureIndex, geometryIndex) {
-        if (featureIndex === 0 && initialValue === undefined) previousValue = currentLine;
-        else previousValue = callback(previousValue, currentLine, featureIndex, multiFeatureIndex, geometryIndex);
-    });
-    return previousValue;
+  var previousValue = initialValue;
+  lineEach(
+    geojson,
+    function (currentLine, featureIndex, multiFeatureIndex, geometryIndex) {
+      if (featureIndex === 0 && initialValue === undefined)
+        previousValue = currentLine;
+      else
+        previousValue = callback(
+          previousValue,
+          currentLine,
+          featureIndex,
+          multiFeatureIndex,
+          geometryIndex
+        );
+    }
+  );
+  return previousValue;
 }
 
 /**
@@ -4051,66 +4283,99 @@ function lineReduce(geojson, callback, initialValue) {
  * // => Feature<LineString<[[-50, -30], [-30, -40]]>>
  */
 function findSegment(geojson, options) {
-    // Optional Parameters
-    options = options || {};
-    if (!helpers.isObject(options)) throw new Error('options is invalid');
-    var featureIndex = options.featureIndex || 0;
-    var multiFeatureIndex = options.multiFeatureIndex || 0;
-    var geometryIndex = options.geometryIndex || 0;
-    var segmentIndex = options.segmentIndex || 0;
+  // Optional Parameters
+  options = options || {};
+  if (!helpers.isObject(options)) throw new Error("options is invalid");
+  var featureIndex = options.featureIndex || 0;
+  var multiFeatureIndex = options.multiFeatureIndex || 0;
+  var geometryIndex = options.geometryIndex || 0;
+  var segmentIndex = options.segmentIndex || 0;
 
-    // Find FeatureIndex
-    var properties = options.properties;
-    var geometry;
+  // Find FeatureIndex
+  var properties = options.properties;
+  var geometry;
 
-    switch (geojson.type) {
-    case 'FeatureCollection':
-        if (featureIndex < 0) featureIndex = geojson.features.length + featureIndex;
-        properties = properties || geojson.features[featureIndex].properties;
-        geometry = geojson.features[featureIndex].geometry;
-        break;
-    case 'Feature':
-        properties = properties || geojson.properties;
-        geometry = geojson.geometry;
-        break;
-    case 'Point':
-    case 'MultiPoint':
-        return null;
-    case 'LineString':
-    case 'Polygon':
-    case 'MultiLineString':
-    case 'MultiPolygon':
-        geometry = geojson;
-        break;
+  switch (geojson.type) {
+    case "FeatureCollection":
+      if (featureIndex < 0)
+        featureIndex = geojson.features.length + featureIndex;
+      properties = properties || geojson.features[featureIndex].properties;
+      geometry = geojson.features[featureIndex].geometry;
+      break;
+    case "Feature":
+      properties = properties || geojson.properties;
+      geometry = geojson.geometry;
+      break;
+    case "Point":
+    case "MultiPoint":
+      return null;
+    case "LineString":
+    case "Polygon":
+    case "MultiLineString":
+    case "MultiPolygon":
+      geometry = geojson;
+      break;
     default:
-        throw new Error('geojson is invalid');
-    }
+      throw new Error("geojson is invalid");
+  }
 
-    // Find SegmentIndex
-    if (geometry === null) return null;
-    var coords = geometry.coordinates;
-    switch (geometry.type) {
-    case 'Point':
-    case 'MultiPoint':
-        return null;
-    case 'LineString':
-        if (segmentIndex < 0) segmentIndex = coords.length + segmentIndex - 1;
-        return helpers.lineString([coords[segmentIndex], coords[segmentIndex + 1]], properties, options);
-    case 'Polygon':
-        if (geometryIndex < 0) geometryIndex = coords.length + geometryIndex;
-        if (segmentIndex < 0) segmentIndex = coords[geometryIndex].length + segmentIndex - 1;
-        return helpers.lineString([coords[geometryIndex][segmentIndex], coords[geometryIndex][segmentIndex + 1]], properties, options);
-    case 'MultiLineString':
-        if (multiFeatureIndex < 0) multiFeatureIndex = coords.length + multiFeatureIndex;
-        if (segmentIndex < 0) segmentIndex = coords[multiFeatureIndex].length + segmentIndex - 1;
-        return helpers.lineString([coords[multiFeatureIndex][segmentIndex], coords[multiFeatureIndex][segmentIndex + 1]], properties, options);
-    case 'MultiPolygon':
-        if (multiFeatureIndex < 0) multiFeatureIndex = coords.length + multiFeatureIndex;
-        if (geometryIndex < 0) geometryIndex = coords[multiFeatureIndex].length + geometryIndex;
-        if (segmentIndex < 0) segmentIndex = coords[multiFeatureIndex][geometryIndex].length - segmentIndex - 1;
-        return helpers.lineString([coords[multiFeatureIndex][geometryIndex][segmentIndex], coords[multiFeatureIndex][geometryIndex][segmentIndex + 1]], properties, options);
-    }
-    throw new Error('geojson is invalid');
+  // Find SegmentIndex
+  if (geometry === null) return null;
+  var coords = geometry.coordinates;
+  switch (geometry.type) {
+    case "Point":
+    case "MultiPoint":
+      return null;
+    case "LineString":
+      if (segmentIndex < 0) segmentIndex = coords.length + segmentIndex - 1;
+      return helpers.lineString(
+        [coords[segmentIndex], coords[segmentIndex + 1]],
+        properties,
+        options
+      );
+    case "Polygon":
+      if (geometryIndex < 0) geometryIndex = coords.length + geometryIndex;
+      if (segmentIndex < 0)
+        segmentIndex = coords[geometryIndex].length + segmentIndex - 1;
+      return helpers.lineString(
+        [
+          coords[geometryIndex][segmentIndex],
+          coords[geometryIndex][segmentIndex + 1],
+        ],
+        properties,
+        options
+      );
+    case "MultiLineString":
+      if (multiFeatureIndex < 0)
+        multiFeatureIndex = coords.length + multiFeatureIndex;
+      if (segmentIndex < 0)
+        segmentIndex = coords[multiFeatureIndex].length + segmentIndex - 1;
+      return helpers.lineString(
+        [
+          coords[multiFeatureIndex][segmentIndex],
+          coords[multiFeatureIndex][segmentIndex + 1],
+        ],
+        properties,
+        options
+      );
+    case "MultiPolygon":
+      if (multiFeatureIndex < 0)
+        multiFeatureIndex = coords.length + multiFeatureIndex;
+      if (geometryIndex < 0)
+        geometryIndex = coords[multiFeatureIndex].length + geometryIndex;
+      if (segmentIndex < 0)
+        segmentIndex =
+          coords[multiFeatureIndex][geometryIndex].length - segmentIndex - 1;
+      return helpers.lineString(
+        [
+          coords[multiFeatureIndex][geometryIndex][segmentIndex],
+          coords[multiFeatureIndex][geometryIndex][segmentIndex + 1],
+        ],
+        properties,
+        options
+      );
+  }
+  throw new Error("geojson is invalid");
 }
 
 /**
@@ -4147,93 +4412,106 @@ function findSegment(geojson, options) {
  * // => Feature<Point<[-30, -40]>>
  */
 function findPoint(geojson, options) {
-    // Optional Parameters
-    options = options || {};
-    if (!helpers.isObject(options)) throw new Error('options is invalid');
-    var featureIndex = options.featureIndex || 0;
-    var multiFeatureIndex = options.multiFeatureIndex || 0;
-    var geometryIndex = options.geometryIndex || 0;
-    var coordIndex = options.coordIndex || 0;
+  // Optional Parameters
+  options = options || {};
+  if (!helpers.isObject(options)) throw new Error("options is invalid");
+  var featureIndex = options.featureIndex || 0;
+  var multiFeatureIndex = options.multiFeatureIndex || 0;
+  var geometryIndex = options.geometryIndex || 0;
+  var coordIndex = options.coordIndex || 0;
 
-    // Find FeatureIndex
-    var properties = options.properties;
-    var geometry;
+  // Find FeatureIndex
+  var properties = options.properties;
+  var geometry;
 
-    switch (geojson.type) {
-    case 'FeatureCollection':
-        if (featureIndex < 0) featureIndex = geojson.features.length + featureIndex;
-        properties = properties || geojson.features[featureIndex].properties;
-        geometry = geojson.features[featureIndex].geometry;
-        break;
-    case 'Feature':
-        properties = properties || geojson.properties;
-        geometry = geojson.geometry;
-        break;
-    case 'Point':
-    case 'MultiPoint':
-        return null;
-    case 'LineString':
-    case 'Polygon':
-    case 'MultiLineString':
-    case 'MultiPolygon':
-        geometry = geojson;
-        break;
+  switch (geojson.type) {
+    case "FeatureCollection":
+      if (featureIndex < 0)
+        featureIndex = geojson.features.length + featureIndex;
+      properties = properties || geojson.features[featureIndex].properties;
+      geometry = geojson.features[featureIndex].geometry;
+      break;
+    case "Feature":
+      properties = properties || geojson.properties;
+      geometry = geojson.geometry;
+      break;
+    case "Point":
+    case "MultiPoint":
+      return null;
+    case "LineString":
+    case "Polygon":
+    case "MultiLineString":
+    case "MultiPolygon":
+      geometry = geojson;
+      break;
     default:
-        throw new Error('geojson is invalid');
-    }
+      throw new Error("geojson is invalid");
+  }
 
-    // Find Coord Index
-    if (geometry === null) return null;
-    var coords = geometry.coordinates;
-    switch (geometry.type) {
-    case 'Point':
-        return helpers.point(coords, properties, options);
-    case 'MultiPoint':
-        if (multiFeatureIndex < 0) multiFeatureIndex = coords.length + multiFeatureIndex;
-        return helpers.point(coords[multiFeatureIndex], properties, options);
-    case 'LineString':
-        if (coordIndex < 0) coordIndex = coords.length + coordIndex;
-        return helpers.point(coords[coordIndex], properties, options);
-    case 'Polygon':
-        if (geometryIndex < 0) geometryIndex = coords.length + geometryIndex;
-        if (coordIndex < 0) coordIndex = coords[geometryIndex].length + coordIndex;
-        return helpers.point(coords[geometryIndex][coordIndex], properties, options);
-    case 'MultiLineString':
-        if (multiFeatureIndex < 0) multiFeatureIndex = coords.length + multiFeatureIndex;
-        if (coordIndex < 0) coordIndex = coords[multiFeatureIndex].length + coordIndex;
-        return helpers.point(coords[multiFeatureIndex][coordIndex], properties, options);
-    case 'MultiPolygon':
-        if (multiFeatureIndex < 0) multiFeatureIndex = coords.length + multiFeatureIndex;
-        if (geometryIndex < 0) geometryIndex = coords[multiFeatureIndex].length + geometryIndex;
-        if (coordIndex < 0) coordIndex = coords[multiFeatureIndex][geometryIndex].length - coordIndex;
-        return helpers.point(coords[multiFeatureIndex][geometryIndex][coordIndex], properties, options);
-    }
-    throw new Error('geojson is invalid');
+  // Find Coord Index
+  if (geometry === null) return null;
+  var coords = geometry.coordinates;
+  switch (geometry.type) {
+    case "Point":
+      return helpers.point(coords, properties, options);
+    case "MultiPoint":
+      if (multiFeatureIndex < 0)
+        multiFeatureIndex = coords.length + multiFeatureIndex;
+      return helpers.point(coords[multiFeatureIndex], properties, options);
+    case "LineString":
+      if (coordIndex < 0) coordIndex = coords.length + coordIndex;
+      return helpers.point(coords[coordIndex], properties, options);
+    case "Polygon":
+      if (geometryIndex < 0) geometryIndex = coords.length + geometryIndex;
+      if (coordIndex < 0)
+        coordIndex = coords[geometryIndex].length + coordIndex;
+      return helpers.point(coords[geometryIndex][coordIndex], properties, options);
+    case "MultiLineString":
+      if (multiFeatureIndex < 0)
+        multiFeatureIndex = coords.length + multiFeatureIndex;
+      if (coordIndex < 0)
+        coordIndex = coords[multiFeatureIndex].length + coordIndex;
+      return helpers.point(coords[multiFeatureIndex][coordIndex], properties, options);
+    case "MultiPolygon":
+      if (multiFeatureIndex < 0)
+        multiFeatureIndex = coords.length + multiFeatureIndex;
+      if (geometryIndex < 0)
+        geometryIndex = coords[multiFeatureIndex].length + geometryIndex;
+      if (coordIndex < 0)
+        coordIndex =
+          coords[multiFeatureIndex][geometryIndex].length - coordIndex;
+      return helpers.point(
+        coords[multiFeatureIndex][geometryIndex][coordIndex],
+        properties,
+        options
+      );
+  }
+  throw new Error("geojson is invalid");
 }
 
+exports.coordAll = coordAll;
 exports.coordEach = coordEach;
 exports.coordReduce = coordReduce;
-exports.propEach = propEach;
-exports.propReduce = propReduce;
 exports.featureEach = featureEach;
 exports.featureReduce = featureReduce;
-exports.coordAll = coordAll;
-exports.geomEach = geomEach;
-exports.geomReduce = geomReduce;
+exports.findPoint = findPoint;
+exports.findSegment = findSegment;
 exports.flattenEach = flattenEach;
 exports.flattenReduce = flattenReduce;
-exports.segmentEach = segmentEach;
-exports.segmentReduce = segmentReduce;
+exports.geomEach = geomEach;
+exports.geomReduce = geomReduce;
 exports.lineEach = lineEach;
 exports.lineReduce = lineReduce;
-exports.findSegment = findSegment;
-exports.findPoint = findPoint;
+exports.propEach = propEach;
+exports.propReduce = propReduce;
+exports.segmentEach = segmentEach;
+exports.segmentReduce = segmentReduce;
 
 },{"@turf/helpers":14}],19:[function(require,module,exports){
 "use strict";
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
-}
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 // Taken from http://geomalgorithms.com/a02-_lines.html
 var distance_1 = __importDefault(require("@turf/distance"));
@@ -4329,14 +4607,16 @@ function distanceToSegment(p, a, b, options) {
         return calcDistance(p, b, { method: options.method, units: "degrees" });
     }
     var b2 = c1 / c2;
-    var Pb = [a[0] + (b2 * v[0]), a[1] + (b2 * v[1])];
+    var Pb = [a[0] + b2 * v[0], a[1] + b2 * v[1]];
     return calcDistance(p, Pb, { method: options.method, units: "degrees" });
 }
 function dot(u, v) {
-    return (u[0] * v[0] + u[1] * v[1]);
+    return u[0] * v[0] + u[1] * v[1];
 }
 function calcDistance(a, b, options) {
-    return options.method === "planar" ? rhumb_distance_1.default(a, b, options) : distance_1.default(a, b, options);
+    return options.method === "planar"
+        ? rhumb_distance_1.default(a, b, options)
+        : distance_1.default(a, b, options);
 }
 exports.default = pointToLineDistance;
 
@@ -4369,9 +4649,12 @@ function default_1(poly, options) {
         options.properties = poly.properties;
     }
     switch (geom.type) {
-        case "Polygon": return polygonToLine(geom, options);
-        case "MultiPolygon": return multiPolygonToLine(geom, options);
-        default: throw new Error("invalid poly");
+        case "Polygon":
+            return polygonToLine(geom, options);
+        case "MultiPolygon":
+            return multiPolygonToLine(geom, options);
+        default:
+            throw new Error("invalid poly");
     }
 }
 exports.default = default_1;
@@ -4381,9 +4664,12 @@ exports.default = default_1;
 function polygonToLine(poly, options) {
     if (options === void 0) { options = {}; }
     var geom = invariant_1.getGeom(poly);
-    var type = geom.type;
     var coords = geom.coordinates;
-    var properties = options.properties ? options.properties : poly.type === "Feature" ? poly.properties : {};
+    var properties = options.properties
+        ? options.properties
+        : poly.type === "Feature"
+            ? poly.properties
+            : {};
     return coordsToLine(coords, properties);
 }
 exports.polygonToLine = polygonToLine;
@@ -4393,10 +4679,12 @@ exports.polygonToLine = polygonToLine;
 function multiPolygonToLine(multiPoly, options) {
     if (options === void 0) { options = {}; }
     var geom = invariant_1.getGeom(multiPoly);
-    var type = geom.type;
     var coords = geom.coordinates;
-    var properties = options.properties ? options.properties :
-        multiPoly.type === "Feature" ? multiPoly.properties : {};
+    var properties = options.properties
+        ? options.properties
+        : multiPoly.type === "Feature"
+            ? multiPoly.properties
+            : {};
     var lines = [];
     coords.forEach(function (coord) {
         lines.push(coordsToLine(coord, properties));
@@ -4449,7 +4737,12 @@ function rhumbDistance(from, to, options) {
     var destination = invariant_1.getCoord(to);
     // compensate the crossing of the 180th meridian (https://macwright.org/2016/09/26/the-180th-meridian.html)
     // solution from https://github.com/mapbox/mapbox-gl-js/issues/3250#issuecomment-294887678
-    destination[0] += (destination[0] - origin[0] > 180) ? -360 : (origin[0] - destination[0] > 180) ? 360 : 0;
+    destination[0] +=
+        destination[0] - origin[0] > 180
+            ? -360
+            : origin[0] - destination[0] > 180
+                ? 360
+                : 0;
     var distanceInMeters = calculateRhumbDistance(origin, destination);
     var distance = helpers_1.convertLength(distanceInMeters, "meters", options.units);
     return distance;
@@ -4476,13 +4769,13 @@ function calculateRhumbDistance(origin, destination, radius) {
     // Δ => Delta
     // δ => delta
     // θ => theta
-    radius = (radius === undefined) ? helpers_1.earthRadius : Number(radius);
+    radius = radius === undefined ? helpers_1.earthRadius : Number(radius);
     // see www.edwilliams.org/avform.htm#Rhumb
     var R = radius;
-    var phi1 = origin[1] * Math.PI / 180;
-    var phi2 = destination[1] * Math.PI / 180;
+    var phi1 = (origin[1] * Math.PI) / 180;
+    var phi2 = (destination[1] * Math.PI) / 180;
     var DeltaPhi = phi2 - phi1;
-    var DeltaLambda = Math.abs(destination[0] - origin[0]) * Math.PI / 180;
+    var DeltaLambda = (Math.abs(destination[0] - origin[0]) * Math.PI) / 180;
     // if dLon over 180° take shorter rhumb line across the anti-meridian:
     if (DeltaLambda > Math.PI) {
         DeltaLambda -= 2 * Math.PI;
@@ -6801,9 +7094,7 @@ function fromByteArray (uint8) {
 
   // go through the array every three bytes, we'll deal with trailing stuff later
   for (var i = 0, len2 = len - extraBytes; i < len2; i += maxChunkLength) {
-    parts.push(encodeChunk(
-      uint8, i, (i + maxChunkLength) > len2 ? len2 : (i + maxChunkLength)
-    ))
+    parts.push(encodeChunk(uint8, i, (i + maxChunkLength) > len2 ? len2 : (i + maxChunkLength)))
   }
 
   // pad the end with zeros, but make sure to not forget the extra bytes
@@ -6830,7 +7121,7 @@ function fromByteArray (uint8) {
 },{}],29:[function(require,module,exports){
 
 },{}],30:[function(require,module,exports){
-(function (Buffer){
+(function (Buffer){(function (){
 /*!
  * The buffer module from node.js, for the browser.
  *
@@ -6843,10 +7134,6 @@ function fromByteArray (uint8) {
 
 var base64 = require('base64-js')
 var ieee754 = require('ieee754')
-var customInspectSymbol =
-  (typeof Symbol === 'function' && typeof Symbol.for === 'function')
-    ? Symbol.for('nodejs.util.inspect.custom')
-    : null
 
 exports.Buffer = Buffer
 exports.SlowBuffer = SlowBuffer
@@ -6883,9 +7170,7 @@ function typedArraySupport () {
   // Can typed array instances can be augmented?
   try {
     var arr = new Uint8Array(1)
-    var proto = { foo: function () { return 42 } }
-    Object.setPrototypeOf(proto, Uint8Array.prototype)
-    Object.setPrototypeOf(arr, proto)
+    arr.__proto__ = { __proto__: Uint8Array.prototype, foo: function () { return 42 } }
     return arr.foo() === 42
   } catch (e) {
     return false
@@ -6914,7 +7199,7 @@ function createBuffer (length) {
   }
   // Return an augmented `Uint8Array` instance
   var buf = new Uint8Array(length)
-  Object.setPrototypeOf(buf, Buffer.prototype)
+  buf.__proto__ = Buffer.prototype
   return buf
 }
 
@@ -6964,7 +7249,7 @@ function from (value, encodingOrOffset, length) {
   }
 
   if (value == null) {
-    throw new TypeError(
+    throw TypeError(
       'The first argument must be one of type string, Buffer, ArrayBuffer, Array, ' +
       'or Array-like Object. Received type ' + (typeof value)
     )
@@ -6972,12 +7257,6 @@ function from (value, encodingOrOffset, length) {
 
   if (isInstance(value, ArrayBuffer) ||
       (value && isInstance(value.buffer, ArrayBuffer))) {
-    return fromArrayBuffer(value, encodingOrOffset, length)
-  }
-
-  if (typeof SharedArrayBuffer !== 'undefined' &&
-      (isInstance(value, SharedArrayBuffer) ||
-      (value && isInstance(value.buffer, SharedArrayBuffer)))) {
     return fromArrayBuffer(value, encodingOrOffset, length)
   }
 
@@ -7022,8 +7301,8 @@ Buffer.from = function (value, encodingOrOffset, length) {
 
 // Note: Change prototype *after* Buffer.from is defined to workaround Chrome bug:
 // https://github.com/feross/buffer/pull/148
-Object.setPrototypeOf(Buffer.prototype, Uint8Array.prototype)
-Object.setPrototypeOf(Buffer, Uint8Array)
+Buffer.prototype.__proto__ = Uint8Array.prototype
+Buffer.__proto__ = Uint8Array
 
 function assertSize (size) {
   if (typeof size !== 'number') {
@@ -7127,8 +7406,7 @@ function fromArrayBuffer (array, byteOffset, length) {
   }
 
   // Return an augmented `Uint8Array` instance
-  Object.setPrototypeOf(buf, Buffer.prototype)
-
+  buf.__proto__ = Buffer.prototype
   return buf
 }
 
@@ -7450,9 +7728,6 @@ Buffer.prototype.inspect = function inspect () {
   if (this.length > max) str += ' ... '
   return '<Buffer ' + str + '>'
 }
-if (customInspectSymbol) {
-  Buffer.prototype[customInspectSymbol] = Buffer.prototype.inspect
-}
 
 Buffer.prototype.compare = function compare (target, start, end, thisStart, thisEnd) {
   if (isInstance(target, Uint8Array)) {
@@ -7578,7 +7853,7 @@ function bidirectionalIndexOf (buffer, val, byteOffset, encoding, dir) {
         return Uint8Array.prototype.lastIndexOf.call(buffer, val, byteOffset)
       }
     }
-    return arrayIndexOf(buffer, [val], byteOffset, encoding, dir)
+    return arrayIndexOf(buffer, [ val ], byteOffset, encoding, dir)
   }
 
   throw new TypeError('val must be string, number or Buffer')
@@ -7907,7 +8182,7 @@ function hexSlice (buf, start, end) {
 
   var out = ''
   for (var i = start; i < end; ++i) {
-    out += hexSliceLookupTable[buf[i]]
+    out += toHex(buf[i])
   }
   return out
 }
@@ -7944,8 +8219,7 @@ Buffer.prototype.slice = function slice (start, end) {
 
   var newBuf = this.subarray(start, end)
   // Return an augmented `Uint8Array` instance
-  Object.setPrototypeOf(newBuf, Buffer.prototype)
-
+  newBuf.__proto__ = Buffer.prototype
   return newBuf
 }
 
@@ -8434,8 +8708,6 @@ Buffer.prototype.fill = function fill (val, start, end, encoding) {
     }
   } else if (typeof val === 'number') {
     val = val & 255
-  } else if (typeof val === 'boolean') {
-    val = Number(val)
   }
 
   // Invalid ranges are not set to a default, so can range check early.
@@ -8491,6 +8763,11 @@ function base64clean (str) {
     str = str + '='
   }
   return str
+}
+
+function toHex (n) {
+  if (n < 16) return '0' + n.toString(16)
+  return n.toString(16)
 }
 
 function utf8ToBytes (string, units) {
@@ -8623,30 +8900,20 @@ function numberIsNaN (obj) {
   return obj !== obj // eslint-disable-line no-self-compare
 }
 
-// Create lookup table for `toString('hex')`
-// See: https://github.com/feross/buffer/issues/219
-var hexSliceLookupTable = (function () {
-  var alphabet = '0123456789abcdef'
-  var table = new Array(256)
-  for (var i = 0; i < 16; ++i) {
-    var i16 = i * 16
-    for (var j = 0; j < 16; ++j) {
-      table[i16 + j] = alphabet[i] + alphabet[j]
-    }
-  }
-  return table
-})()
-
-}).call(this,require("buffer").Buffer)
+}).call(this)}).call(this,require("buffer").Buffer)
 
 },{"base64-js":28,"buffer":30,"ieee754":32}],31:[function(require,module,exports){
 'use strict';
 
-var rbush = require('rbush');
-var convexHull = require('monotone-convex-hull-2d');
+var RBush = require('rbush');
 var Queue = require('tinyqueue');
 var pointInPolygon = require('point-in-polygon');
-var orient = require('robust-orientation')[3];
+var orient = require('robust-predicates/umd/orient2d.min.js').orient2d;
+
+// Fix for require issue in webpack https://github.com/mapbox/concaveman/issues/18
+if (Queue.default) {
+    Queue = Queue.default;
+}
 
 module.exports = concaveman;
 module.exports.default = concaveman;
@@ -8662,7 +8929,19 @@ function concaveman(points, concavity, lengthThreshold) {
     var hull = fastConvexHull(points);
 
     // index the points with an R-tree
-    var tree = rbush(16, ['[0]', '[1]', '[0]', '[1]']).load(points);
+    var tree = new RBush(16);
+    tree.toBBox = function (a) {
+        return {
+            minX: a[0],
+            minY: a[1],
+            maxX: a[0],
+            maxY: a[1]
+        };
+    };
+    tree.compareMinX = function (a, b) { return a[0] - b[0]; };
+    tree.compareMinY = function (a, b) { return a[1] - b[1]; };
+
+    tree.load(points);
 
     // turn the convex hull into a linked list and populate the initial edge queue with the nodes
     var queue = [];
@@ -8674,7 +8953,7 @@ function concaveman(points, concavity, lengthThreshold) {
     }
 
     // index the segments with an R-tree (for intersection checks)
-    var segTree = rbush(16);
+    var segTree = new RBush(16);
     for (i = 0; i < queue.length; i++) segTree.insert(updateBBox(queue[i]));
 
     var sqConcavity = concavity * concavity;
@@ -8723,7 +9002,7 @@ function concaveman(points, concavity, lengthThreshold) {
 }
 
 function findCandidate(tree, a, b, c, d, maxDist, segTree) {
-    var queue = new Queue(null, compareDist);
+    var queue = new Queue([], compareDist);
     var node = tree.data;
 
     // search through the point R-tree with a depth-first search using a priority queue
@@ -8800,11 +9079,15 @@ function noIntersections(a, b, segTree) {
     return true;
 }
 
+function cross(p1, p2, p3) {
+    return orient(p1[0], p1[1], p2[0], p2[1], p3[0], p3[1]);
+}
+
 // check if the edges (p1,q1) and (p2,q2) intersect
 function intersects(p1, q1, p2, q2) {
     return p1 !== q2 && q1 !== p2 &&
-        orient(p1, q1, p2) > 0 !== orient(p1, q1, q2) > 0 &&
-        orient(p2, q2, p1) > 0 !== orient(p2, q2, q1) > 0;
+        cross(p1, q1, p2) > 0 !== cross(p1, q1, q2) > 0 &&
+        cross(p2, q2, p1) > 0 !== cross(p2, q2, q1) > 0;
 }
 
 // update the bounding box of a node's edge
@@ -8842,12 +9125,7 @@ function fastConvexHull(points) {
     }
 
     // get convex hull around the filtered points
-    var indices = convexHull(filtered);
-
-    // return the hull as array of points (rather than indices)
-    var hull = [];
-    for (i = 0; i < indices.length; i++) hull.push(filtered[indices[i]]);
-    return hull;
+    return convexHull(filtered);
 }
 
 // create a new node in a doubly linked list
@@ -8981,7 +9259,36 @@ function sqSegSegDist(x0, y0, x1, y1, x2, y2, x3, y3) {
     return dx * dx + dy * dy;
 }
 
-},{"monotone-convex-hull-2d":61,"point-in-polygon":80,"rbush":84,"robust-orientation":85,"tinyqueue":97}],32:[function(require,module,exports){
+function compareByX(a, b) {
+    return a[0] === b[0] ? a[1] - b[1] : a[0] - b[0];
+}
+
+function convexHull(points) {
+    points.sort(compareByX);
+
+    var lower = [];
+    for (var i = 0; i < points.length; i++) {
+        while (lower.length >= 2 && cross(lower[lower.length - 2], lower[lower.length - 1], points[i]) <= 0) {
+            lower.pop();
+        }
+        lower.push(points[i]);
+    }
+
+    var upper = [];
+    for (var ii = points.length - 1; ii >= 0; ii--) {
+        while (upper.length >= 2 && cross(upper[upper.length - 2], upper[upper.length - 1], points[ii]) <= 0) {
+            upper.pop();
+        }
+        upper.push(points[ii]);
+    }
+
+    upper.pop();
+    lower.pop();
+    return lower.concat(upper);
+}
+
+},{"point-in-polygon":80,"rbush":84,"robust-predicates/umd/orient2d.min.js":85,"tinyqueue":95}],32:[function(require,module,exports){
+/*! ieee754. BSD-3-Clause License. Feross Aboukhadijeh <https://feross.org/opensource> */
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
   var e, m
   var eLen = (nBytes * 8) - mLen - 1
@@ -9068,7 +9375,7 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
 }
 
 },{}],33:[function(require,module,exports){
-(function (global){
+(function (global){(function (){
 'use strict';
 var Mutation = global.MutationObserver || global.WebKitMutationObserver;
 
@@ -9139,7 +9446,7 @@ function immediate(task) {
   }
 }
 
-}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+}).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
 },{}],34:[function(require,module,exports){
 'use strict';
@@ -9663,7 +9970,7 @@ exports.uncompress =  function(input) {
     return pako.inflateRaw(input);
 };
 
-},{"pako":62}],43:[function(require,module,exports){
+},{"pako":61}],43:[function(require,module,exports){
 'use strict';
 
 var base64 = require('./base64');
@@ -9695,7 +10002,10 @@ function JSZip(data, options) {
     //   "folder/" : {...},
     //   "folder/data.txt" : {...}
     // }
-    this.files = {};
+    // NOTE: we use a null prototype because we do not
+    // want filenames like "toString" coming from a zip file
+    // to overwrite methods and attributes in a normal Object.
+    this.files = Object.create(null);
 
     this.comment = null;
 
@@ -9786,7 +10096,7 @@ module.exports = function(data, options) {
 };
 
 },{"./base64":35,"./utf8":54,"./utils":55,"./zipEntries":56}],45:[function(require,module,exports){
-(function (Buffer){
+(function (Buffer){(function (){
 'use strict';
 module.exports = function(data, encoding){
     return new Buffer(data, encoding);
@@ -9795,7 +10105,7 @@ module.exports.test = function(b){
     return Buffer.isBuffer(b);
 };
 
-}).call(this,require("buffer").Buffer)
+}).call(this)}).call(this,require("buffer").Buffer)
 
 },{"buffer":30}],46:[function(require,module,exports){
 'use strict';
@@ -10438,9 +10748,6 @@ var out = {
         var result = [],
             filename, relativePath, file, fileClone;
         for (filename in this.files) {
-            if (!this.files.hasOwnProperty(filename)) {
-                continue;
-            }
             file = this.files[filename];
             // return a new object, don't let the user mess with our internal objects :)
             fileClone = new ZipObject(file.name, file._data, utils.extend(file.options));
@@ -10584,9 +10891,6 @@ var out = {
 
         // first, generate all the zip parts.
         for (var name in this.files) {
-            if (!this.files.hasOwnProperty(name)) {
-                continue;
-            }
             var file = this.files[name];
 
             var compressionName = file.options.compression || options.compression.toUpperCase();
@@ -10773,7 +11077,7 @@ StringWriter.prototype = {
 module.exports = StringWriter;
 
 },{"./utils":55}],51:[function(require,module,exports){
-(function (Buffer){
+(function (Buffer){(function (){
 'use strict';
 exports.base64 = true;
 exports.array = true;
@@ -10809,7 +11113,7 @@ else {
     }
 }
 
-}).call(this,require("buffer").Buffer)
+}).call(this)}).call(this,require("buffer").Buffer)
 
 },{"buffer":30}],52:[function(require,module,exports){
 'use strict';
@@ -12859,88 +13163,6 @@ MersenneTwister.prototype.random_long = function() {
 module.exports = MersenneTwister;
 
 },{}],61:[function(require,module,exports){
-'use strict'
-
-module.exports = monotoneConvexHull2D
-
-var orient = require('robust-orientation')[3]
-
-function monotoneConvexHull2D(points) {
-  var n = points.length
-
-  if(n < 3) {
-    var result = new Array(n)
-    for(var i=0; i<n; ++i) {
-      result[i] = i
-    }
-
-    if(n === 2 &&
-       points[0][0] === points[1][0] &&
-       points[0][1] === points[1][1]) {
-      return [0]
-    }
-
-    return result
-  }
-
-  //Sort point indices along x-axis
-  var sorted = new Array(n)
-  for(var i=0; i<n; ++i) {
-    sorted[i] = i
-  }
-  sorted.sort(function(a,b) {
-    var d = points[a][0]-points[b][0]
-    if(d) {
-      return d
-    }
-    return points[a][1] - points[b][1]
-  })
-
-  //Construct upper and lower hulls
-  var lower = [sorted[0], sorted[1]]
-  var upper = [sorted[0], sorted[1]]
-
-  for(var i=2; i<n; ++i) {
-    var idx = sorted[i]
-    var p   = points[idx]
-
-    //Insert into lower list
-    var m = lower.length
-    while(m > 1 && orient(
-        points[lower[m-2]], 
-        points[lower[m-1]], 
-        p) <= 0) {
-      m -= 1
-      lower.pop()
-    }
-    lower.push(idx)
-
-    //Insert into upper list
-    m = upper.length
-    while(m > 1 && orient(
-        points[upper[m-2]], 
-        points[upper[m-1]], 
-        p) >= 0) {
-      m -= 1
-      upper.pop()
-    }
-    upper.push(idx)
-  }
-
-  //Merge lists together
-  var result = new Array(upper.length + lower.length - 2)
-  var ptr    = 0
-  for(var i=0, nl=lower.length; i<nl; ++i) {
-    result[ptr++] = lower[i]
-  }
-  for(var j=upper.length-2; j>0; --j) {
-    result[ptr++] = upper[j]
-  }
-
-  //Return result
-  return result
-}
-},{"robust-orientation":85}],62:[function(require,module,exports){
 // Top level file is just a mixin of submodules & constants
 'use strict';
 
@@ -12956,7 +13178,7 @@ assign(pako, deflate, inflate, constants);
 
 module.exports = pako;
 
-},{"./lib/deflate":63,"./lib/inflate":64,"./lib/utils/common":65,"./lib/zlib/constants":68}],63:[function(require,module,exports){
+},{"./lib/deflate":62,"./lib/inflate":63,"./lib/utils/common":64,"./lib/zlib/constants":67}],62:[function(require,module,exports){
 'use strict';
 
 
@@ -13358,7 +13580,7 @@ exports.deflate = deflate;
 exports.deflateRaw = deflateRaw;
 exports.gzip = gzip;
 
-},{"./utils/common":65,"./utils/strings":66,"./zlib/deflate":70,"./zlib/messages":75,"./zlib/zstream":77}],64:[function(require,module,exports){
+},{"./utils/common":64,"./utils/strings":65,"./zlib/deflate":69,"./zlib/messages":74,"./zlib/zstream":76}],63:[function(require,module,exports){
 'use strict';
 
 
@@ -13783,7 +14005,7 @@ exports.inflate = inflate;
 exports.inflateRaw = inflateRaw;
 exports.ungzip  = inflate;
 
-},{"./utils/common":65,"./utils/strings":66,"./zlib/constants":68,"./zlib/gzheader":71,"./zlib/inflate":73,"./zlib/messages":75,"./zlib/zstream":77}],65:[function(require,module,exports){
+},{"./utils/common":64,"./utils/strings":65,"./zlib/constants":67,"./zlib/gzheader":70,"./zlib/inflate":72,"./zlib/messages":74,"./zlib/zstream":76}],64:[function(require,module,exports){
 'use strict';
 
 
@@ -13890,7 +14112,7 @@ exports.setTyped = function (on) {
 
 exports.setTyped(TYPED_OK);
 
-},{}],66:[function(require,module,exports){
+},{}],65:[function(require,module,exports){
 // String encode/decode helpers
 'use strict';
 
@@ -14079,7 +14301,7 @@ exports.utf8border = function (buf, max) {
   return (pos + _utf8len[buf[pos]] > max) ? pos : max;
 };
 
-},{"./common":65}],67:[function(require,module,exports){
+},{"./common":64}],66:[function(require,module,exports){
 'use strict';
 
 // Note: adler32 takes 12% for level 0 and 2% for level 6.
@@ -14132,7 +14354,7 @@ function adler32(adler, buf, len, pos) {
 
 module.exports = adler32;
 
-},{}],68:[function(require,module,exports){
+},{}],67:[function(require,module,exports){
 'use strict';
 
 // (C) 1995-2013 Jean-loup Gailly and Mark Adler
@@ -14202,7 +14424,7 @@ module.exports = {
   //Z_NULL:                 null // Use -1 or null inline, depending on var type
 };
 
-},{}],69:[function(require,module,exports){
+},{}],68:[function(require,module,exports){
 'use strict';
 
 // Note: we can't get significant speed boost here.
@@ -14263,7 +14485,7 @@ function crc32(crc, buf, len, pos) {
 
 module.exports = crc32;
 
-},{}],70:[function(require,module,exports){
+},{}],69:[function(require,module,exports){
 'use strict';
 
 // (C) 1995-2013 Jean-loup Gailly and Mark Adler
@@ -16139,7 +16361,7 @@ exports.deflatePrime = deflatePrime;
 exports.deflateTune = deflateTune;
 */
 
-},{"../utils/common":65,"./adler32":67,"./crc32":69,"./messages":75,"./trees":76}],71:[function(require,module,exports){
+},{"../utils/common":64,"./adler32":66,"./crc32":68,"./messages":74,"./trees":75}],70:[function(require,module,exports){
 'use strict';
 
 // (C) 1995-2013 Jean-loup Gailly and Mark Adler
@@ -16199,7 +16421,7 @@ function GZheader() {
 
 module.exports = GZheader;
 
-},{}],72:[function(require,module,exports){
+},{}],71:[function(require,module,exports){
 'use strict';
 
 // (C) 1995-2013 Jean-loup Gailly and Mark Adler
@@ -16546,7 +16768,7 @@ module.exports = function inflate_fast(strm, start) {
   return;
 };
 
-},{}],73:[function(require,module,exports){
+},{}],72:[function(require,module,exports){
 'use strict';
 
 // (C) 1995-2013 Jean-loup Gailly and Mark Adler
@@ -18104,7 +18326,7 @@ exports.inflateSyncPoint = inflateSyncPoint;
 exports.inflateUndermine = inflateUndermine;
 */
 
-},{"../utils/common":65,"./adler32":67,"./crc32":69,"./inffast":72,"./inftrees":74}],74:[function(require,module,exports){
+},{"../utils/common":64,"./adler32":66,"./crc32":68,"./inffast":71,"./inftrees":73}],73:[function(require,module,exports){
 'use strict';
 
 // (C) 1995-2013 Jean-loup Gailly and Mark Adler
@@ -18449,7 +18671,7 @@ module.exports = function inflate_table(type, lens, lens_index, codes, table, ta
   return 0;
 };
 
-},{"../utils/common":65}],75:[function(require,module,exports){
+},{"../utils/common":64}],74:[function(require,module,exports){
 'use strict';
 
 // (C) 1995-2013 Jean-loup Gailly and Mark Adler
@@ -18483,7 +18705,7 @@ module.exports = {
   '-6':   'incompatible version' /* Z_VERSION_ERROR (-6) */
 };
 
-},{}],76:[function(require,module,exports){
+},{}],75:[function(require,module,exports){
 'use strict';
 
 // (C) 1995-2013 Jean-loup Gailly and Mark Adler
@@ -19707,7 +19929,7 @@ exports._tr_flush_block  = _tr_flush_block;
 exports._tr_tally = _tr_tally;
 exports._tr_align = _tr_align;
 
-},{"../utils/common":65}],77:[function(require,module,exports){
+},{"../utils/common":64}],76:[function(require,module,exports){
 'use strict';
 
 // (C) 1995-2013 Jean-loup Gailly and Mark Adler
@@ -19756,7 +19978,7 @@ function ZStream() {
 
 module.exports = ZStream;
 
-},{}],78:[function(require,module,exports){
+},{}],77:[function(require,module,exports){
 require('text-encoding-polyfill');
 var StringDecoder = require('string_decoder').StringDecoder;
 function defaultDecoder(data) {
@@ -19765,8 +19987,8 @@ function defaultDecoder(data) {
   return out.replace(/\0/g, '').trim();
 }
 module.exports = createDecoder;
-var regex = /^(?:ASNI\s)?(\d+)$/m;
-function createDecoder(encoding) {
+var regex = /^(?:ANSI\s)?(\d+)$/m;
+function createDecoder(encoding, second) {
   if (!encoding) {
     return defaultDecoder;
   }
@@ -19774,8 +19996,10 @@ function createDecoder(encoding) {
     new TextDecoder(encoding.trim());
   } catch(e) {
     var match = regex.exec(encoding);
-    if (match) {
-      encoding = 'windows-' + match[1];
+    if (match && !second) {
+      return createDecoder('windows-' + match[1], true);
+    } else {
+      return defaultDecoder;
     }
   }
   return browserDecoder;
@@ -19788,7 +20012,7 @@ function createDecoder(encoding) {
   }
 }
 
-},{"string_decoder":94,"text-encoding-polyfill":95}],79:[function(require,module,exports){
+},{"string_decoder":92,"text-encoding-polyfill":93}],78:[function(require,module,exports){
 var createDecoder = require('./decoder');
 function dbfHeader(data) {
   var out = {};
@@ -19870,27 +20094,58 @@ module.exports = function(buffer, encoding) {
   return out;
 };
 
-},{"./decoder":78}],80:[function(require,module,exports){
-module.exports = function (point, vs) {
-    // ray-casting algorithm based on
-    // http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html
-    
+},{"./decoder":77}],79:[function(require,module,exports){
+module.exports = function pointInPolygonFlat (point, vs, start, end) {
     var x = point[0], y = point[1];
-    
     var inside = false;
-    for (var i = 0, j = vs.length - 1; i < vs.length; j = i++) {
-        var xi = vs[i][0], yi = vs[i][1];
-        var xj = vs[j][0], yj = vs[j][1];
-        
-        var intersect = ((yi > y) != (yj > y))
+    if (start === undefined) start = 0;
+    if (end === undefined) end = vs.length;
+    var len = (end-start)/2;
+    for (var i = 0, j = len - 1; i < len; j = i++) {
+        var xi = vs[start+i*2+0], yi = vs[start+i*2+1];
+        var xj = vs[start+j*2+0], yj = vs[start+j*2+1];
+        var intersect = ((yi > y) !== (yj > y))
             && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
         if (intersect) inside = !inside;
     }
-    
     return inside;
 };
 
-},{}],81:[function(require,module,exports){
+},{}],80:[function(require,module,exports){
+var pointInPolygonFlat = require('./flat.js')
+var pointInPolygonNested = require('./nested.js')
+
+module.exports = function pointInPolygon (point, vs, start, end) {
+    if (vs.length > 0 && Array.isArray(vs[0])) {
+        return pointInPolygonNested(point, vs, start, end);
+    } else {
+        return pointInPolygonFlat(point, vs, start, end);
+    }
+}
+module.exports.nested = pointInPolygonNested
+module.exports.flat = pointInPolygonFlat
+
+},{"./flat.js":79,"./nested.js":81}],81:[function(require,module,exports){
+// ray-casting algorithm based on
+// https://wrf.ecse.rpi.edu/Research/Short_Notes/pnpoly.html
+
+module.exports = function pointInPolygonNested (point, vs, start, end) {
+    var x = point[0], y = point[1];
+    var inside = false;
+    if (start === undefined) start = 0;
+    if (end === undefined) end = vs.length;
+    var len = end - start;
+    for (var i = 0, j = len - 1; i < len; j = i++) {
+        var xi = vs[i+start][0], yi = vs[i+start][1];
+        var xj = vs[j+start][0], yj = vs[j+start][1];
+        var intersect = ((yi > y) !== (yj > y))
+            && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+        if (intersect) inside = !inside;
+    }
+    return inside;
+};
+
+},{}],82:[function(require,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
 
@@ -20076,7 +20331,7 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],82:[function(require,module,exports){
+},{}],83:[function(require,module,exports){
 (function (global, factory) {
     typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
     typeof define === 'function' && define.amd ? define(factory) :
@@ -20097,8 +20352,12 @@ process.umask = function() { return 0; };
 
     var PJD_3PARAM = 1;
     var PJD_7PARAM = 2;
+    var PJD_GRIDSHIFT = 3;
     var PJD_WGS84 = 4; // WGS84 or equivalent
     var PJD_NODATUM = 5; // WGS84 or equivalent
+    var SRS_WGS84_SEMIMAJOR = 6378137.0;  // only used in grid shift transforms
+    var SRS_WGS84_SEMIMINOR = 6356752.314;  // only used in grid shift transforms
+    var SRS_WGS84_ESQUARED = 0.0066943799901413165; // only used in grid shift transforms
     var SEC_TO_RAD = 4.84813681109535993589914102357e-6;
     var HALF_PI = Math.PI/2;
     // ellipoid pj_set_ell.c
@@ -20202,6 +20461,9 @@ process.umask = function() { return 0; };
         alpha: function(v) {
           self.alpha = parseFloat(v) * D2R;
         },
+        gamma: function(v) {
+          self.rectified_grid_angle = parseFloat(v);
+        },
         lonc: function(v) {
           self.longc = v * D2R;
         },
@@ -20267,6 +20529,9 @@ process.umask = function() { return 0; };
           if (v.length === 3 && legalAxis.indexOf(v.substr(0, 1)) !== -1 && legalAxis.indexOf(v.substr(1, 1)) !== -1 && legalAxis.indexOf(v.substr(2, 1)) !== -1) {
             self.axis = v;
           }
+        },
+        approx: function() {
+          self.approx = true;
         }
       };
       for (paramName in paramObj) {
@@ -20500,6 +20765,13 @@ process.umask = function() { return 0; };
         obj[key] = v;
         return;
       }
+      if (key === 'AXIS') {
+        if (!(key in obj)) {
+          obj[key] = [];
+        }
+        obj[key].push(v);
+        return;
+      }
       if (!Array.isArray(key)) {
         obj[key] = {};
       }
@@ -20592,6 +20864,27 @@ process.umask = function() { return 0; };
           wkt.projName = wkt.PROJECTION;
         }
       }
+      if (wkt.AXIS) {
+        var axisOrder = '';
+        for (var i = 0, ii = wkt.AXIS.length; i < ii; ++i) {
+          var axis = [wkt.AXIS[i][0].toLowerCase(), wkt.AXIS[i][1].toLowerCase()];
+          if (axis[0].indexOf('north') !== -1 || ((axis[0] === 'y' || axis[0] === 'lat') && axis[1] === 'north')) {
+            axisOrder += 'n';
+          } else if (axis[0].indexOf('south') !== -1 || ((axis[0] === 'y' || axis[0] === 'lat') && axis[1] === 'south')) {
+            axisOrder += 's';
+          } else if (axis[0].indexOf('east') !== -1 || ((axis[0] === 'x' || axis[0] === 'lon') && axis[1] === 'east')) {
+            axisOrder += 'e';
+          } else if (axis[0].indexOf('west') !== -1 || ((axis[0] === 'x' || axis[0] === 'lon') && axis[1] === 'west')) {
+            axisOrder += 'w';
+          }
+        }
+        if (axisOrder.length === 2) {
+          axisOrder += 'u';
+        }
+        if (axisOrder.length === 3) {
+          wkt.axis = axisOrder;
+        }
+      }
       if (wkt.UNIT) {
         wkt.units = wkt.UNIT.name.toLowerCase();
         if (wkt.units === 'metre') {
@@ -20626,7 +20919,7 @@ process.umask = function() { return 0; };
         if (wkt.datumCode === 'new_zealand_geodetic_datum_1949' || wkt.datumCode === 'new_zealand_1949') {
           wkt.datumCode = 'nzgd49';
         }
-        if (wkt.datumCode === 'wgs_1984') {
+        if (wkt.datumCode === 'wgs_1984' || wkt.datumCode === 'world_geodetic_system_1984') {
           if (wkt.PROJECTION === 'Mercator_Auxiliary_Sphere') {
             wkt.sphere = true;
           }
@@ -20684,12 +20977,22 @@ process.umask = function() { return 0; };
       };
       var list = [
         ['standard_parallel_1', 'Standard_Parallel_1'],
+        ['standard_parallel_1', 'Latitude of 1st standard parallel'],
         ['standard_parallel_2', 'Standard_Parallel_2'],
+        ['standard_parallel_2', 'Latitude of 2nd standard parallel'],
         ['false_easting', 'False_Easting'],
+        ['false_easting', 'False easting'],
+        ['false-easting', 'Easting at false origin'],
         ['false_northing', 'False_Northing'],
+        ['false_northing', 'False northing'],
+        ['false_northing', 'Northing at false origin'],
         ['central_meridian', 'Central_Meridian'],
+        ['central_meridian', 'Longitude of natural origin'],
+        ['central_meridian', 'Longitude of false origin'],
         ['latitude_of_origin', 'Latitude_Of_Origin'],
         ['latitude_of_origin', 'Central_Parallel'],
+        ['latitude_of_origin', 'Latitude of natural origin'],
+        ['latitude_of_origin', 'Latitude of false origin'],
         ['scale_factor', 'Scale_Factor'],
         ['k0', 'scale_factor'],
         ['latitude_of_center', 'Latitude_Of_Center'],
@@ -20787,7 +21090,7 @@ process.umask = function() { return 0; };
     function testDef(code){
       return code in defs;
     }
-     var codeWords = ['PROJECTEDCRS', 'PROJCRS', 'GEOGCS','GEOCCS','PROJCS','LOCAL_CS', 'GEODCRS', 'GEODETICCRS', 'GEODETICDATUM', 'ENGCRS', 'ENGINEERINGCRS'];
+    var codeWords = ['PROJECTEDCRS', 'PROJCRS', 'GEOGCS','GEOCCS','PROJCS','LOCAL_CS', 'GEODCRS', 'GEODETICCRS', 'GEODETICDATUM', 'ENGCRS', 'ENGINEERINGCRS'];
     function testWKT(code){
       return codeWords.some(function (word) {
         return code.indexOf(word) > -1;
@@ -21371,7 +21674,7 @@ process.umask = function() { return 0; };
     };
 
     exports$3.potsdam = {
-      towgs84: "606.0,23.0,413.0",
+      towgs84: "598.1,73.7,418.2,0.202,0.045,-2.455,6.7",
       ellipse: "bessel",
       datumName: "Potsdam Rauenberg 1950 DHDN"
     };
@@ -21383,7 +21686,7 @@ process.umask = function() { return 0; };
     };
 
     exports$3.hermannskogel = {
-      towgs84: "653.0,-212.0,449.0",
+      towgs84: "577.326,90.129,463.919,5.137,1.474,5.297,2.4232",
       ellipse: "bessel",
       datumName: "Hermannskogel"
     };
@@ -21442,7 +21745,7 @@ process.umask = function() { return 0; };
       datumName: "Reseau National Belge 1972"
     };
 
-    function datum(datumCode, datum_params, a, b, es, ep2) {
+    function datum(datumCode, datum_params, a, b, es, ep2, nadgrids) {
       var out = {};
 
       if (datumCode === undefined || datumCode === 'none') {
@@ -21467,11 +21770,158 @@ process.umask = function() { return 0; };
         }
       }
 
+      if (nadgrids) {
+        out.datum_type = PJD_GRIDSHIFT;
+        out.grids = nadgrids;
+      }
       out.a = a; //datum object also uses these values
       out.b = b;
       out.es = es;
       out.ep2 = ep2;
       return out;
+    }
+
+    /**
+     * Resources for details of NTv2 file formats:
+     * - https://web.archive.org/web/20140127204822if_/http://www.mgs.gov.on.ca:80/stdprodconsume/groups/content/@mgs/@iandit/documents/resourcelist/stel02_047447.pdf
+     * - http://mimaka.com/help/gs/html/004_NTV2%20Data%20Format.htm
+     */
+
+    var loadedNadgrids = {};
+
+    /**
+     * Load a binary NTv2 file (.gsb) to a key that can be used in a proj string like +nadgrids=<key>. Pass the NTv2 file
+     * as an ArrayBuffer.
+     */
+    function nadgrid(key, data) {
+      var view = new DataView(data);
+      var isLittleEndian = detectLittleEndian(view);
+      var header = readHeader(view, isLittleEndian);
+      if (header.nSubgrids > 1) {
+        console.log('Only single NTv2 subgrids are currently supported, subsequent sub grids are ignored');
+      }
+      var subgrids = readSubgrids(view, header, isLittleEndian);
+      var nadgrid = {header: header, subgrids: subgrids};
+      loadedNadgrids[key] = nadgrid;
+      return nadgrid;
+    }
+
+    /**
+     * Given a proj4 value for nadgrids, return an array of loaded grids
+     */
+    function getNadgrids(nadgrids) {
+      // Format details: http://proj.maptools.org/gen_parms.html
+      if (nadgrids === undefined) { return null; }
+      var grids = nadgrids.split(',');
+      return grids.map(parseNadgridString);
+    }
+
+    function parseNadgridString(value) {
+      if (value.length === 0) {
+        return null;
+      }
+      var optional = value[0] === '@';
+      if (optional) {
+        value = value.slice(1);
+      }
+      if (value === 'null') {
+        return {name: 'null', mandatory: !optional, grid: null, isNull: true};
+      }
+      return {
+        name: value,
+        mandatory: !optional,
+        grid: loadedNadgrids[value] || null,
+        isNull: false
+      };
+    }
+
+    function secondsToRadians(seconds) {
+      return (seconds / 3600) * Math.PI / 180;
+    }
+
+    function detectLittleEndian(view) {
+      var nFields = view.getInt32(8, false);
+      if (nFields === 11) {
+        return false;
+      }
+      nFields = view.getInt32(8, true);
+      if (nFields !== 11) {
+        console.warn('Failed to detect nadgrid endian-ness, defaulting to little-endian');
+      }
+      return true;
+    }
+
+    function readHeader(view, isLittleEndian) {
+      return {
+        nFields: view.getInt32(8, isLittleEndian),
+        nSubgridFields: view.getInt32(24, isLittleEndian),
+        nSubgrids: view.getInt32(40, isLittleEndian),
+        shiftType: decodeString(view, 56, 56 + 8).trim(),
+        fromSemiMajorAxis: view.getFloat64(120, isLittleEndian),
+        fromSemiMinorAxis: view.getFloat64(136, isLittleEndian),
+        toSemiMajorAxis: view.getFloat64(152, isLittleEndian),
+        toSemiMinorAxis: view.getFloat64(168, isLittleEndian),
+      };
+    }
+
+    function decodeString(view, start, end) {
+      return String.fromCharCode.apply(null, new Uint8Array(view.buffer.slice(start, end)));
+    }
+
+    function readSubgrids(view, header, isLittleEndian) {
+      var gridOffset = 176;
+      var grids = [];
+      for (var i = 0; i < header.nSubgrids; i++) {
+        var subHeader = readGridHeader(view, gridOffset, isLittleEndian);
+        var nodes = readGridNodes(view, gridOffset, subHeader, isLittleEndian);
+        var lngColumnCount = Math.round(
+          1 + (subHeader.upperLongitude - subHeader.lowerLongitude) / subHeader.longitudeInterval);
+        var latColumnCount = Math.round(
+          1 + (subHeader.upperLatitude - subHeader.lowerLatitude) / subHeader.latitudeInterval);
+        // Proj4 operates on radians whereas the coordinates are in seconds in the grid
+        grids.push({
+          ll: [secondsToRadians(subHeader.lowerLongitude), secondsToRadians(subHeader.lowerLatitude)],
+          del: [secondsToRadians(subHeader.longitudeInterval), secondsToRadians(subHeader.latitudeInterval)],
+          lim: [lngColumnCount, latColumnCount],
+          count: subHeader.gridNodeCount,
+          cvs: mapNodes(nodes)
+        });
+      }
+      return grids;
+    }
+
+    function mapNodes(nodes) {
+      return nodes.map(function (r) {return [secondsToRadians(r.longitudeShift), secondsToRadians(r.latitudeShift)];});
+    }
+
+    function readGridHeader(view, offset, isLittleEndian) {
+      return {
+        name: decodeString(view, offset + 8, offset + 16).trim(),
+        parent: decodeString(view, offset + 24, offset + 24 + 8).trim(),
+        lowerLatitude: view.getFloat64(offset + 72, isLittleEndian),
+        upperLatitude: view.getFloat64(offset + 88, isLittleEndian),
+        lowerLongitude: view.getFloat64(offset + 104, isLittleEndian),
+        upperLongitude: view.getFloat64(offset + 120, isLittleEndian),
+        latitudeInterval: view.getFloat64(offset + 136, isLittleEndian),
+        longitudeInterval: view.getFloat64(offset + 152, isLittleEndian),
+        gridNodeCount: view.getInt32(offset + 168, isLittleEndian)
+      };
+    }
+
+    function readGridNodes(view, offset, gridHeader, isLittleEndian) {
+      var nodesOffset = offset + 176;
+      var gridRecordLength = 16;
+      var gridShiftRecords = [];
+      for (var i = 0; i < gridHeader.gridNodeCount; i++) {
+        var record = {
+          latitudeShift: view.getFloat32(nodesOffset + i * gridRecordLength, isLittleEndian),
+          longitudeShift: view.getFloat32(nodesOffset + i * gridRecordLength + 4, isLittleEndian),
+          latitudeAccuracy: view.getFloat32(nodesOffset + i * gridRecordLength + 8, isLittleEndian),
+          longitudeAccuracy: view.getFloat32(nodesOffset + i * gridRecordLength + 12, isLittleEndian),
+        };
+        gridShiftRecords.push(record);
+      }
+      return gridShiftRecords;
     }
 
     function Projection(srsCode,callback) {
@@ -21496,7 +21946,7 @@ process.umask = function() { return 0; };
       if (json.datumCode && json.datumCode !== 'none') {
         var datumDef = match(exports$3, json.datumCode);
         if (datumDef) {
-          json.datum_params = datumDef.towgs84 ? datumDef.towgs84.split(',') : null;
+          json.datum_params = json.datum_params || (datumDef.towgs84 ? datumDef.towgs84.split(',') : null);
           json.ellps = datumDef.ellipse;
           json.datumName = datumDef.datumName ? datumDef.datumName : json.datumCode;
         }
@@ -21504,14 +21954,18 @@ process.umask = function() { return 0; };
       json.k0 = json.k0 || 1.0;
       json.axis = json.axis || 'enu';
       json.ellps = json.ellps || 'wgs84';
+      json.lat1 = json.lat1 || json.lat0; // Lambert_Conformal_Conic_1SP, for example, needs this
+
       var sphere_ = sphere(json.a, json.b, json.rf, json.ellps, json.sphere);
       var ecc = eccentricity(sphere_.a, sphere_.b, sphere_.rf, json.R_A);
-      var datumObj = json.datum || datum(json.datumCode, json.datum_params, sphere_.a, sphere_.b, ecc.es, ecc.ep2);
+      var nadgrids = getNadgrids(json.nadgrids);
+      var datumObj = json.datum || datum(json.datumCode, json.datum_params, sphere_.a, sphere_.b, ecc.es, ecc.ep2,
+        nadgrids);
 
       extend(this, json); // transfer everything over from the projection because we don't know what we'll need
       extend(this, ourProj); // transfer all the methods from the projection
 
-      // copy the 4 things over we calulated in deriveConstants.sphere
+      // copy the 4 things over we calculated in deriveConstants.sphere
       this.a = sphere_.a;
       this.b = sphere_.b;
       this.rf = sphere_.rf;
@@ -21798,14 +22252,33 @@ process.umask = function() { return 0; };
       }
 
       // If this datum requires grid shifts, then apply it to geodetic coordinates.
+      var source_a = source.a;
+      var source_es = source.es;
+      if (source.datum_type === PJD_GRIDSHIFT) {
+        var gridShiftCode = applyGridShift(source, false, point);
+        if (gridShiftCode !== 0) {
+          return undefined;
+        }
+        source_a = SRS_WGS84_SEMIMAJOR;
+        source_es = SRS_WGS84_ESQUARED;
+      }
+
+      var dest_a = dest.a;
+      var dest_b = dest.b;
+      var dest_es = dest.es;
+      if (dest.datum_type === PJD_GRIDSHIFT) {
+        dest_a = SRS_WGS84_SEMIMAJOR;
+        dest_b = SRS_WGS84_SEMIMINOR;
+        dest_es = SRS_WGS84_ESQUARED;
+      }
 
       // Do we need to go through geocentric coordinates?
-      if (source.es === dest.es && source.a === dest.a && !checkParams(source.datum_type) &&  !checkParams(dest.datum_type)) {
+      if (source_es === dest_es && source_a === dest_a && !checkParams(source.datum_type) &&  !checkParams(dest.datum_type)) {
         return point;
       }
 
       // Convert to geocentric coordinates.
-      point = geodeticToGeocentric(point, source.es, source.a);
+      point = geodeticToGeocentric(point, source_es, source_a);
       // Convert between datums
       if (checkParams(source.datum_type)) {
         point = geocentricToWgs84(point, source.datum_type, source.datum_params);
@@ -21813,9 +22286,132 @@ process.umask = function() { return 0; };
       if (checkParams(dest.datum_type)) {
         point = geocentricFromWgs84(point, dest.datum_type, dest.datum_params);
       }
-      return geocentricToGeodetic(point, dest.es, dest.a, dest.b);
+      point = geocentricToGeodetic(point, dest_es, dest_a, dest_b);
 
+      if (dest.datum_type === PJD_GRIDSHIFT) {
+        var destGridShiftResult = applyGridShift(dest, true, point);
+        if (destGridShiftResult !== 0) {
+          return undefined;
+        }
+      }
+
+      return point;
     };
+
+    function applyGridShift(source, inverse, point) {
+      if (source.grids === null || source.grids.length === 0) {
+        console.log('Grid shift grids not found');
+        return -1;
+      }
+      var input = {x: -point.x, y: point.y};
+      var output = {x: Number.NaN, y: Number.NaN};
+      var attemptedGrids = [];
+      for (var i = 0; i < source.grids.length; i++) {
+        var grid = source.grids[i];
+        attemptedGrids.push(grid.name);
+        if (grid.isNull) {
+          output = input;
+          break;
+        }
+        if (grid.grid === null) {
+          if (grid.mandatory) {
+            console.log("Unable to find mandatory grid '" + grid.name + "'");
+            return -1;
+          }
+          continue;
+        }
+        var subgrid = grid.grid.subgrids[0];
+        // skip tables that don't match our point at all
+        var epsilon = (Math.abs(subgrid.del[1]) + Math.abs(subgrid.del[0])) / 10000.0;
+        var minX = subgrid.ll[0] - epsilon;
+        var minY = subgrid.ll[1] - epsilon;
+        var maxX = subgrid.ll[0] + (subgrid.lim[0] - 1) * subgrid.del[0] + epsilon;
+        var maxY = subgrid.ll[1] + (subgrid.lim[1] - 1) * subgrid.del[1] + epsilon;
+        if (minY > input.y || minX > input.x || maxY < input.y || maxX < input.x ) {
+          continue;
+        }
+        output = applySubgridShift(input, inverse, subgrid);
+        if (!isNaN(output.x)) {
+          break;
+        }
+      }
+      if (isNaN(output.x)) {
+        console.log("Failed to find a grid shift table for location '"+
+          -input.x * R2D + " " + input.y * R2D + " tried: '" + attemptedGrids + "'");
+        return -1;
+      }
+      point.x = -output.x;
+      point.y = output.y;
+      return 0;
+    }
+
+    function applySubgridShift(pin, inverse, ct) {
+      var val = {x: Number.NaN, y: Number.NaN};
+      if (isNaN(pin.x)) { return val; }
+      var tb = {x: pin.x, y: pin.y};
+      tb.x -= ct.ll[0];
+      tb.y -= ct.ll[1];
+      tb.x = adjust_lon(tb.x - Math.PI) + Math.PI;
+      var t = nadInterpolate(tb, ct);
+      if (inverse) {
+        if (isNaN(t.x)) {
+          return val;
+        }
+        t.x = tb.x - t.x;
+        t.y = tb.y - t.y;
+        var i = 9, tol = 1e-12;
+        var dif, del;
+        do {
+          del = nadInterpolate(t, ct);
+          if (isNaN(del.x)) {
+            console.log("Inverse grid shift iteration failed, presumably at grid edge.  Using first approximation.");
+            break;
+          }
+          dif = {x: tb.x - (del.x + t.x), y: tb.y - (del.y + t.y)};
+          t.x += dif.x;
+          t.y += dif.y;
+        } while (i-- && Math.abs(dif.x) > tol && Math.abs(dif.y) > tol);
+        if (i < 0) {
+          console.log("Inverse grid shift iterator failed to converge.");
+          return val;
+        }
+        val.x = adjust_lon(t.x + ct.ll[0]);
+        val.y = t.y + ct.ll[1];
+      } else {
+        if (!isNaN(t.x)) {
+          val.x = pin.x + t.x;
+          val.y = pin.y + t.y;
+        }
+      }
+      return val;
+    }
+
+    function nadInterpolate(pin, ct) {
+      var t = {x: pin.x / ct.del[0], y: pin.y / ct.del[1]};
+      var indx = {x: Math.floor(t.x), y: Math.floor(t.y)};
+      var frct = {x: t.x - 1.0 * indx.x, y: t.y - 1.0 * indx.y};
+      var val= {x: Number.NaN, y: Number.NaN};
+      var inx;
+      if (indx.x < 0 || indx.x >= ct.lim[0]) {
+        return val;
+      }
+      if (indx.y < 0 || indx.y >= ct.lim[1]) {
+        return val;
+      }
+      inx = (indx.y * ct.lim[0]) + indx.x;
+      var f00 = {x: ct.cvs[inx][0], y: ct.cvs[inx][1]};
+      inx++;
+      var f10= {x: ct.cvs[inx][0], y: ct.cvs[inx][1]};
+      inx += ct.lim[0];
+      var f11 = {x: ct.cvs[inx][0], y: ct.cvs[inx][1]};
+      inx--;
+      var f01 = {x: ct.cvs[inx][0], y: ct.cvs[inx][1]};
+      var m11 = frct.x * frct.y, m10 = frct.x * (1.0 - frct.y),
+        m00 = (1.0 - frct.x) * (1.0 - frct.y), m01 = (1.0 - frct.x) * frct.y;
+      val.x = (m00 * f00.x + m10 * f10.x + m01 * f01.x + m11 * f11.x);
+      val.y = (m00 * f00.y + m10 * f10.y + m01 * f01.y + m11 * f11.y);
+      return val;
+    }
 
     var adjust_axis = function(crs, denorm, point) {
       var xin = point.x,
@@ -21829,11 +22425,20 @@ process.umask = function() { return 0; };
         }
         if (i === 0) {
           v = xin;
-          t = 'x';
+          if ("ew".indexOf(crs.axis[i]) !== -1) {
+            t = 'x';
+          } else {
+            t = 'y';
+          }
+
         }
         else if (i === 1) {
           v = yin;
-          t = 'y';
+          if ("ns".indexOf(crs.axis[i]) !== -1) {
+            t = 'y';
+          } else {
+            t = 'x';
+          }
         }
         else {
           v = zin;
@@ -21904,7 +22509,7 @@ process.umask = function() { return 0; };
       return ((source.datum.datum_type === PJD_3PARAM || source.datum.datum_type === PJD_7PARAM) && dest.datumCode !== 'WGS84') || ((dest.datum.datum_type === PJD_3PARAM || dest.datum.datum_type === PJD_7PARAM) && source.datumCode !== 'WGS84');
     }
 
-    function transform(source, dest, point) {
+    function transform(source, dest, point, enforceAxis) {
       var wgs84;
       if (Array.isArray(point)) {
         point = toPoint(point);
@@ -21913,11 +22518,11 @@ process.umask = function() { return 0; };
       // Workaround for datum shifts towgs84, if either source or destination projection is not wgs84
       if (source.datum && dest.datum && checkNotWGS(source, dest)) {
         wgs84 = new Projection('WGS84');
-        point = transform(source, wgs84, point);
+        point = transform(source, wgs84, point, enforceAxis);
         source = wgs84;
       }
       // DGR, 2010/11/12
-      if (source.axis !== 'enu') {
+      if (enforceAxis && source.axis !== 'enu') {
         point = adjust_axis(source, false, point);
       }
       // Transform source points to long/lat, if they aren't already.
@@ -21936,6 +22541,9 @@ process.umask = function() { return 0; };
           };
         }
         point = source.inverse(point); // Convert Cartesian to longlat
+        if (!point) {
+          return;
+        }
       }
       // Adjust for the prime meridian if necessary
       if (source.from_greenwich) {
@@ -21944,6 +22552,9 @@ process.umask = function() { return 0; };
 
       // Convert datums if needed, and if possible.
       point = datum_transform(source.datum, dest.datum, point);
+      if (!point) {
+        return;
+      }
 
       // Adjust for the prime meridian if necessary
       if (dest.from_greenwich) {
@@ -21973,7 +22584,7 @@ process.umask = function() { return 0; };
       }
 
       // DGR, 2010/11/12
-      if (dest.axis !== 'enu') {
+      if (enforceAxis && dest.axis !== 'enu') {
         return adjust_axis(dest, true, point);
       }
 
@@ -21982,10 +22593,10 @@ process.umask = function() { return 0; };
 
     var wgs84 = Projection('WGS84');
 
-    function transformer(from, to, coords) {
+    function transformer(from, to, coords, enforceAxis) {
       var transformedArray, out, keys;
       if (Array.isArray(coords)) {
-        transformedArray = transform(from, to, coords) || {x: NaN, y: NaN};
+        transformedArray = transform(from, to, coords, enforceAxis) || {x: NaN, y: NaN};
         if (coords.length > 2) {
           if ((typeof from.name !== 'undefined' && from.name === 'geocent') || (typeof to.name !== 'undefined' && to.name === 'geocent')) {
             if (typeof transformedArray.z === 'number') {
@@ -22000,7 +22611,7 @@ process.umask = function() { return 0; };
           return [transformedArray.x, transformedArray.y];
         }
       } else {
-        out = transform(from, to, coords);
+        out = transform(from, to, coords, enforceAxis);
         keys = Object.keys(coords);
         if (keys.length === 2) {
           return out;
@@ -22050,11 +22661,11 @@ process.umask = function() { return 0; };
         return transformer(fromProj, toProj, coord);
       } else {
         obj = {
-          forward: function (coords) {
-            return transformer(fromProj, toProj, coords);
+          forward: function (coords, enforceAxis) {
+            return transformer(fromProj, toProj, coords, enforceAxis);
           },
-          inverse: function (coords) {
-            return transformer(toProj, fromProj, coords);
+          inverse: function (coords, enforceAxis) {
+            return transformer(toProj, fromProj, coords, enforceAxis);
           }
         };
         if (single) {
@@ -23049,7 +23660,7 @@ process.umask = function() { return 0; };
       return p;
     }
 
-    var names$3 = ["Transverse_Mercator", "Transverse Mercator", "tmerc"];
+    var names$3 = ["Fast_Transverse_Mercator", "Fast Transverse Mercator"];
     var tmerc = {
       init: init$2,
       forward: forward$2,
@@ -23158,8 +23769,14 @@ process.umask = function() { return 0; };
     // https://github.com/mbloch/mapshaper-proj/blob/master/src/projections/etmerc.js
 
     function init$3() {
-      if (this.es === undefined || this.es <= 0) {
-        throw new Error('incorrect elliptical usage');
+      if (!this.approx && (isNaN(this.es) || this.es <= 0)) {
+        throw new Error('Incorrect elliptical usage. Try using the +approx option in the proj string, or PROJECTION["Fast_Transverse_Mercator"] in the WKT.');
+      }
+      if (this.approx) {
+        // When '+approx' is set, use tmerc instead
+        tmerc.init.apply(this);
+        this.forward = tmerc.forward;
+        this.inverse = tmerc.inverse;
       }
 
       this.x0 = this.x0 !== undefined ? this.x0 : 0;
@@ -23304,7 +23921,7 @@ process.umask = function() { return 0; };
       return p;
     }
 
-    var names$4 = ["Extended_Transverse_Mercator", "Extended Transverse Mercator", "etmerc"];
+    var names$4 = ["Extended_Transverse_Mercator", "Extended Transverse Mercator", "etmerc", "Transverse_Mercator", "Transverse Mercator", "tmerc"];
     var etmerc = {
       init: init$3,
       forward: forward$3,
@@ -23719,166 +24336,234 @@ process.umask = function() { return 0; };
       names: names$9
     };
 
+    var TOL = 1e-7;
+
+    function isTypeA(P) {
+      var typeAProjections = ['Hotine_Oblique_Mercator','Hotine_Oblique_Mercator_Azimuth_Natural_Origin'];
+      var projectionName = typeof P.PROJECTION === "object" ? Object.keys(P.PROJECTION)[0] : P.PROJECTION;
+      
+      return 'no_uoff' in P || 'no_off' in P || typeAProjections.indexOf(projectionName) !== -1;
+    }
+
+
     /* Initialize the Oblique Mercator  projection
         ------------------------------------------*/
-    function init$9() {
-      this.no_off = this.no_off || false;
-      this.no_rot = this.no_rot || false;
-
-      if (isNaN(this.k0)) {
-        this.k0 = 1;
-      }
-      var sinlat = Math.sin(this.lat0);
-      var coslat = Math.cos(this.lat0);
-      var con = this.e * sinlat;
-
-      this.bl = Math.sqrt(1 + this.es / (1 - this.es) * Math.pow(coslat, 4));
-      this.al = this.a * this.bl * this.k0 * Math.sqrt(1 - this.es) / (1 - con * con);
-      var t0 = tsfnz(this.e, this.lat0, sinlat);
-      var dl = this.bl / coslat * Math.sqrt((1 - this.es) / (1 - con * con));
-      if (dl * dl < 1) {
-        dl = 1;
-      }
-      var fl;
-      var gl;
-      if (!isNaN(this.longc)) {
-        //Central point and azimuth method
-
-        if (this.lat0 >= 0) {
-          fl = dl + Math.sqrt(dl * dl - 1);
-        }
-        else {
-          fl = dl - Math.sqrt(dl * dl - 1);
-        }
-        this.el = fl * Math.pow(t0, this.bl);
-        gl = 0.5 * (fl - 1 / fl);
-        this.gamma0 = Math.asin(Math.sin(this.alpha) / dl);
-        this.long0 = this.longc - Math.asin(gl * Math.tan(this.gamma0)) / this.bl;
-
-      }
-      else {
-        //2 points method
-        var t1 = tsfnz(this.e, this.lat1, Math.sin(this.lat1));
-        var t2 = tsfnz(this.e, this.lat2, Math.sin(this.lat2));
-        if (this.lat0 >= 0) {
-          this.el = (dl + Math.sqrt(dl * dl - 1)) * Math.pow(t0, this.bl);
-        }
-        else {
-          this.el = (dl - Math.sqrt(dl * dl - 1)) * Math.pow(t0, this.bl);
-        }
-        var hl = Math.pow(t1, this.bl);
-        var ll = Math.pow(t2, this.bl);
-        fl = this.el / hl;
-        gl = 0.5 * (fl - 1 / fl);
-        var jl = (this.el * this.el - ll * hl) / (this.el * this.el + ll * hl);
-        var pl = (ll - hl) / (ll + hl);
-        var dlon12 = adjust_lon(this.long1 - this.long2);
-        this.long0 = 0.5 * (this.long1 + this.long2) - Math.atan(jl * Math.tan(0.5 * this.bl * (dlon12)) / pl) / this.bl;
-        this.long0 = adjust_lon(this.long0);
-        var dlon10 = adjust_lon(this.long1 - this.long0);
-        this.gamma0 = Math.atan(Math.sin(this.bl * (dlon10)) / gl);
-        this.alpha = Math.asin(dl * Math.sin(this.gamma0));
+    function init$9() {  
+      var con, com, cosph0, D, F, H, L, sinph0, p, J, gamma = 0,
+        gamma0, lamc = 0, lam1 = 0, lam2 = 0, phi1 = 0, phi2 = 0, alpha_c = 0;
+      
+      // only Type A uses the no_off or no_uoff property
+      // https://github.com/OSGeo/proj.4/issues/104
+      this.no_off = isTypeA(this);
+      this.no_rot = 'no_rot' in this;
+      
+      var alp = false;
+      if ("alpha" in this) {
+        alp = true;
       }
 
+      var gam = false;
+      if ("rectified_grid_angle" in this) {
+        gam = true;
+      }
+
+      if (alp) {
+        alpha_c = this.alpha;
+      }
+      
+      if (gam) {
+        gamma = (this.rectified_grid_angle * D2R);
+      }
+      
+      if (alp || gam) {
+        lamc = this.longc;
+      } else {
+        lam1 = this.long1;
+        phi1 = this.lat1;
+        lam2 = this.long2;
+        phi2 = this.lat2;
+        
+        if (Math.abs(phi1 - phi2) <= TOL || (con = Math.abs(phi1)) <= TOL ||
+            Math.abs(con - HALF_PI) <= TOL || Math.abs(Math.abs(this.lat0) - HALF_PI) <= TOL ||
+            Math.abs(Math.abs(phi2) - HALF_PI) <= TOL) {
+          throw new Error();
+        }
+      }
+      
+      var one_es = 1.0 - this.es;
+      com = Math.sqrt(one_es);
+      
+      if (Math.abs(this.lat0) > EPSLN) {
+        sinph0 = Math.sin(this.lat0);
+        cosph0 = Math.cos(this.lat0);
+        con = 1 - this.es * sinph0 * sinph0;
+        this.B = cosph0 * cosph0;
+        this.B = Math.sqrt(1 + this.es * this.B * this.B / one_es);
+        this.A = this.B * this.k0 * com / con;
+        D = this.B * com / (cosph0 * Math.sqrt(con));
+        F = D * D -1;
+        
+        if (F <= 0) {
+          F = 0;
+        } else {
+          F = Math.sqrt(F);
+          if (this.lat0 < 0) {
+            F = -F;
+          }
+        }
+        
+        this.E = F += D;
+        this.E *= Math.pow(tsfnz(this.e, this.lat0, sinph0), this.B);
+      } else {
+        this.B = 1 / com;
+        this.A = this.k0;
+        this.E = D = F = 1;
+      }
+      
+      if (alp || gam) {
+        if (alp) {
+          gamma0 = Math.asin(Math.sin(alpha_c) / D);
+          if (!gam) {
+            gamma = alpha_c;
+          }
+        } else {
+          gamma0 = gamma;
+          alpha_c = Math.asin(D * Math.sin(gamma0));
+        }
+        this.lam0 = lamc - Math.asin(0.5 * (F - 1 / F) * Math.tan(gamma0)) / this.B;
+      } else {
+        H = Math.pow(tsfnz(this.e, phi1, Math.sin(phi1)), this.B);
+        L = Math.pow(tsfnz(this.e, phi2, Math.sin(phi2)), this.B);
+        F = this.E / H;
+        p = (L - H) / (L + H);
+        J = this.E * this.E;
+        J = (J - L * H) / (J + L * H);
+        con = lam1 - lam2;
+        
+        if (con < -Math.pi) {
+          lam2 -=TWO_PI;
+        } else if (con > Math.pi) {
+          lam2 += TWO_PI;
+        }
+        
+        this.lam0 = adjust_lon(0.5 * (lam1 + lam2) - Math.atan(J * Math.tan(0.5 * this.B * (lam1 - lam2)) / p) / this.B);
+        gamma0 = Math.atan(2 * Math.sin(this.B * adjust_lon(lam1 - this.lam0)) / (F - 1 / F));
+        gamma = alpha_c = Math.asin(D * Math.sin(gamma0));
+      }
+      
+      this.singam = Math.sin(gamma0);
+      this.cosgam = Math.cos(gamma0);
+      this.sinrot = Math.sin(gamma);
+      this.cosrot = Math.cos(gamma);
+      
+      this.rB = 1 / this.B;
+      this.ArB = this.A * this.rB;
+      this.BrA = 1 / this.ArB;
       if (this.no_off) {
-        this.uc = 0;
+        this.u_0 = 0;
+      } else {
+        this.u_0 = Math.abs(this.ArB * Math.atan(Math.sqrt(D * D - 1) / Math.cos(alpha_c)));
+        
+        if (this.lat0 < 0) {
+          this.u_0 = - this.u_0;
+        }  
       }
-      else {
-        if (this.lat0 >= 0) {
-          this.uc = this.al / this.bl * Math.atan2(Math.sqrt(dl * dl - 1), Math.cos(this.alpha));
-        }
-        else {
-          this.uc = -1 * this.al / this.bl * Math.atan2(Math.sqrt(dl * dl - 1), Math.cos(this.alpha));
-        }
-      }
-
+        
+      F = 0.5 * gamma0;
+      this.v_pole_n = this.ArB * Math.log(Math.tan(FORTPI - F));
+      this.v_pole_s = this.ArB * Math.log(Math.tan(FORTPI + F));
     }
+
 
     /* Oblique Mercator forward equations--mapping lat,long to x,y
         ----------------------------------------------------------*/
     function forward$8(p) {
-      var lon = p.x;
-      var lat = p.y;
-      var dlon = adjust_lon(lon - this.long0);
-      var us, vs;
-      var con;
-      if (Math.abs(Math.abs(lat) - HALF_PI) <= EPSLN) {
-        if (lat > 0) {
-          con = -1;
+      var coords = {};
+      var S, T, U, V, W, temp, u, v;
+      p.x = p.x - this.lam0;
+      
+      if (Math.abs(Math.abs(p.y) - HALF_PI) > EPSLN) {
+        W = this.E / Math.pow(tsfnz(this.e, p.y, Math.sin(p.y)), this.B);
+        
+        temp = 1 / W;
+        S = 0.5 * (W - temp);
+        T = 0.5 * (W + temp);
+        V = Math.sin(this.B * p.x);
+        U = (S * this.singam - V * this.cosgam) / T;
+            
+        if (Math.abs(Math.abs(U) - 1.0) < EPSLN) {
+          throw new Error();
         }
-        else {
-          con = 1;
-        }
-        vs = this.al / this.bl * Math.log(Math.tan(FORTPI + con * this.gamma0 * 0.5));
-        us = -1 * con * HALF_PI * this.al / this.bl;
+        
+        v = 0.5 * this.ArB * Math.log((1 - U)/(1 + U));
+        temp = Math.cos(this.B * p.x);
+        
+        if (Math.abs(temp) < TOL) {
+          u = this.A * p.x;
+        } else {
+          u = this.ArB * Math.atan2((S * this.cosgam + V * this.singam), temp);
+        }    
+      } else {
+        v = p.y > 0 ? this.v_pole_n : this.v_pole_s;
+        u = this.ArB * p.y;
       }
-      else {
-        var t = tsfnz(this.e, lat, Math.sin(lat));
-        var ql = this.el / Math.pow(t, this.bl);
-        var sl = 0.5 * (ql - 1 / ql);
-        var tl = 0.5 * (ql + 1 / ql);
-        var vl = Math.sin(this.bl * (dlon));
-        var ul = (sl * Math.sin(this.gamma0) - vl * Math.cos(this.gamma0)) / tl;
-        if (Math.abs(Math.abs(ul) - 1) <= EPSLN) {
-          vs = Number.POSITIVE_INFINITY;
-        }
-        else {
-          vs = 0.5 * this.al * Math.log((1 - ul) / (1 + ul)) / this.bl;
-        }
-        if (Math.abs(Math.cos(this.bl * (dlon))) <= EPSLN) {
-          us = this.al * this.bl * (dlon);
-        }
-        else {
-          us = this.al * Math.atan2(sl * Math.cos(this.gamma0) + vl * Math.sin(this.gamma0), Math.cos(this.bl * dlon)) / this.bl;
-        }
-      }
-
+         
       if (this.no_rot) {
-        p.x = this.x0 + us;
-        p.y = this.y0 + vs;
+        coords.x = u;
+        coords.y = v;
+      } else {
+        u -= this.u_0;
+        coords.x = v * this.cosrot + u * this.sinrot;
+        coords.y = u * this.cosrot - v * this.sinrot;
       }
-      else {
-
-        us -= this.uc;
-        p.x = this.x0 + vs * Math.cos(this.alpha) + us * Math.sin(this.alpha);
-        p.y = this.y0 + us * Math.cos(this.alpha) - vs * Math.sin(this.alpha);
-      }
-      return p;
+      
+      coords.x = (this.a * coords.x + this.x0);
+      coords.y = (this.a * coords.y + this.y0);
+      
+      return coords;
     }
 
     function inverse$8(p) {
-      var us, vs;
+      var u, v, Qp, Sp, Tp, Vp, Up;
+      var coords = {};
+      
+      p.x = (p.x - this.x0) * (1.0 / this.a);
+      p.y = (p.y - this.y0) * (1.0 / this.a);
+
       if (this.no_rot) {
-        vs = p.y - this.y0;
-        us = p.x - this.x0;
+        v = p.y;
+        u = p.x;
+      } else {
+        v = p.x * this.cosrot - p.y * this.sinrot;
+        u = p.y * this.cosrot + p.x * this.sinrot + this.u_0;
       }
-      else {
-        vs = (p.x - this.x0) * Math.cos(this.alpha) - (p.y - this.y0) * Math.sin(this.alpha);
-        us = (p.y - this.y0) * Math.cos(this.alpha) + (p.x - this.x0) * Math.sin(this.alpha);
-        us += this.uc;
+      
+      Qp = Math.exp(-this.BrA * v);
+      Sp = 0.5 * (Qp - 1 / Qp);
+      Tp = 0.5 * (Qp + 1 / Qp);
+      Vp = Math.sin(this.BrA * u);
+      Up = (Vp * this.cosgam + Sp * this.singam) / Tp;
+      
+      if (Math.abs(Math.abs(Up) - 1) < EPSLN) {
+        coords.x = 0;
+        coords.y = Up < 0 ? -HALF_PI : HALF_PI;
+      } else {
+        coords.y = this.E / Math.sqrt((1 + Up) / (1 - Up));
+        coords.y = phi2z(this.e, Math.pow(coords.y, 1 / this.B));
+        
+        if (coords.y === Infinity) {
+          throw new Error();
+        }
+            
+        coords.x = -this.rB * Math.atan2((Sp * this.cosgam - Vp * this.singam), Math.cos(this.BrA * u));
       }
-      var qp = Math.exp(-1 * this.bl * vs / this.al);
-      var sp = 0.5 * (qp - 1 / qp);
-      var tp = 0.5 * (qp + 1 / qp);
-      var vp = Math.sin(this.bl * us / this.al);
-      var up = (vp * Math.cos(this.gamma0) + sp * Math.sin(this.gamma0)) / tp;
-      var ts = Math.pow(this.el / Math.sqrt((1 + up) / (1 - up)), 1 / this.bl);
-      if (Math.abs(up - 1) < EPSLN) {
-        p.x = this.long0;
-        p.y = HALF_PI;
-      }
-      else if (Math.abs(up + 1) < EPSLN) {
-        p.x = this.long0;
-        p.y = -1 * HALF_PI;
-      }
-      else {
-        p.y = phi2z(this.e, ts);
-        p.x = adjust_lon(this.long0 - Math.atan2(sp * Math.cos(this.gamma0) - vp * Math.sin(this.gamma0), Math.cos(this.bl * us / this.al)) / this.bl);
-      }
-      return p;
+      
+      coords.x += this.lam0;
+      
+      return coords;
     }
 
-    var names$10 = ["Hotine_Oblique_Mercator", "Hotine Oblique Mercator", "Hotine_Oblique_Mercator_Azimuth_Natural_Origin", "Hotine_Oblique_Mercator_Azimuth_Center", "omerc"];
+    var names$10 = ["Hotine_Oblique_Mercator", "Hotine Oblique Mercator", "Hotine_Oblique_Mercator_Azimuth_Natural_Origin", "Hotine_Oblique_Mercator_Two_Point_Natural_Origin", "Hotine_Oblique_Mercator_Azimuth_Center", "Oblique_Mercator", "omerc"];
     var omerc = {
       init: init$9,
       forward: forward$8,
@@ -23887,16 +24572,18 @@ process.umask = function() { return 0; };
     };
 
     function init$10() {
-
-      // array of:  r_maj,r_min,lat1,lat2,c_lon,c_lat,false_east,false_north
-      //double c_lat;                   /* center latitude                      */
-      //double c_lon;                   /* center longitude                     */
+      
+      //double lat0;                    /* the reference latitude               */
+      //double long0;                   /* the reference longitude              */
       //double lat1;                    /* first standard parallel              */
       //double lat2;                    /* second standard parallel             */
       //double r_maj;                   /* major axis                           */
       //double r_min;                   /* minor axis                           */
       //double false_east;              /* x offset in meters                   */
       //double false_north;             /* y offset in meters                   */
+      
+      //the above value can be set with proj4.defs
+      //example: proj4.defs("EPSG:2154","+proj=lcc +lat_1=49 +lat_2=44 +lat_0=46.5 +lon_0=3 +x_0=700000 +y_0=6600000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs");
 
       if (!this.lat2) {
         this.lat2 = this.lat1;
@@ -24012,7 +24699,16 @@ process.umask = function() { return 0; };
       return p;
     }
 
-    var names$11 = ["Lambert Tangential Conformal Conic Projection", "Lambert_Conformal_Conic", "Lambert_Conformal_Conic_2SP", "lcc"];
+    var names$11 = [
+      "Lambert Tangential Conformal Conic Projection",
+      "Lambert_Conformal_Conic",
+      "Lambert_Conformal_Conic_1SP",
+      "Lambert_Conformal_Conic_2SP",
+      "lcc",
+      "Lambert Conic Conformal (1SP)",
+      "Lambert Conic Conformal (2SP)"
+    ];
+
     var lcc = {
       init: init$10,
       forward: forward$9,
@@ -24371,7 +25067,7 @@ process.umask = function() { return 0; };
           if (this.mode === this.N_POLE) {
             coslam = -coslam;
           }
-          if (Math.abs(phi + this.phi0) < EPSLN) {
+          if (Math.abs(phi + this.lat0) < EPSLN) {
             return null;
           }
           y = FORTPI - phi * 0.5;
@@ -24470,7 +25166,7 @@ process.umask = function() { return 0; };
           y = cosz * rh;
           break;
         case this.OBLIQ:
-          phi = (Math.abs(rh) <= EPSLN) ? this.phi0 : Math.asin(cosz * this.sinph0 + y * sinz * this.cosph0 / rh);
+          phi = (Math.abs(rh) <= EPSLN) ? this.lat0 : Math.asin(cosz * this.sinph0 + y * sinz * this.cosph0 / rh);
           x *= sinz * this.cosph0;
           y = (cosz - Math.sin(phi) * this.sinph0) * rh;
           break;
@@ -24491,8 +25187,8 @@ process.umask = function() { return 0; };
           y *= this.dd;
           rho = Math.sqrt(x * x + y * y);
           if (rho < EPSLN) {
-            p.x = 0;
-            p.y = this.phi0;
+            p.x = this.long0;
+            p.y = this.lat0;
             return p;
           }
           sCe = 2 * Math.asin(0.5 * rho / this.rq);
@@ -24515,8 +25211,8 @@ process.umask = function() { return 0; };
           }
           q = (x * x + y * y);
           if (!q) {
-            p.x = 0;
-            p.y = this.phi0;
+            p.x = this.long0;
+            p.y = this.lat0;
             return p;
           }
           ab = 1 - q / this.qp;
@@ -25798,7 +26494,7 @@ process.umask = function() { return 0; };
           //default case
           cos_c = this.sin_p12 * sinphi + this.cos_p12 * cosphi * Math.cos(dlon);
           c = Math.acos(cos_c);
-          kp = c / Math.sin(c);
+          kp = c ? c / Math.sin(c) : 1;
           p.x = this.x0 + this.a * kp * cosphi * Math.sin(dlon);
           p.y = this.y0 + this.a * kp * (this.cos_p12 * sinphi - this.sin_p12 * cosphi * Math.cos(dlon));
           return p;
@@ -25862,7 +26558,7 @@ process.umask = function() { return 0; };
     function inverse$24(p) {
       p.x -= this.x0;
       p.y -= this.y0;
-      var rh, z, sinz, cosz, lon, lat, con, e0, e1, e2, e3, Mlp, M, N1, psi, Az, cosAz, tmp, A, B, D, Ee, F;
+      var rh, z, sinz, cosz, lon, lat, con, e0, e1, e2, e3, Mlp, M, N1, psi, Az, cosAz, tmp, A, B, D, Ee, F, sinpsi;
       if (this.sphere) {
         rh = Math.sqrt(p.x * p.x + p.y * p.y);
         if (rh > (2 * HALF_PI * this.a)) {
@@ -25946,7 +26642,8 @@ process.umask = function() { return 0; };
           F = 1 - A * Ee * Ee / 2 - D * Ee * Ee * Ee / 6;
           psi = Math.asin(this.sin_p12 * Math.cos(Ee) + this.cos_p12 * Math.sin(Ee) * cosAz);
           lon = adjust_lon(this.long0 + Math.asin(Math.sin(Az) * Math.sin(Ee) / Math.cos(psi)));
-          lat = Math.atan((1 - this.es * F * this.sin_p12 / Math.sin(psi)) * Math.tan(psi) / (1 - this.es));
+          sinpsi = Math.sin(psi);
+          lat = Math.atan2((sinpsi - this.es * F * this.sin_p12) * Math.tan(psi), sinpsi * (1 - this.es));
           p.x = lon;
           p.y = lat;
           return p;
@@ -26599,6 +27296,329 @@ process.umask = function() { return 0; };
         names: names$30
     };
 
+    var mode = {
+      N_POLE: 0,
+      S_POLE: 1,
+      EQUIT: 2,
+      OBLIQ: 3
+    };
+
+    var params = {
+      h:     { def: 100000, num: true },           // default is Karman line, no default in PROJ.7
+      azi:   { def: 0, num: true, degrees: true }, // default is North
+      tilt:  { def: 0, num: true, degrees: true }, // default is Nadir
+      long0: { def: 0, num: true },                // default is Greenwich, conversion to rad is automatic
+      lat0:  { def: 0, num: true }                 // default is Equator, conversion to rad is automatic
+    };
+
+    function init$30() {
+      Object.keys(params).forEach(function (p) {
+        if (typeof this[p] === "undefined") {
+          this[p] = params[p].def;
+        } else if (params[p].num && isNaN(this[p])) {
+          throw new Error("Invalid parameter value, must be numeric " + p + " = " + this[p]);
+        } else if (params[p].num) {
+          this[p] = parseFloat(this[p]);
+        }
+        if (params[p].degrees) {
+          this[p] = this[p] * D2R;
+        }
+      }.bind(this));
+
+      if (Math.abs((Math.abs(this.lat0) - HALF_PI)) < EPSLN) {
+        this.mode = this.lat0 < 0 ? mode.S_POLE : mode.N_POLE;
+      } else if (Math.abs(this.lat0) < EPSLN) {
+        this.mode = mode.EQUIT;
+      } else {
+        this.mode = mode.OBLIQ;
+        this.sinph0 = Math.sin(this.lat0);
+        this.cosph0 = Math.cos(this.lat0);
+      }
+
+      this.pn1 = this.h / this.a;  // Normalize relative to the Earth's radius
+
+      if (this.pn1 <= 0 || this.pn1 > 1e10) {
+        throw new Error("Invalid height");
+      }
+      
+      this.p = 1 + this.pn1;
+      this.rp = 1 / this.p;
+      this.h1 = 1 / this.pn1;
+      this.pfact = (this.p + 1) * this.h1;
+      this.es = 0;
+
+      var omega = this.tilt;
+      var gamma = this.azi;
+      this.cg = Math.cos(gamma);
+      this.sg = Math.sin(gamma);
+      this.cw = Math.cos(omega);
+      this.sw = Math.sin(omega);
+    }
+
+    function forward$29(p) {
+      p.x -= this.long0;
+      var sinphi = Math.sin(p.y);
+      var cosphi = Math.cos(p.y);
+      var coslam = Math.cos(p.x);
+      var x, y;
+      switch (this.mode) {
+        case mode.OBLIQ:
+          y = this.sinph0 * sinphi + this.cosph0 * cosphi * coslam;
+          break;
+        case mode.EQUIT:
+          y = cosphi * coslam;
+          break;
+        case mode.S_POLE:
+          y = -sinphi;
+          break;
+        case mode.N_POLE:
+          y = sinphi;
+          break;
+      }
+      y = this.pn1 / (this.p - y);
+      x = y * cosphi * Math.sin(p.x);
+
+      switch (this.mode) {
+        case mode.OBLIQ:
+          y *= this.cosph0 * sinphi - this.sinph0 * cosphi * coslam;
+          break;
+        case mode.EQUIT:
+          y *= sinphi;
+          break;
+        case mode.N_POLE:
+          y *= -(cosphi * coslam);
+          break;
+        case mode.S_POLE:
+          y *= cosphi * coslam;
+          break;
+      }
+
+      // Tilt 
+      var yt, ba;
+      yt = y * this.cg + x * this.sg;
+      ba = 1 / (yt * this.sw * this.h1 + this.cw);
+      x = (x * this.cg - y * this.sg) * this.cw * ba;
+      y = yt * ba;
+
+      p.x = x * this.a;
+      p.y = y * this.a;
+      return p;
+    }
+
+    function inverse$29(p) {
+      p.x /= this.a;
+      p.y /= this.a;
+      var r = { x: p.x, y: p.y };
+
+      // Un-Tilt
+      var bm, bq, yt;
+      yt = 1 / (this.pn1 - p.y * this.sw);
+      bm = this.pn1 * p.x * yt;
+      bq = this.pn1 * p.y * this.cw * yt;
+      p.x = bm * this.cg + bq * this.sg;
+      p.y = bq * this.cg - bm * this.sg;
+
+      var rh = hypot(p.x, p.y);
+      if (Math.abs(rh) < EPSLN) {
+        r.x = 0;
+        r.y = p.y;
+      } else {
+        var cosz, sinz;
+        sinz = 1 - rh * rh * this.pfact;
+        sinz = (this.p - Math.sqrt(sinz)) / (this.pn1 / rh + rh / this.pn1);
+        cosz = Math.sqrt(1 - sinz * sinz);
+        switch (this.mode) {
+          case mode.OBLIQ:
+            r.y = Math.asin(cosz * this.sinph0 + p.y * sinz * this.cosph0 / rh);
+            p.y = (cosz - this.sinph0 * Math.sin(r.y)) * rh;
+            p.x *= sinz * this.cosph0;
+            break;
+          case mode.EQUIT:
+            r.y = Math.asin(p.y * sinz / rh);
+            p.y = cosz * rh;
+            p.x *= sinz;
+            break;
+          case mode.N_POLE:
+            r.y = Math.asin(cosz);
+            p.y = -p.y;
+            break;
+          case mode.S_POLE:
+            r.y = -Math.asin(cosz);
+            break;
+        }
+        r.x = Math.atan2(p.x, p.y);
+      }
+
+      p.x = r.x + this.long0;
+      p.y = r.y;
+      return p;
+    }
+
+    var names$31 = ["Tilted_Perspective", "tpers"];
+    var tpers = {
+      init: init$30,
+      forward: forward$29,
+      inverse: inverse$29,
+      names: names$31
+    };
+
+    function init$31() {
+        this.flip_axis = (this.sweep === 'x' ? 1 : 0);
+        this.h = Number(this.h);
+        this.radius_g_1 = this.h / this.a;
+
+        if (this.radius_g_1 <= 0 || this.radius_g_1 > 1e10) {
+            throw new Error();
+        }
+
+        this.radius_g = 1.0 + this.radius_g_1;
+        this.C = this.radius_g * this.radius_g - 1.0;
+
+        if (this.es !== 0.0) {
+            var one_es = 1.0 - this.es;
+            var rone_es = 1 / one_es;
+
+            this.radius_p = Math.sqrt(one_es);
+            this.radius_p2 = one_es;
+            this.radius_p_inv2 = rone_es;
+
+            this.shape = 'ellipse'; // Use as a condition in the forward and inverse functions.
+        } else {
+            this.radius_p = 1.0;
+            this.radius_p2 = 1.0;
+            this.radius_p_inv2 = 1.0;
+
+            this.shape = 'sphere';  // Use as a condition in the forward and inverse functions.
+        }
+
+        if (!this.title) {
+            this.title = "Geostationary Satellite View";
+        }
+    }
+
+    function forward$30(p) {
+        var lon = p.x;
+        var lat = p.y;
+        var tmp, v_x, v_y, v_z;
+        lon = lon - this.long0;
+
+        if (this.shape === 'ellipse') {
+            lat = Math.atan(this.radius_p2 * Math.tan(lat));
+            var r = this.radius_p / hypot(this.radius_p * Math.cos(lat), Math.sin(lat));
+
+            v_x = r * Math.cos(lon) * Math.cos(lat);
+            v_y = r * Math.sin(lon) * Math.cos(lat);
+            v_z = r * Math.sin(lat);
+
+            if (((this.radius_g - v_x) * v_x - v_y * v_y - v_z * v_z * this.radius_p_inv2) < 0.0) {
+                p.x = Number.NaN;
+                p.y = Number.NaN;
+                return p;
+            }
+
+            tmp = this.radius_g - v_x;
+            if (this.flip_axis) {
+                p.x = this.radius_g_1 * Math.atan(v_y / hypot(v_z, tmp));
+                p.y = this.radius_g_1 * Math.atan(v_z / tmp);
+            } else {
+                p.x = this.radius_g_1 * Math.atan(v_y / tmp);
+                p.y = this.radius_g_1 * Math.atan(v_z / hypot(v_y, tmp));
+            }
+        } else if (this.shape === 'sphere') {
+            tmp = Math.cos(lat);
+            v_x = Math.cos(lon) * tmp;
+            v_y = Math.sin(lon) * tmp;
+            v_z = Math.sin(lat);
+            tmp = this.radius_g - v_x;
+
+            if (this.flip_axis) {
+                p.x = this.radius_g_1 * Math.atan(v_y / hypot(v_z, tmp));
+                p.y = this.radius_g_1 * Math.atan(v_z / tmp);
+            } else {
+                p.x = this.radius_g_1 * Math.atan(v_y / tmp);
+                p.y = this.radius_g_1 * Math.atan(v_z / hypot(v_y, tmp));
+            }
+        }
+        p.x = p.x * this.a;
+        p.y = p.y * this.a;
+        return p;
+    }
+
+    function inverse$30(p) {
+        var v_x = -1.0;
+        var v_y = 0.0;
+        var v_z = 0.0;
+        var a, b, det, k;
+
+        p.x = p.x / this.a;
+        p.y = p.y / this.a;
+
+        if (this.shape === 'ellipse') {
+            if (this.flip_axis) {
+                v_z = Math.tan(p.y / this.radius_g_1);
+                v_y = Math.tan(p.x / this.radius_g_1) * hypot(1.0, v_z);
+            } else {
+                v_y = Math.tan(p.x / this.radius_g_1);
+                v_z = Math.tan(p.y / this.radius_g_1) * hypot(1.0, v_y);
+            }
+
+            var v_zp = v_z / this.radius_p;
+            a = v_y * v_y + v_zp * v_zp + v_x * v_x;
+            b = 2 * this.radius_g * v_x;
+            det = (b * b) - 4 * a * this.C;
+
+            if (det < 0.0) {
+                p.x = Number.NaN;
+                p.y = Number.NaN;
+                return p;
+            }
+
+            k = (-b - Math.sqrt(det)) / (2.0 * a);
+            v_x = this.radius_g + k * v_x;
+            v_y *= k;
+            v_z *= k;
+
+            p.x = Math.atan2(v_y, v_x);
+            p.y = Math.atan(v_z * Math.cos(p.x) / v_x);
+            p.y = Math.atan(this.radius_p_inv2 * Math.tan(p.y));
+        } else if (this.shape === 'sphere') {
+            if (this.flip_axis) {
+                v_z = Math.tan(p.y / this.radius_g_1);
+                v_y = Math.tan(p.x / this.radius_g_1) * Math.sqrt(1.0 + v_z * v_z);
+            } else {
+                v_y = Math.tan(p.x / this.radius_g_1);
+                v_z = Math.tan(p.y / this.radius_g_1) * Math.sqrt(1.0 + v_y * v_y);
+            }
+
+            a = v_y * v_y + v_z * v_z + v_x * v_x;
+            b = 2 * this.radius_g * v_x;
+            det = (b * b) - 4 * a * this.C;
+            if (det < 0.0) {
+                p.x = Number.NaN;
+                p.y = Number.NaN;
+                return p;
+            }
+
+            k = (-b - Math.sqrt(det)) / (2.0 * a);
+            v_x = this.radius_g + k * v_x;
+            v_y *= k;
+            v_z *= k;
+
+            p.x = Math.atan2(v_y, v_x);
+            p.y = Math.atan(v_z * Math.cos(p.x) / v_x);
+        }
+        p.x = p.x + this.long0;
+        return p;
+    }
+
+    var names$32 = ["Geostationary Satellite View", "Geostationary_Satellite", "geos"];
+    var geos = {
+        init: init$31,
+        forward: forward$30,
+        inverse: inverse$30,
+        names: names$32,
+    };
+
     var includedProjections = function(proj4){
       proj4.Proj.projections.add(tmerc);
       proj4.Proj.projections.add(etmerc);
@@ -26627,6 +27647,8 @@ process.umask = function() { return 0; };
       proj4.Proj.projections.add(qsc);
       proj4.Proj.projections.add(robin);
       proj4.Proj.projections.add(geocent);
+      proj4.Proj.projections.add(tpers);
+      proj4.Proj.projections.add(geos);
     };
 
     proj4$1.defaultDatum = 'WGS84'; //default datum
@@ -26635,1201 +27657,24 @@ process.umask = function() { return 0; };
     proj4$1.Point = Point;
     proj4$1.toPoint = toPoint;
     proj4$1.defs = defs;
+    proj4$1.nadgrid = nadgrid;
     proj4$1.transform = transform;
     proj4$1.mgrs = mgrs;
-    proj4$1.version = '2.6.0';
+    proj4$1.version = '2.8.0';
     includedProjections(proj4$1);
 
     return proj4$1;
 
 })));
 
-},{}],83:[function(require,module,exports){
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
-	typeof define === 'function' && define.amd ? define(factory) :
-	(global.quickselect = factory());
-}(this, (function () { 'use strict';
-
-function quickselect(arr, k, left, right, compare) {
-    quickselectStep(arr, k, left || 0, right || (arr.length - 1), compare || defaultCompare);
-}
-
-function quickselectStep(arr, k, left, right, compare) {
-
-    while (right > left) {
-        if (right - left > 600) {
-            var n = right - left + 1;
-            var m = k - left + 1;
-            var z = Math.log(n);
-            var s = 0.5 * Math.exp(2 * z / 3);
-            var sd = 0.5 * Math.sqrt(z * s * (n - s) / n) * (m - n / 2 < 0 ? -1 : 1);
-            var newLeft = Math.max(left, Math.floor(k - m * s / n + sd));
-            var newRight = Math.min(right, Math.floor(k + (n - m) * s / n + sd));
-            quickselectStep(arr, k, newLeft, newRight, compare);
-        }
-
-        var t = arr[k];
-        var i = left;
-        var j = right;
-
-        swap(arr, left, k);
-        if (compare(arr[right], t) > 0) swap(arr, left, right);
-
-        while (i < j) {
-            swap(arr, i, j);
-            i++;
-            j--;
-            while (compare(arr[i], t) < 0) i++;
-            while (compare(arr[j], t) > 0) j--;
-        }
-
-        if (compare(arr[left], t) === 0) swap(arr, left, j);
-        else {
-            j++;
-            swap(arr, j, right);
-        }
-
-        if (j <= k) left = j + 1;
-        if (k <= j) right = j - 1;
-    }
-}
-
-function swap(arr, i, j) {
-    var tmp = arr[i];
-    arr[i] = arr[j];
-    arr[j] = tmp;
-}
-
-function defaultCompare(a, b) {
-    return a < b ? -1 : a > b ? 1 : 0;
-}
-
-return quickselect;
-
-})));
-
 },{}],84:[function(require,module,exports){
-'use strict';
+!function(t,i){"object"==typeof exports&&"undefined"!=typeof module?module.exports=i():"function"==typeof define&&define.amd?define(i):(t=t||self).RBush=i()}(this,function(){"use strict";function t(t,r,e,a,h){!function t(n,r,e,a,h){for(;a>e;){if(a-e>600){var o=a-e+1,s=r-e+1,l=Math.log(o),f=.5*Math.exp(2*l/3),u=.5*Math.sqrt(l*f*(o-f)/o)*(s-o/2<0?-1:1),m=Math.max(e,Math.floor(r-s*f/o+u)),c=Math.min(a,Math.floor(r+(o-s)*f/o+u));t(n,r,m,c,h)}var p=n[r],d=e,x=a;for(i(n,e,r),h(n[a],p)>0&&i(n,e,a);d<x;){for(i(n,d,x),d++,x--;h(n[d],p)<0;)d++;for(;h(n[x],p)>0;)x--}0===h(n[e],p)?i(n,e,x):i(n,++x,a),x<=r&&(e=x+1),r<=x&&(a=x-1)}}(t,r,e||0,a||t.length-1,h||n)}function i(t,i,n){var r=t[i];t[i]=t[n],t[n]=r}function n(t,i){return t<i?-1:t>i?1:0}var r=function(t){void 0===t&&(t=9),this._maxEntries=Math.max(4,t),this._minEntries=Math.max(2,Math.ceil(.4*this._maxEntries)),this.clear()};function e(t,i,n){if(!n)return i.indexOf(t);for(var r=0;r<i.length;r++)if(n(t,i[r]))return r;return-1}function a(t,i){h(t,0,t.children.length,i,t)}function h(t,i,n,r,e){e||(e=p(null)),e.minX=1/0,e.minY=1/0,e.maxX=-1/0,e.maxY=-1/0;for(var a=i;a<n;a++){var h=t.children[a];o(e,t.leaf?r(h):h)}return e}function o(t,i){return t.minX=Math.min(t.minX,i.minX),t.minY=Math.min(t.minY,i.minY),t.maxX=Math.max(t.maxX,i.maxX),t.maxY=Math.max(t.maxY,i.maxY),t}function s(t,i){return t.minX-i.minX}function l(t,i){return t.minY-i.minY}function f(t){return(t.maxX-t.minX)*(t.maxY-t.minY)}function u(t){return t.maxX-t.minX+(t.maxY-t.minY)}function m(t,i){return t.minX<=i.minX&&t.minY<=i.minY&&i.maxX<=t.maxX&&i.maxY<=t.maxY}function c(t,i){return i.minX<=t.maxX&&i.minY<=t.maxY&&i.maxX>=t.minX&&i.maxY>=t.minY}function p(t){return{children:t,height:1,leaf:!0,minX:1/0,minY:1/0,maxX:-1/0,maxY:-1/0}}function d(i,n,r,e,a){for(var h=[n,r];h.length;)if(!((r=h.pop())-(n=h.pop())<=e)){var o=n+Math.ceil((r-n)/e/2)*e;t(i,o,n,r,a),h.push(n,o,o,r)}}return r.prototype.all=function(){return this._all(this.data,[])},r.prototype.search=function(t){var i=this.data,n=[];if(!c(t,i))return n;for(var r=this.toBBox,e=[];i;){for(var a=0;a<i.children.length;a++){var h=i.children[a],o=i.leaf?r(h):h;c(t,o)&&(i.leaf?n.push(h):m(t,o)?this._all(h,n):e.push(h))}i=e.pop()}return n},r.prototype.collides=function(t){var i=this.data;if(!c(t,i))return!1;for(var n=[];i;){for(var r=0;r<i.children.length;r++){var e=i.children[r],a=i.leaf?this.toBBox(e):e;if(c(t,a)){if(i.leaf||m(t,a))return!0;n.push(e)}}i=n.pop()}return!1},r.prototype.load=function(t){if(!t||!t.length)return this;if(t.length<this._minEntries){for(var i=0;i<t.length;i++)this.insert(t[i]);return this}var n=this._build(t.slice(),0,t.length-1,0);if(this.data.children.length)if(this.data.height===n.height)this._splitRoot(this.data,n);else{if(this.data.height<n.height){var r=this.data;this.data=n,n=r}this._insert(n,this.data.height-n.height-1,!0)}else this.data=n;return this},r.prototype.insert=function(t){return t&&this._insert(t,this.data.height-1),this},r.prototype.clear=function(){return this.data=p([]),this},r.prototype.remove=function(t,i){if(!t)return this;for(var n,r,a,h=this.data,o=this.toBBox(t),s=[],l=[];h||s.length;){if(h||(h=s.pop(),r=s[s.length-1],n=l.pop(),a=!0),h.leaf){var f=e(t,h.children,i);if(-1!==f)return h.children.splice(f,1),s.push(h),this._condense(s),this}a||h.leaf||!m(h,o)?r?(n++,h=r.children[n],a=!1):h=null:(s.push(h),l.push(n),n=0,r=h,h=h.children[0])}return this},r.prototype.toBBox=function(t){return t},r.prototype.compareMinX=function(t,i){return t.minX-i.minX},r.prototype.compareMinY=function(t,i){return t.minY-i.minY},r.prototype.toJSON=function(){return this.data},r.prototype.fromJSON=function(t){return this.data=t,this},r.prototype._all=function(t,i){for(var n=[];t;)t.leaf?i.push.apply(i,t.children):n.push.apply(n,t.children),t=n.pop();return i},r.prototype._build=function(t,i,n,r){var e,h=n-i+1,o=this._maxEntries;if(h<=o)return a(e=p(t.slice(i,n+1)),this.toBBox),e;r||(r=Math.ceil(Math.log(h)/Math.log(o)),o=Math.ceil(h/Math.pow(o,r-1))),(e=p([])).leaf=!1,e.height=r;var s=Math.ceil(h/o),l=s*Math.ceil(Math.sqrt(o));d(t,i,n,l,this.compareMinX);for(var f=i;f<=n;f+=l){var u=Math.min(f+l-1,n);d(t,f,u,s,this.compareMinY);for(var m=f;m<=u;m+=s){var c=Math.min(m+s-1,u);e.children.push(this._build(t,m,c,r-1))}}return a(e,this.toBBox),e},r.prototype._chooseSubtree=function(t,i,n,r){for(;r.push(i),!i.leaf&&r.length-1!==n;){for(var e=1/0,a=1/0,h=void 0,o=0;o<i.children.length;o++){var s=i.children[o],l=f(s),u=(m=t,c=s,(Math.max(c.maxX,m.maxX)-Math.min(c.minX,m.minX))*(Math.max(c.maxY,m.maxY)-Math.min(c.minY,m.minY))-l);u<a?(a=u,e=l<e?l:e,h=s):u===a&&l<e&&(e=l,h=s)}i=h||i.children[0]}var m,c;return i},r.prototype._insert=function(t,i,n){var r=n?t:this.toBBox(t),e=[],a=this._chooseSubtree(r,this.data,i,e);for(a.children.push(t),o(a,r);i>=0&&e[i].children.length>this._maxEntries;)this._split(e,i),i--;this._adjustParentBBoxes(r,e,i)},r.prototype._split=function(t,i){var n=t[i],r=n.children.length,e=this._minEntries;this._chooseSplitAxis(n,e,r);var h=this._chooseSplitIndex(n,e,r),o=p(n.children.splice(h,n.children.length-h));o.height=n.height,o.leaf=n.leaf,a(n,this.toBBox),a(o,this.toBBox),i?t[i-1].children.push(o):this._splitRoot(n,o)},r.prototype._splitRoot=function(t,i){this.data=p([t,i]),this.data.height=t.height+1,this.data.leaf=!1,a(this.data,this.toBBox)},r.prototype._chooseSplitIndex=function(t,i,n){for(var r,e,a,o,s,l,u,m=1/0,c=1/0,p=i;p<=n-i;p++){var d=h(t,0,p,this.toBBox),x=h(t,p,n,this.toBBox),v=(e=d,a=x,o=void 0,s=void 0,l=void 0,u=void 0,o=Math.max(e.minX,a.minX),s=Math.max(e.minY,a.minY),l=Math.min(e.maxX,a.maxX),u=Math.min(e.maxY,a.maxY),Math.max(0,l-o)*Math.max(0,u-s)),M=f(d)+f(x);v<m?(m=v,r=p,c=M<c?M:c):v===m&&M<c&&(c=M,r=p)}return r||n-i},r.prototype._chooseSplitAxis=function(t,i,n){var r=t.leaf?this.compareMinX:s,e=t.leaf?this.compareMinY:l;this._allDistMargin(t,i,n,r)<this._allDistMargin(t,i,n,e)&&t.children.sort(r)},r.prototype._allDistMargin=function(t,i,n,r){t.children.sort(r);for(var e=this.toBBox,a=h(t,0,i,e),s=h(t,n-i,n,e),l=u(a)+u(s),f=i;f<n-i;f++){var m=t.children[f];o(a,t.leaf?e(m):m),l+=u(a)}for(var c=n-i-1;c>=i;c--){var p=t.children[c];o(s,t.leaf?e(p):p),l+=u(s)}return l},r.prototype._adjustParentBBoxes=function(t,i,n){for(var r=n;r>=0;r--)o(i[r],t)},r.prototype._condense=function(t){for(var i=t.length-1,n=void 0;i>=0;i--)0===t[i].children.length?i>0?(n=t[i-1].children).splice(n.indexOf(t[i]),1):this.clear():a(t[i],this.toBBox)},r});
 
-module.exports = rbush;
-module.exports.default = rbush;
+},{}],85:[function(require,module,exports){
+!function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"function"==typeof define&&define.amd?define(["exports"],e):e((t=t||self).predicates={})}(this,function(t){"use strict";const e=134217729,n=33306690738754706e-32;function r(t,e,n,r,o){let f,i,u,c,s=e[0],a=r[0],d=0,l=0;a>s==a>-s?(f=s,s=e[++d]):(f=a,a=r[++l]);let p=0;if(d<t&&l<n)for(a>s==a>-s?(u=f-((i=s+f)-s),s=e[++d]):(u=f-((i=a+f)-a),a=r[++l]),f=i,0!==u&&(o[p++]=u);d<t&&l<n;)a>s==a>-s?(u=f-((i=f+s)-(c=i-f))+(s-c),s=e[++d]):(u=f-((i=f+a)-(c=i-f))+(a-c),a=r[++l]),f=i,0!==u&&(o[p++]=u);for(;d<t;)u=f-((i=f+s)-(c=i-f))+(s-c),s=e[++d],f=i,0!==u&&(o[p++]=u);for(;l<n;)u=f-((i=f+a)-(c=i-f))+(a-c),a=r[++l],f=i,0!==u&&(o[p++]=u);return 0===f&&0!==p||(o[p++]=f),p}function o(t){return new Float64Array(t)}const f=33306690738754716e-32,i=22204460492503146e-32,u=11093356479670487e-47,c=o(4),s=o(8),a=o(12),d=o(16),l=o(4);t.orient2d=function(t,o,p,b,y,h){const M=(o-h)*(p-y),x=(t-y)*(b-h),j=M-x;if(0===M||0===x||M>0!=x>0)return j;const m=Math.abs(M+x);return Math.abs(j)>=f*m?j:-function(t,o,f,p,b,y,h){let M,x,j,m,_,v,w,A,F,O,P,g,k,q,z,B,C,D;const E=t-b,G=f-b,H=o-y,I=p-y;_=(z=(A=E-(w=(v=e*E)-(v-E)))*(O=I-(F=(v=e*I)-(v-I)))-((q=E*I)-w*F-A*F-w*O))-(P=z-(C=(A=H-(w=(v=e*H)-(v-H)))*(O=G-(F=(v=e*G)-(v-G)))-((B=H*G)-w*F-A*F-w*O))),c[0]=z-(P+_)+(_-C),_=(k=q-((g=q+P)-(_=g-q))+(P-_))-(P=k-B),c[1]=k-(P+_)+(_-B),_=(D=g+P)-g,c[2]=g-(D-_)+(P-_),c[3]=D;let J=function(t,e){let n=e[0];for(let r=1;r<t;r++)n+=e[r];return n}(4,c),K=i*h;if(J>=K||-J>=K)return J;if(M=t-(E+(_=t-E))+(_-b),j=f-(G+(_=f-G))+(_-b),x=o-(H+(_=o-H))+(_-y),m=p-(I+(_=p-I))+(_-y),0===M&&0===x&&0===j&&0===m)return J;if(K=u*h+n*Math.abs(J),(J+=E*m+I*M-(H*j+G*x))>=K||-J>=K)return J;_=(z=(A=M-(w=(v=e*M)-(v-M)))*(O=I-(F=(v=e*I)-(v-I)))-((q=M*I)-w*F-A*F-w*O))-(P=z-(C=(A=x-(w=(v=e*x)-(v-x)))*(O=G-(F=(v=e*G)-(v-G)))-((B=x*G)-w*F-A*F-w*O))),l[0]=z-(P+_)+(_-C),_=(k=q-((g=q+P)-(_=g-q))+(P-_))-(P=k-B),l[1]=k-(P+_)+(_-B),_=(D=g+P)-g,l[2]=g-(D-_)+(P-_),l[3]=D;const L=r(4,c,4,l,s);_=(z=(A=E-(w=(v=e*E)-(v-E)))*(O=m-(F=(v=e*m)-(v-m)))-((q=E*m)-w*F-A*F-w*O))-(P=z-(C=(A=H-(w=(v=e*H)-(v-H)))*(O=j-(F=(v=e*j)-(v-j)))-((B=H*j)-w*F-A*F-w*O))),l[0]=z-(P+_)+(_-C),_=(k=q-((g=q+P)-(_=g-q))+(P-_))-(P=k-B),l[1]=k-(P+_)+(_-B),_=(D=g+P)-g,l[2]=g-(D-_)+(P-_),l[3]=D;const N=r(L,s,4,l,a);_=(z=(A=M-(w=(v=e*M)-(v-M)))*(O=m-(F=(v=e*m)-(v-m)))-((q=M*m)-w*F-A*F-w*O))-(P=z-(C=(A=x-(w=(v=e*x)-(v-x)))*(O=j-(F=(v=e*j)-(v-j)))-((B=x*j)-w*F-A*F-w*O))),l[0]=z-(P+_)+(_-C),_=(k=q-((g=q+P)-(_=g-q))+(P-_))-(P=k-B),l[1]=k-(P+_)+(_-B),_=(D=g+P)-g,l[2]=g-(D-_)+(P-_),l[3]=D;const Q=r(N,a,4,l,d);return d[Q-1]}(t,o,p,b,y,h,m)},t.orient2dfast=function(t,e,n,r,o,f){return(e-f)*(n-o)-(t-o)*(r-f)},Object.defineProperty(t,"__esModule",{value:!0})});
 
-var quickselect = require('quickselect');
-
-function rbush(maxEntries, format) {
-    if (!(this instanceof rbush)) return new rbush(maxEntries, format);
-
-    // max entries in a node is 9 by default; min node fill is 40% for best performance
-    this._maxEntries = Math.max(4, maxEntries || 9);
-    this._minEntries = Math.max(2, Math.ceil(this._maxEntries * 0.4));
-
-    if (format) {
-        this._initFormat(format);
-    }
-
-    this.clear();
-}
-
-rbush.prototype = {
-
-    all: function () {
-        return this._all(this.data, []);
-    },
-
-    search: function (bbox) {
-
-        var node = this.data,
-            result = [],
-            toBBox = this.toBBox;
-
-        if (!intersects(bbox, node)) return result;
-
-        var nodesToSearch = [],
-            i, len, child, childBBox;
-
-        while (node) {
-            for (i = 0, len = node.children.length; i < len; i++) {
-
-                child = node.children[i];
-                childBBox = node.leaf ? toBBox(child) : child;
-
-                if (intersects(bbox, childBBox)) {
-                    if (node.leaf) result.push(child);
-                    else if (contains(bbox, childBBox)) this._all(child, result);
-                    else nodesToSearch.push(child);
-                }
-            }
-            node = nodesToSearch.pop();
-        }
-
-        return result;
-    },
-
-    collides: function (bbox) {
-
-        var node = this.data,
-            toBBox = this.toBBox;
-
-        if (!intersects(bbox, node)) return false;
-
-        var nodesToSearch = [],
-            i, len, child, childBBox;
-
-        while (node) {
-            for (i = 0, len = node.children.length; i < len; i++) {
-
-                child = node.children[i];
-                childBBox = node.leaf ? toBBox(child) : child;
-
-                if (intersects(bbox, childBBox)) {
-                    if (node.leaf || contains(bbox, childBBox)) return true;
-                    nodesToSearch.push(child);
-                }
-            }
-            node = nodesToSearch.pop();
-        }
-
-        return false;
-    },
-
-    load: function (data) {
-        if (!(data && data.length)) return this;
-
-        if (data.length < this._minEntries) {
-            for (var i = 0, len = data.length; i < len; i++) {
-                this.insert(data[i]);
-            }
-            return this;
-        }
-
-        // recursively build the tree with the given data from scratch using OMT algorithm
-        var node = this._build(data.slice(), 0, data.length - 1, 0);
-
-        if (!this.data.children.length) {
-            // save as is if tree is empty
-            this.data = node;
-
-        } else if (this.data.height === node.height) {
-            // split root if trees have the same height
-            this._splitRoot(this.data, node);
-
-        } else {
-            if (this.data.height < node.height) {
-                // swap trees if inserted one is bigger
-                var tmpNode = this.data;
-                this.data = node;
-                node = tmpNode;
-            }
-
-            // insert the small tree into the large tree at appropriate level
-            this._insert(node, this.data.height - node.height - 1, true);
-        }
-
-        return this;
-    },
-
-    insert: function (item) {
-        if (item) this._insert(item, this.data.height - 1);
-        return this;
-    },
-
-    clear: function () {
-        this.data = createNode([]);
-        return this;
-    },
-
-    remove: function (item, equalsFn) {
-        if (!item) return this;
-
-        var node = this.data,
-            bbox = this.toBBox(item),
-            path = [],
-            indexes = [],
-            i, parent, index, goingUp;
-
-        // depth-first iterative tree traversal
-        while (node || path.length) {
-
-            if (!node) { // go up
-                node = path.pop();
-                parent = path[path.length - 1];
-                i = indexes.pop();
-                goingUp = true;
-            }
-
-            if (node.leaf) { // check current node
-                index = findItem(item, node.children, equalsFn);
-
-                if (index !== -1) {
-                    // item found, remove the item and condense tree upwards
-                    node.children.splice(index, 1);
-                    path.push(node);
-                    this._condense(path);
-                    return this;
-                }
-            }
-
-            if (!goingUp && !node.leaf && contains(node, bbox)) { // go down
-                path.push(node);
-                indexes.push(i);
-                i = 0;
-                parent = node;
-                node = node.children[0];
-
-            } else if (parent) { // go right
-                i++;
-                node = parent.children[i];
-                goingUp = false;
-
-            } else node = null; // nothing found
-        }
-
-        return this;
-    },
-
-    toBBox: function (item) { return item; },
-
-    compareMinX: compareNodeMinX,
-    compareMinY: compareNodeMinY,
-
-    toJSON: function () { return this.data; },
-
-    fromJSON: function (data) {
-        this.data = data;
-        return this;
-    },
-
-    _all: function (node, result) {
-        var nodesToSearch = [];
-        while (node) {
-            if (node.leaf) result.push.apply(result, node.children);
-            else nodesToSearch.push.apply(nodesToSearch, node.children);
-
-            node = nodesToSearch.pop();
-        }
-        return result;
-    },
-
-    _build: function (items, left, right, height) {
-
-        var N = right - left + 1,
-            M = this._maxEntries,
-            node;
-
-        if (N <= M) {
-            // reached leaf level; return leaf
-            node = createNode(items.slice(left, right + 1));
-            calcBBox(node, this.toBBox);
-            return node;
-        }
-
-        if (!height) {
-            // target height of the bulk-loaded tree
-            height = Math.ceil(Math.log(N) / Math.log(M));
-
-            // target number of root entries to maximize storage utilization
-            M = Math.ceil(N / Math.pow(M, height - 1));
-        }
-
-        node = createNode([]);
-        node.leaf = false;
-        node.height = height;
-
-        // split the items into M mostly square tiles
-
-        var N2 = Math.ceil(N / M),
-            N1 = N2 * Math.ceil(Math.sqrt(M)),
-            i, j, right2, right3;
-
-        multiSelect(items, left, right, N1, this.compareMinX);
-
-        for (i = left; i <= right; i += N1) {
-
-            right2 = Math.min(i + N1 - 1, right);
-
-            multiSelect(items, i, right2, N2, this.compareMinY);
-
-            for (j = i; j <= right2; j += N2) {
-
-                right3 = Math.min(j + N2 - 1, right2);
-
-                // pack each entry recursively
-                node.children.push(this._build(items, j, right3, height - 1));
-            }
-        }
-
-        calcBBox(node, this.toBBox);
-
-        return node;
-    },
-
-    _chooseSubtree: function (bbox, node, level, path) {
-
-        var i, len, child, targetNode, area, enlargement, minArea, minEnlargement;
-
-        while (true) {
-            path.push(node);
-
-            if (node.leaf || path.length - 1 === level) break;
-
-            minArea = minEnlargement = Infinity;
-
-            for (i = 0, len = node.children.length; i < len; i++) {
-                child = node.children[i];
-                area = bboxArea(child);
-                enlargement = enlargedArea(bbox, child) - area;
-
-                // choose entry with the least area enlargement
-                if (enlargement < minEnlargement) {
-                    minEnlargement = enlargement;
-                    minArea = area < minArea ? area : minArea;
-                    targetNode = child;
-
-                } else if (enlargement === minEnlargement) {
-                    // otherwise choose one with the smallest area
-                    if (area < minArea) {
-                        minArea = area;
-                        targetNode = child;
-                    }
-                }
-            }
-
-            node = targetNode || node.children[0];
-        }
-
-        return node;
-    },
-
-    _insert: function (item, level, isNode) {
-
-        var toBBox = this.toBBox,
-            bbox = isNode ? item : toBBox(item),
-            insertPath = [];
-
-        // find the best node for accommodating the item, saving all nodes along the path too
-        var node = this._chooseSubtree(bbox, this.data, level, insertPath);
-
-        // put the item into the node
-        node.children.push(item);
-        extend(node, bbox);
-
-        // split on node overflow; propagate upwards if necessary
-        while (level >= 0) {
-            if (insertPath[level].children.length > this._maxEntries) {
-                this._split(insertPath, level);
-                level--;
-            } else break;
-        }
-
-        // adjust bboxes along the insertion path
-        this._adjustParentBBoxes(bbox, insertPath, level);
-    },
-
-    // split overflowed node into two
-    _split: function (insertPath, level) {
-
-        var node = insertPath[level],
-            M = node.children.length,
-            m = this._minEntries;
-
-        this._chooseSplitAxis(node, m, M);
-
-        var splitIndex = this._chooseSplitIndex(node, m, M);
-
-        var newNode = createNode(node.children.splice(splitIndex, node.children.length - splitIndex));
-        newNode.height = node.height;
-        newNode.leaf = node.leaf;
-
-        calcBBox(node, this.toBBox);
-        calcBBox(newNode, this.toBBox);
-
-        if (level) insertPath[level - 1].children.push(newNode);
-        else this._splitRoot(node, newNode);
-    },
-
-    _splitRoot: function (node, newNode) {
-        // split root node
-        this.data = createNode([node, newNode]);
-        this.data.height = node.height + 1;
-        this.data.leaf = false;
-        calcBBox(this.data, this.toBBox);
-    },
-
-    _chooseSplitIndex: function (node, m, M) {
-
-        var i, bbox1, bbox2, overlap, area, minOverlap, minArea, index;
-
-        minOverlap = minArea = Infinity;
-
-        for (i = m; i <= M - m; i++) {
-            bbox1 = distBBox(node, 0, i, this.toBBox);
-            bbox2 = distBBox(node, i, M, this.toBBox);
-
-            overlap = intersectionArea(bbox1, bbox2);
-            area = bboxArea(bbox1) + bboxArea(bbox2);
-
-            // choose distribution with minimum overlap
-            if (overlap < minOverlap) {
-                minOverlap = overlap;
-                index = i;
-
-                minArea = area < minArea ? area : minArea;
-
-            } else if (overlap === minOverlap) {
-                // otherwise choose distribution with minimum area
-                if (area < minArea) {
-                    minArea = area;
-                    index = i;
-                }
-            }
-        }
-
-        return index;
-    },
-
-    // sorts node children by the best axis for split
-    _chooseSplitAxis: function (node, m, M) {
-
-        var compareMinX = node.leaf ? this.compareMinX : compareNodeMinX,
-            compareMinY = node.leaf ? this.compareMinY : compareNodeMinY,
-            xMargin = this._allDistMargin(node, m, M, compareMinX),
-            yMargin = this._allDistMargin(node, m, M, compareMinY);
-
-        // if total distributions margin value is minimal for x, sort by minX,
-        // otherwise it's already sorted by minY
-        if (xMargin < yMargin) node.children.sort(compareMinX);
-    },
-
-    // total margin of all possible split distributions where each node is at least m full
-    _allDistMargin: function (node, m, M, compare) {
-
-        node.children.sort(compare);
-
-        var toBBox = this.toBBox,
-            leftBBox = distBBox(node, 0, m, toBBox),
-            rightBBox = distBBox(node, M - m, M, toBBox),
-            margin = bboxMargin(leftBBox) + bboxMargin(rightBBox),
-            i, child;
-
-        for (i = m; i < M - m; i++) {
-            child = node.children[i];
-            extend(leftBBox, node.leaf ? toBBox(child) : child);
-            margin += bboxMargin(leftBBox);
-        }
-
-        for (i = M - m - 1; i >= m; i--) {
-            child = node.children[i];
-            extend(rightBBox, node.leaf ? toBBox(child) : child);
-            margin += bboxMargin(rightBBox);
-        }
-
-        return margin;
-    },
-
-    _adjustParentBBoxes: function (bbox, path, level) {
-        // adjust bboxes along the given tree path
-        for (var i = level; i >= 0; i--) {
-            extend(path[i], bbox);
-        }
-    },
-
-    _condense: function (path) {
-        // go through the path, removing empty nodes and updating bboxes
-        for (var i = path.length - 1, siblings; i >= 0; i--) {
-            if (path[i].children.length === 0) {
-                if (i > 0) {
-                    siblings = path[i - 1].children;
-                    siblings.splice(siblings.indexOf(path[i]), 1);
-
-                } else this.clear();
-
-            } else calcBBox(path[i], this.toBBox);
-        }
-    },
-
-    _initFormat: function (format) {
-        // data format (minX, minY, maxX, maxY accessors)
-
-        // uses eval-type function compilation instead of just accepting a toBBox function
-        // because the algorithms are very sensitive to sorting functions performance,
-        // so they should be dead simple and without inner calls
-
-        var compareArr = ['return a', ' - b', ';'];
-
-        this.compareMinX = new Function('a', 'b', compareArr.join(format[0]));
-        this.compareMinY = new Function('a', 'b', compareArr.join(format[1]));
-
-        this.toBBox = new Function('a',
-            'return {minX: a' + format[0] +
-            ', minY: a' + format[1] +
-            ', maxX: a' + format[2] +
-            ', maxY: a' + format[3] + '};');
-    }
-};
-
-function findItem(item, items, equalsFn) {
-    if (!equalsFn) return items.indexOf(item);
-
-    for (var i = 0; i < items.length; i++) {
-        if (equalsFn(item, items[i])) return i;
-    }
-    return -1;
-}
-
-// calculate node's bbox from bboxes of its children
-function calcBBox(node, toBBox) {
-    distBBox(node, 0, node.children.length, toBBox, node);
-}
-
-// min bounding rectangle of node children from k to p-1
-function distBBox(node, k, p, toBBox, destNode) {
-    if (!destNode) destNode = createNode(null);
-    destNode.minX = Infinity;
-    destNode.minY = Infinity;
-    destNode.maxX = -Infinity;
-    destNode.maxY = -Infinity;
-
-    for (var i = k, child; i < p; i++) {
-        child = node.children[i];
-        extend(destNode, node.leaf ? toBBox(child) : child);
-    }
-
-    return destNode;
-}
-
-function extend(a, b) {
-    a.minX = Math.min(a.minX, b.minX);
-    a.minY = Math.min(a.minY, b.minY);
-    a.maxX = Math.max(a.maxX, b.maxX);
-    a.maxY = Math.max(a.maxY, b.maxY);
-    return a;
-}
-
-function compareNodeMinX(a, b) { return a.minX - b.minX; }
-function compareNodeMinY(a, b) { return a.minY - b.minY; }
-
-function bboxArea(a)   { return (a.maxX - a.minX) * (a.maxY - a.minY); }
-function bboxMargin(a) { return (a.maxX - a.minX) + (a.maxY - a.minY); }
-
-function enlargedArea(a, b) {
-    return (Math.max(b.maxX, a.maxX) - Math.min(b.minX, a.minX)) *
-           (Math.max(b.maxY, a.maxY) - Math.min(b.minY, a.minY));
-}
-
-function intersectionArea(a, b) {
-    var minX = Math.max(a.minX, b.minX),
-        minY = Math.max(a.minY, b.minY),
-        maxX = Math.min(a.maxX, b.maxX),
-        maxY = Math.min(a.maxY, b.maxY);
-
-    return Math.max(0, maxX - minX) *
-           Math.max(0, maxY - minY);
-}
-
-function contains(a, b) {
-    return a.minX <= b.minX &&
-           a.minY <= b.minY &&
-           b.maxX <= a.maxX &&
-           b.maxY <= a.maxY;
-}
-
-function intersects(a, b) {
-    return b.minX <= a.maxX &&
-           b.minY <= a.maxY &&
-           b.maxX >= a.minX &&
-           b.maxY >= a.minY;
-}
-
-function createNode(children) {
-    return {
-        children: children,
-        height: 1,
-        leaf: true,
-        minX: Infinity,
-        minY: Infinity,
-        maxX: -Infinity,
-        maxY: -Infinity
-    };
-}
-
-// sort an array so that items come in groups of n unsorted items, with groups sorted between each other;
-// combines selection algorithm with binary divide & conquer approach
-
-function multiSelect(arr, left, right, n, compare) {
-    var stack = [left, right],
-        mid;
-
-    while (stack.length) {
-        right = stack.pop();
-        left = stack.pop();
-
-        if (right - left <= n) continue;
-
-        mid = left + Math.ceil((right - left) / n / 2) * n;
-        quickselect(arr, mid, left, right, compare);
-
-        stack.push(left, mid, mid, right);
-    }
-}
-
-},{"quickselect":83}],85:[function(require,module,exports){
-"use strict"
-
-var twoProduct = require("two-product")
-var robustSum = require("robust-sum")
-var robustScale = require("robust-scale")
-var robustSubtract = require("robust-subtract")
-
-var NUM_EXPAND = 5
-
-var EPSILON     = 1.1102230246251565e-16
-var ERRBOUND3   = (3.0 + 16.0 * EPSILON) * EPSILON
-var ERRBOUND4   = (7.0 + 56.0 * EPSILON) * EPSILON
-
-function cofactor(m, c) {
-  var result = new Array(m.length-1)
-  for(var i=1; i<m.length; ++i) {
-    var r = result[i-1] = new Array(m.length-1)
-    for(var j=0,k=0; j<m.length; ++j) {
-      if(j === c) {
-        continue
-      }
-      r[k++] = m[i][j]
-    }
-  }
-  return result
-}
-
-function matrix(n) {
-  var result = new Array(n)
-  for(var i=0; i<n; ++i) {
-    result[i] = new Array(n)
-    for(var j=0; j<n; ++j) {
-      result[i][j] = ["m", j, "[", (n-i-1), "]"].join("")
-    }
-  }
-  return result
-}
-
-function sign(n) {
-  if(n & 1) {
-    return "-"
-  }
-  return ""
-}
-
-function generateSum(expr) {
-  if(expr.length === 1) {
-    return expr[0]
-  } else if(expr.length === 2) {
-    return ["sum(", expr[0], ",", expr[1], ")"].join("")
-  } else {
-    var m = expr.length>>1
-    return ["sum(", generateSum(expr.slice(0, m)), ",", generateSum(expr.slice(m)), ")"].join("")
-  }
-}
-
-function determinant(m) {
-  if(m.length === 2) {
-    return [["sum(prod(", m[0][0], ",", m[1][1], "),prod(-", m[0][1], ",", m[1][0], "))"].join("")]
-  } else {
-    var expr = []
-    for(var i=0; i<m.length; ++i) {
-      expr.push(["scale(", generateSum(determinant(cofactor(m, i))), ",", sign(i), m[0][i], ")"].join(""))
-    }
-    return expr
-  }
-}
-
-function orientation(n) {
-  var pos = []
-  var neg = []
-  var m = matrix(n)
-  var args = []
-  for(var i=0; i<n; ++i) {
-    if((i&1)===0) {
-      pos.push.apply(pos, determinant(cofactor(m, i)))
-    } else {
-      neg.push.apply(neg, determinant(cofactor(m, i)))
-    }
-    args.push("m" + i)
-  }
-  var posExpr = generateSum(pos)
-  var negExpr = generateSum(neg)
-  var funcName = "orientation" + n + "Exact"
-  var code = ["function ", funcName, "(", args.join(), "){var p=", posExpr, ",n=", negExpr, ",d=sub(p,n);\
-return d[d.length-1];};return ", funcName].join("")
-  var proc = new Function("sum", "prod", "scale", "sub", code)
-  return proc(robustSum, twoProduct, robustScale, robustSubtract)
-}
-
-var orientation3Exact = orientation(3)
-var orientation4Exact = orientation(4)
-
-var CACHED = [
-  function orientation0() { return 0 },
-  function orientation1() { return 0 },
-  function orientation2(a, b) { 
-    return b[0] - a[0]
-  },
-  function orientation3(a, b, c) {
-    var l = (a[1] - c[1]) * (b[0] - c[0])
-    var r = (a[0] - c[0]) * (b[1] - c[1])
-    var det = l - r
-    var s
-    if(l > 0) {
-      if(r <= 0) {
-        return det
-      } else {
-        s = l + r
-      }
-    } else if(l < 0) {
-      if(r >= 0) {
-        return det
-      } else {
-        s = -(l + r)
-      }
-    } else {
-      return det
-    }
-    var tol = ERRBOUND3 * s
-    if(det >= tol || det <= -tol) {
-      return det
-    }
-    return orientation3Exact(a, b, c)
-  },
-  function orientation4(a,b,c,d) {
-    var adx = a[0] - d[0]
-    var bdx = b[0] - d[0]
-    var cdx = c[0] - d[0]
-    var ady = a[1] - d[1]
-    var bdy = b[1] - d[1]
-    var cdy = c[1] - d[1]
-    var adz = a[2] - d[2]
-    var bdz = b[2] - d[2]
-    var cdz = c[2] - d[2]
-    var bdxcdy = bdx * cdy
-    var cdxbdy = cdx * bdy
-    var cdxady = cdx * ady
-    var adxcdy = adx * cdy
-    var adxbdy = adx * bdy
-    var bdxady = bdx * ady
-    var det = adz * (bdxcdy - cdxbdy) 
-            + bdz * (cdxady - adxcdy)
-            + cdz * (adxbdy - bdxady)
-    var permanent = (Math.abs(bdxcdy) + Math.abs(cdxbdy)) * Math.abs(adz)
-                  + (Math.abs(cdxady) + Math.abs(adxcdy)) * Math.abs(bdz)
-                  + (Math.abs(adxbdy) + Math.abs(bdxady)) * Math.abs(cdz)
-    var tol = ERRBOUND4 * permanent
-    if ((det > tol) || (-det > tol)) {
-      return det
-    }
-    return orientation4Exact(a,b,c,d)
-  }
-]
-
-function slowOrient(args) {
-  var proc = CACHED[args.length]
-  if(!proc) {
-    proc = CACHED[args.length] = orientation(args.length)
-  }
-  return proc.apply(undefined, args)
-}
-
-function generateOrientationProc() {
-  while(CACHED.length <= NUM_EXPAND) {
-    CACHED.push(orientation(CACHED.length))
-  }
-  var args = []
-  var procArgs = ["slow"]
-  for(var i=0; i<=NUM_EXPAND; ++i) {
-    args.push("a" + i)
-    procArgs.push("o" + i)
-  }
-  var code = [
-    "function getOrientation(", args.join(), "){switch(arguments.length){case 0:case 1:return 0;"
-  ]
-  for(var i=2; i<=NUM_EXPAND; ++i) {
-    code.push("case ", i, ":return o", i, "(", args.slice(0, i).join(), ");")
-  }
-  code.push("}var s=new Array(arguments.length);for(var i=0;i<arguments.length;++i){s[i]=arguments[i]};return slow(s);}return getOrientation")
-  procArgs.push(code.join(""))
-
-  var proc = Function.apply(undefined, procArgs)
-  module.exports = proc.apply(undefined, [slowOrient].concat(CACHED))
-  for(var i=0; i<=NUM_EXPAND; ++i) {
-    module.exports[i] = CACHED[i]
-  }
-}
-
-generateOrientationProc()
-},{"robust-scale":86,"robust-subtract":87,"robust-sum":88,"two-product":98}],86:[function(require,module,exports){
-"use strict"
-
-var twoProduct = require("two-product")
-var twoSum = require("two-sum")
-
-module.exports = scaleLinearExpansion
-
-function scaleLinearExpansion(e, scale) {
-  var n = e.length
-  if(n === 1) {
-    var ts = twoProduct(e[0], scale)
-    if(ts[0]) {
-      return ts
-    }
-    return [ ts[1] ]
-  }
-  var g = new Array(2 * n)
-  var q = [0.1, 0.1]
-  var t = [0.1, 0.1]
-  var count = 0
-  twoProduct(e[0], scale, q)
-  if(q[0]) {
-    g[count++] = q[0]
-  }
-  for(var i=1; i<n; ++i) {
-    twoProduct(e[i], scale, t)
-    var pq = q[1]
-    twoSum(pq, t[0], q)
-    if(q[0]) {
-      g[count++] = q[0]
-    }
-    var a = t[1]
-    var b = q[1]
-    var x = a + b
-    var bv = x - a
-    var y = b - bv
-    q[1] = x
-    if(y) {
-      g[count++] = y
-    }
-  }
-  if(q[1]) {
-    g[count++] = q[1]
-  }
-  if(count === 0) {
-    g[count++] = 0.0
-  }
-  g.length = count
-  return g
-}
-},{"two-product":98,"two-sum":99}],87:[function(require,module,exports){
-"use strict"
-
-module.exports = robustSubtract
-
-//Easy case: Add two scalars
-function scalarScalar(a, b) {
-  var x = a + b
-  var bv = x - a
-  var av = x - bv
-  var br = b - bv
-  var ar = a - av
-  var y = ar + br
-  if(y) {
-    return [y, x]
-  }
-  return [x]
-}
-
-function robustSubtract(e, f) {
-  var ne = e.length|0
-  var nf = f.length|0
-  if(ne === 1 && nf === 1) {
-    return scalarScalar(e[0], -f[0])
-  }
-  var n = ne + nf
-  var g = new Array(n)
-  var count = 0
-  var eptr = 0
-  var fptr = 0
-  var abs = Math.abs
-  var ei = e[eptr]
-  var ea = abs(ei)
-  var fi = -f[fptr]
-  var fa = abs(fi)
-  var a, b
-  if(ea < fa) {
-    b = ei
-    eptr += 1
-    if(eptr < ne) {
-      ei = e[eptr]
-      ea = abs(ei)
-    }
-  } else {
-    b = fi
-    fptr += 1
-    if(fptr < nf) {
-      fi = -f[fptr]
-      fa = abs(fi)
-    }
-  }
-  if((eptr < ne && ea < fa) || (fptr >= nf)) {
-    a = ei
-    eptr += 1
-    if(eptr < ne) {
-      ei = e[eptr]
-      ea = abs(ei)
-    }
-  } else {
-    a = fi
-    fptr += 1
-    if(fptr < nf) {
-      fi = -f[fptr]
-      fa = abs(fi)
-    }
-  }
-  var x = a + b
-  var bv = x - a
-  var y = b - bv
-  var q0 = y
-  var q1 = x
-  var _x, _bv, _av, _br, _ar
-  while(eptr < ne && fptr < nf) {
-    if(ea < fa) {
-      a = ei
-      eptr += 1
-      if(eptr < ne) {
-        ei = e[eptr]
-        ea = abs(ei)
-      }
-    } else {
-      a = fi
-      fptr += 1
-      if(fptr < nf) {
-        fi = -f[fptr]
-        fa = abs(fi)
-      }
-    }
-    b = q0
-    x = a + b
-    bv = x - a
-    y = b - bv
-    if(y) {
-      g[count++] = y
-    }
-    _x = q1 + x
-    _bv = _x - q1
-    _av = _x - _bv
-    _br = x - _bv
-    _ar = q1 - _av
-    q0 = _ar + _br
-    q1 = _x
-  }
-  while(eptr < ne) {
-    a = ei
-    b = q0
-    x = a + b
-    bv = x - a
-    y = b - bv
-    if(y) {
-      g[count++] = y
-    }
-    _x = q1 + x
-    _bv = _x - q1
-    _av = _x - _bv
-    _br = x - _bv
-    _ar = q1 - _av
-    q0 = _ar + _br
-    q1 = _x
-    eptr += 1
-    if(eptr < ne) {
-      ei = e[eptr]
-    }
-  }
-  while(fptr < nf) {
-    a = fi
-    b = q0
-    x = a + b
-    bv = x - a
-    y = b - bv
-    if(y) {
-      g[count++] = y
-    } 
-    _x = q1 + x
-    _bv = _x - q1
-    _av = _x - _bv
-    _br = x - _bv
-    _ar = q1 - _av
-    q0 = _ar + _br
-    q1 = _x
-    fptr += 1
-    if(fptr < nf) {
-      fi = -f[fptr]
-    }
-  }
-  if(q0) {
-    g[count++] = q0
-  }
-  if(q1) {
-    g[count++] = q1
-  }
-  if(!count) {
-    g[count++] = 0.0  
-  }
-  g.length = count
-  return g
-}
-},{}],88:[function(require,module,exports){
-"use strict"
-
-module.exports = linearExpansionSum
-
-//Easy case: Add two scalars
-function scalarScalar(a, b) {
-  var x = a + b
-  var bv = x - a
-  var av = x - bv
-  var br = b - bv
-  var ar = a - av
-  var y = ar + br
-  if(y) {
-    return [y, x]
-  }
-  return [x]
-}
-
-function linearExpansionSum(e, f) {
-  var ne = e.length|0
-  var nf = f.length|0
-  if(ne === 1 && nf === 1) {
-    return scalarScalar(e[0], f[0])
-  }
-  var n = ne + nf
-  var g = new Array(n)
-  var count = 0
-  var eptr = 0
-  var fptr = 0
-  var abs = Math.abs
-  var ei = e[eptr]
-  var ea = abs(ei)
-  var fi = f[fptr]
-  var fa = abs(fi)
-  var a, b
-  if(ea < fa) {
-    b = ei
-    eptr += 1
-    if(eptr < ne) {
-      ei = e[eptr]
-      ea = abs(ei)
-    }
-  } else {
-    b = fi
-    fptr += 1
-    if(fptr < nf) {
-      fi = f[fptr]
-      fa = abs(fi)
-    }
-  }
-  if((eptr < ne && ea < fa) || (fptr >= nf)) {
-    a = ei
-    eptr += 1
-    if(eptr < ne) {
-      ei = e[eptr]
-      ea = abs(ei)
-    }
-  } else {
-    a = fi
-    fptr += 1
-    if(fptr < nf) {
-      fi = f[fptr]
-      fa = abs(fi)
-    }
-  }
-  var x = a + b
-  var bv = x - a
-  var y = b - bv
-  var q0 = y
-  var q1 = x
-  var _x, _bv, _av, _br, _ar
-  while(eptr < ne && fptr < nf) {
-    if(ea < fa) {
-      a = ei
-      eptr += 1
-      if(eptr < ne) {
-        ei = e[eptr]
-        ea = abs(ei)
-      }
-    } else {
-      a = fi
-      fptr += 1
-      if(fptr < nf) {
-        fi = f[fptr]
-        fa = abs(fi)
-      }
-    }
-    b = q0
-    x = a + b
-    bv = x - a
-    y = b - bv
-    if(y) {
-      g[count++] = y
-    }
-    _x = q1 + x
-    _bv = _x - q1
-    _av = _x - _bv
-    _br = x - _bv
-    _ar = q1 - _av
-    q0 = _ar + _br
-    q1 = _x
-  }
-  while(eptr < ne) {
-    a = ei
-    b = q0
-    x = a + b
-    bv = x - a
-    y = b - bv
-    if(y) {
-      g[count++] = y
-    }
-    _x = q1 + x
-    _bv = _x - q1
-    _av = _x - _bv
-    _br = x - _bv
-    _ar = q1 - _av
-    q0 = _ar + _br
-    q1 = _x
-    eptr += 1
-    if(eptr < ne) {
-      ei = e[eptr]
-    }
-  }
-  while(fptr < nf) {
-    a = fi
-    b = q0
-    x = a + b
-    bv = x - a
-    y = b - bv
-    if(y) {
-      g[count++] = y
-    } 
-    _x = q1 + x
-    _bv = _x - q1
-    _av = _x - _bv
-    _br = x - _bv
-    _ar = q1 - _av
-    q0 = _ar + _br
-    q1 = _x
-    fptr += 1
-    if(fptr < nf) {
-      fi = f[fptr]
-    }
-  }
-  if(q0) {
-    g[count++] = q0
-  }
-  if(q1) {
-    g[count++] = q1
-  }
-  if(!count) {
-    g[count++] = 0.0  
-  }
-  g.length = count
-  return g
-}
-},{}],89:[function(require,module,exports){
+},{}],86:[function(require,module,exports){
+/*! safe-buffer. MIT License. Feross Aboukhadijeh <https://feross.org/opensource> */
 /* eslint-disable node/no-deprecated-api */
 var buffer = require('buffer')
 var Buffer = buffer.Buffer
@@ -27895,10 +27740,10 @@ SafeBuffer.allocUnsafeSlow = function (size) {
   return buffer.SlowBuffer(size)
 }
 
-},{"buffer":30}],90:[function(require,module,exports){
-(function (Buffer){
+},{"buffer":30}],87:[function(require,module,exports){
 'use strict';
 var Promise = require('lie');
+var Buffer = require('buffer').Buffer
 module.exports = binaryAjax;
 function binaryAjax(url){
 	return new Promise(function(resolve,reject){
@@ -27917,7 +27762,7 @@ function binaryAjax(url){
 				}
 			}
 			if(type !== 'prj' && type !== 'cpg'){
-				return resolve(new Buffer(ajax.response));
+				return resolve(Buffer.from(ajax.response));
 			} else {
 				return resolve(ajax.response);
 			}
@@ -27926,10 +27771,39 @@ function binaryAjax(url){
 	});
 }
 
-}).call(this,require("buffer").Buffer)
+},{"buffer":30,"lie":58}],88:[function(require,module,exports){
+(function (global){(function (){
+'use strict';
+var fallback = require('./binaryajax-browser');
+var Buffer = require('buffer').Buffer
+module.exports = async function binaryAjax(url){
+  if (!global.fetch) {
+    return fallback(url)
+  }
+  var type = url.slice(-3).toLowerCase();
+  var isOptionalTxt = type==='prj' || type === 'cpg';
+  try {
+    var resp = await fetch(url)
+    if (resp.status > 399) {
+      throw new Error(resp.statusText);
+    }
+    if (isOptionalTxt) {
+      return resp.text();
+    }
+    var resp = await resp.arrayBuffer();
+    return Buffer.from(resp);
+  } catch (e) {
+  	if(isOptionalTxt){
+      return false;
+    }
+    throw e;
+  }
+}
 
-},{"buffer":30,"lie":58}],91:[function(require,module,exports){
-(function (global,Buffer){
+}).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+
+},{"./binaryajax-browser":87,"buffer":30}],89:[function(require,module,exports){
+(function (global){(function (){
 'use strict';
 var proj4 = require('proj4');
 if (proj4.default) {
@@ -27941,6 +27815,7 @@ var parseShp = require('./parseShp');
 var parseDbf = require('parsedbf');
 var Promise = require('lie');
 var Cache = require('lru-cache');
+var Buffer = require('buffer').Buffer
 var cache = new Cache({
   max: 20
 });
@@ -27953,13 +27828,13 @@ function toBuffer(b) {
     return b;
   }
   if (b instanceof global.ArrayBuffer) {
-    return new Buffer(b);
+    return Buffer.from(b);
   }
   if (b.buffer instanceof global.ArrayBuffer) {
     if (b.BYTES_PER_ELEMENT === 1) {
-      return new Buffer(b);
+      return Buffer.from(b);
     }
-    return new Buffer(b.buffer);
+    return Buffer.from(b.buffer);
   }
 }
 
@@ -28054,7 +27929,15 @@ shp.getShapefile = function(base, whiteList) {
           binaryAjax(base + '.shp'),
           binaryAjax(base + '.prj')
         ]).then(function(args) {
-          return parseShp(args[0], args[1] ? proj4(args[1]) : false);
+          var prj = false;
+          try {
+            if (args[1]) {
+              prj = proj4(args[1]);
+            }
+          } catch (e) {
+            prj = false;
+          }
+          return parseShp(args[0], prj);
         }),
         Promise.all([
           binaryAjax(base + '.dbf'),
@@ -28076,11 +27959,14 @@ shp.parseShp = function(shp, prj) {
     prj = prj.toString();
   }
   if (typeof prj === 'string') {
-    prj = proj4(prj);
-    return parseShp(shp, prj);
-  } else {
-    return parseShp(shp);
+    try {
+      prj = proj4(prj);
+    } catch (e) {
+      prj = false;
+    }
   }
+  return parseShp(shp, prj);
+
 };
 shp.parseDbf = function(dbf, cpg) {
   dbf = toBuffer(dbf);
@@ -28088,9 +27974,9 @@ shp.parseDbf = function(dbf, cpg) {
 };
 module.exports = shp;
 
-}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer)
+}).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
-},{"./binaryajax":90,"./parseShp":92,"./unzip":93,"buffer":30,"lie":58,"lru-cache":59,"parsedbf":79,"proj4":82}],92:[function(require,module,exports){
+},{"./binaryajax":88,"./parseShp":90,"./unzip":91,"buffer":30,"lie":58,"lru-cache":59,"parsedbf":78,"proj4":83}],90:[function(require,module,exports){
 'use strict';
 
 function isClockWise(array) {
@@ -28348,6 +28234,8 @@ ParseShp.prototype.getRows = function() {
     offset += current.len;
     if (current.type) {
       out.push(this.parseFunc(current.data));
+    } else {
+      out.push(null);
     }
   }
   return out;
@@ -28368,7 +28256,7 @@ module.exports = function(buffer, trans) {
   return new ParseShp(buffer, trans).rows;
 };
 
-},{}],93:[function(require,module,exports){
+},{}],91:[function(require,module,exports){
 'use strict';
 
 var JSZip = require('jszip');
@@ -28387,7 +28275,7 @@ module.exports = function(buffer) {
 	return out;
 };
 
-},{"jszip":43}],94:[function(require,module,exports){
+},{"jszip":43}],92:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -28684,13 +28572,13 @@ function simpleWrite(buf) {
 function simpleEnd(buf) {
   return buf && buf.length ? this.write(buf) : '';
 }
-},{"safe-buffer":89}],95:[function(require,module,exports){
+},{"safe-buffer":86}],93:[function(require,module,exports){
 // This is free and unencumbered software released into the public domain.
 // See LICENSE.md for more information.
 
 module.exports = require("./lib/encoding.js");
 
-},{"./lib/encoding.js":96}],96:[function(require,module,exports){
+},{"./lib/encoding.js":94}],94:[function(require,module,exports){
 // This is free and unencumbered software released into the public domain.
 // See LICENSE.md for more information.
 
@@ -32004,149 +31892,102 @@ module.exports = require("./lib/encoding.js");
 // is `undefined`, take a pure object instead
 }(this || {}));
 
-},{"./encoding-indexes.js":29}],97:[function(require,module,exports){
-'use strict';
+},{"./encoding-indexes.js":29}],95:[function(require,module,exports){
+(function (global, factory) {
+typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
+typeof define === 'function' && define.amd ? define(factory) :
+(global = global || self, global.TinyQueue = factory());
+}(this, function () { 'use strict';
 
-module.exports = TinyQueue;
-module.exports.default = TinyQueue;
+var TinyQueue = function TinyQueue(data, compare) {
+    if ( data === void 0 ) data = [];
+    if ( compare === void 0 ) compare = defaultCompare;
 
-function TinyQueue(data, compare) {
-    if (!(this instanceof TinyQueue)) return new TinyQueue(data, compare);
-
-    this.data = data || [];
+    this.data = data;
     this.length = this.data.length;
-    this.compare = compare || defaultCompare;
+    this.compare = compare;
 
     if (this.length > 0) {
-        for (var i = (this.length >> 1) - 1; i >= 0; i--) this._down(i);
+        for (var i = (this.length >> 1) - 1; i >= 0; i--) { this._down(i); }
     }
-}
+};
+
+TinyQueue.prototype.push = function push (item) {
+    this.data.push(item);
+    this.length++;
+    this._up(this.length - 1);
+};
+
+TinyQueue.prototype.pop = function pop () {
+    if (this.length === 0) { return undefined; }
+
+    var top = this.data[0];
+    var bottom = this.data.pop();
+    this.length--;
+
+    if (this.length > 0) {
+        this.data[0] = bottom;
+        this._down(0);
+    }
+
+    return top;
+};
+
+TinyQueue.prototype.peek = function peek () {
+    return this.data[0];
+};
+
+TinyQueue.prototype._up = function _up (pos) {
+    var ref = this;
+        var data = ref.data;
+        var compare = ref.compare;
+    var item = data[pos];
+
+    while (pos > 0) {
+        var parent = (pos - 1) >> 1;
+        var current = data[parent];
+        if (compare(item, current) >= 0) { break; }
+        data[pos] = current;
+        pos = parent;
+    }
+
+    data[pos] = item;
+};
+
+TinyQueue.prototype._down = function _down (pos) {
+    var ref = this;
+        var data = ref.data;
+        var compare = ref.compare;
+    var halfLength = this.length >> 1;
+    var item = data[pos];
+
+    while (pos < halfLength) {
+        var left = (pos << 1) + 1;
+        var best = data[left];
+        var right = left + 1;
+
+        if (right < this.length && compare(data[right], best) < 0) {
+            left = right;
+            best = data[right];
+        }
+        if (compare(best, item) >= 0) { break; }
+
+        data[pos] = best;
+        pos = left;
+    }
+
+    data[pos] = item;
+};
 
 function defaultCompare(a, b) {
     return a < b ? -1 : a > b ? 1 : 0;
 }
 
-TinyQueue.prototype = {
+return TinyQueue;
 
-    push: function (item) {
-        this.data.push(item);
-        this.length++;
-        this._up(this.length - 1);
-    },
+}));
 
-    pop: function () {
-        if (this.length === 0) return undefined;
-
-        var top = this.data[0];
-        this.length--;
-
-        if (this.length > 0) {
-            this.data[0] = this.data[this.length];
-            this._down(0);
-        }
-        this.data.pop();
-
-        return top;
-    },
-
-    peek: function () {
-        return this.data[0];
-    },
-
-    _up: function (pos) {
-        var data = this.data;
-        var compare = this.compare;
-        var item = data[pos];
-
-        while (pos > 0) {
-            var parent = (pos - 1) >> 1;
-            var current = data[parent];
-            if (compare(item, current) >= 0) break;
-            data[pos] = current;
-            pos = parent;
-        }
-
-        data[pos] = item;
-    },
-
-    _down: function (pos) {
-        var data = this.data;
-        var compare = this.compare;
-        var halfLength = this.length >> 1;
-        var item = data[pos];
-
-        while (pos < halfLength) {
-            var left = (pos << 1) + 1;
-            var right = left + 1;
-            var best = data[left];
-
-            if (right < this.length && compare(data[right], best) < 0) {
-                left = right;
-                best = data[right];
-            }
-            if (compare(best, item) >= 0) break;
-
-            data[pos] = best;
-            pos = left;
-        }
-
-        data[pos] = item;
-    }
-};
-
-},{}],98:[function(require,module,exports){
-"use strict"
-
-module.exports = twoProduct
-
-var SPLITTER = +(Math.pow(2, 27) + 1.0)
-
-function twoProduct(a, b, result) {
-  var x = a * b
-
-  var c = SPLITTER * a
-  var abig = c - a
-  var ahi = c - abig
-  var alo = a - ahi
-
-  var d = SPLITTER * b
-  var bbig = d - b
-  var bhi = d - bbig
-  var blo = b - bhi
-
-  var err1 = x - (ahi * bhi)
-  var err2 = err1 - (alo * bhi)
-  var err3 = err2 - (ahi * blo)
-
-  var y = alo * blo - err3
-
-  if(result) {
-    result[0] = y
-    result[1] = x
-    return result
-  }
-
-  return [ y, x ]
-}
-},{}],99:[function(require,module,exports){
-"use strict"
-
-module.exports = fastTwoSum
-
-function fastTwoSum(a, b, result) {
-	var x = a + b
-	var bv = x - a
-	var av = x - bv
-	var br = b - bv
-	var ar = a - av
-	if(result) {
-		result[0] = ar + br
-		result[1] = x
-		return result
-	}
-	return [ar+br, x]
-}
-},{}],100:[function(require,module,exports){
+},{}],96:[function(require,module,exports){
 /**
  * @fileOverview
  * 
@@ -32512,7 +32353,7 @@ function fastTwoSum(a, b, result) {
 };
 
 module.exports = URI;
-},{}],101:[function(require,module,exports){
+},{}],97:[function(require,module,exports){
 /** @license MIT License (c) copyright 2010-2014 original author or authors */
 /** @author Brian Cavalier */
 /** @author John Hann */
@@ -32531,7 +32372,7 @@ define(function (require) {
 });
 })(typeof define === 'function' && define.amd ? define : function (factory) { module.exports = factory(require); });
 
-},{"./Scheduler":102,"./env":114,"./makePromise":116}],102:[function(require,module,exports){
+},{"./Scheduler":98,"./env":110,"./makePromise":112}],98:[function(require,module,exports){
 /** @license MIT License (c) copyright 2010-2014 original author or authors */
 /** @author Brian Cavalier */
 /** @author John Hann */
@@ -32613,7 +32454,7 @@ define(function() {
 });
 }(typeof define === 'function' && define.amd ? define : function(factory) { module.exports = factory(); }));
 
-},{}],103:[function(require,module,exports){
+},{}],99:[function(require,module,exports){
 /** @license MIT License (c) copyright 2010-2014 original author or authors */
 /** @author Brian Cavalier */
 /** @author John Hann */
@@ -32641,7 +32482,7 @@ define(function() {
 	return TimeoutError;
 });
 }(typeof define === 'function' && define.amd ? define : function(factory) { module.exports = factory(); }));
-},{}],104:[function(require,module,exports){
+},{}],100:[function(require,module,exports){
 /** @license MIT License (c) copyright 2010-2014 original author or authors */
 /** @author Brian Cavalier */
 /** @author John Hann */
@@ -32698,7 +32539,7 @@ define(function() {
 
 
 
-},{}],105:[function(require,module,exports){
+},{}],101:[function(require,module,exports){
 /** @license MIT License (c) copyright 2010-2014 original author or authors */
 /** @author Brian Cavalier */
 /** @author John Hann */
@@ -32999,7 +32840,7 @@ define(function(require) {
 });
 }(typeof define === 'function' && define.amd ? define : function(factory) { module.exports = factory(require); }));
 
-},{"../apply":104,"../state":117}],106:[function(require,module,exports){
+},{"../apply":100,"../state":113}],102:[function(require,module,exports){
 /** @license MIT License (c) copyright 2010-2014 original author or authors */
 /** @author Brian Cavalier */
 /** @author John Hann */
@@ -33161,7 +33002,7 @@ define(function() {
 });
 }(typeof define === 'function' && define.amd ? define : function(factory) { module.exports = factory(); }));
 
-},{}],107:[function(require,module,exports){
+},{}],103:[function(require,module,exports){
 /** @license MIT License (c) copyright 2010-2014 original author or authors */
 /** @author Brian Cavalier */
 /** @author John Hann */
@@ -33190,7 +33031,7 @@ define(function() {
 });
 }(typeof define === 'function' && define.amd ? define : function(factory) { module.exports = factory(); }));
 
-},{}],108:[function(require,module,exports){
+},{}],104:[function(require,module,exports){
 /** @license MIT License (c) copyright 2010-2014 original author or authors */
 /** @author Brian Cavalier */
 /** @author John Hann */
@@ -33212,7 +33053,7 @@ define(function(require) {
 });
 }(typeof define === 'function' && define.amd ? define : function(factory) { module.exports = factory(require); }));
 
-},{"../state":117}],109:[function(require,module,exports){
+},{"../state":113}],105:[function(require,module,exports){
 /** @license MIT License (c) copyright 2010-2014 original author or authors */
 /** @author Brian Cavalier */
 /** @author John Hann */
@@ -33279,7 +33120,7 @@ define(function() {
 });
 }(typeof define === 'function' && define.amd ? define : function(factory) { module.exports = factory(); }));
 
-},{}],110:[function(require,module,exports){
+},{}],106:[function(require,module,exports){
 /** @license MIT License (c) copyright 2010-2014 original author or authors */
 /** @author Brian Cavalier */
 /** @author John Hann */
@@ -33305,7 +33146,7 @@ define(function() {
 });
 }(typeof define === 'function' && define.amd ? define : function(factory) { module.exports = factory(); }));
 
-},{}],111:[function(require,module,exports){
+},{}],107:[function(require,module,exports){
 /** @license MIT License (c) copyright 2010-2014 original author or authors */
 /** @author Brian Cavalier */
 /** @author John Hann */
@@ -33385,7 +33226,7 @@ define(function(require) {
 });
 }(typeof define === 'function' && define.amd ? define : function(factory) { module.exports = factory(require); }));
 
-},{"../TimeoutError":103,"../env":114}],112:[function(require,module,exports){
+},{"../TimeoutError":99,"../env":110}],108:[function(require,module,exports){
 /** @license MIT License (c) copyright 2010-2014 original author or authors */
 /** @author Brian Cavalier */
 /** @author John Hann */
@@ -33473,7 +33314,7 @@ define(function(require) {
 });
 }(typeof define === 'function' && define.amd ? define : function(factory) { module.exports = factory(require); }));
 
-},{"../env":114,"../format":115}],113:[function(require,module,exports){
+},{"../env":110,"../format":111}],109:[function(require,module,exports){
 /** @license MIT License (c) copyright 2010-2014 original author or authors */
 /** @author Brian Cavalier */
 /** @author John Hann */
@@ -33513,8 +33354,8 @@ define(function() {
 }(typeof define === 'function' && define.amd ? define : function(factory) { module.exports = factory(); }));
 
 
-},{}],114:[function(require,module,exports){
-(function (process){
+},{}],110:[function(require,module,exports){
+(function (process){(function (){
 /** @license MIT License (c) copyright 2010-2014 original author or authors */
 /** @author Brian Cavalier */
 /** @author John Hann */
@@ -33589,9 +33430,9 @@ define(function(require) {
 });
 }(typeof define === 'function' && define.amd ? define : function(factory) { module.exports = factory(require); }));
 
-}).call(this,require('_process'))
+}).call(this)}).call(this,require('_process'))
 
-},{"_process":81}],115:[function(require,module,exports){
+},{"_process":82}],111:[function(require,module,exports){
 /** @license MIT License (c) copyright 2010-2014 original author or authors */
 /** @author Brian Cavalier */
 /** @author John Hann */
@@ -33649,8 +33490,8 @@ define(function() {
 });
 }(typeof define === 'function' && define.amd ? define : function(factory) { module.exports = factory(); }));
 
-},{}],116:[function(require,module,exports){
-(function (process){
+},{}],112:[function(require,module,exports){
+(function (process){(function (){
 /** @license MIT License (c) copyright 2010-2014 original author or authors */
 /** @author Brian Cavalier */
 /** @author John Hann */
@@ -34607,9 +34448,9 @@ define(function() {
 });
 }(typeof define === 'function' && define.amd ? define : function(factory) { module.exports = factory(); }));
 
-}).call(this,require('_process'))
+}).call(this)}).call(this,require('_process'))
 
-},{"_process":81}],117:[function(require,module,exports){
+},{"_process":82}],113:[function(require,module,exports){
 /** @license MIT License (c) copyright 2010-2014 original author or authors */
 /** @author Brian Cavalier */
 /** @author John Hann */
@@ -34646,7 +34487,7 @@ define(function() {
 });
 }(typeof define === 'function' && define.amd ? define : function(factory) { module.exports = factory(); }));
 
-},{}],118:[function(require,module,exports){
+},{}],114:[function(require,module,exports){
 /** @license MIT License (c) copyright 2010-2014 original author or authors */
 
 /**
@@ -34876,7 +34717,7 @@ define(function (require) {
 });
 })(typeof define === 'function' && define.amd ? define : function (factory) { module.exports = factory(require); });
 
-},{"./lib/Promise":101,"./lib/TimeoutError":103,"./lib/apply":104,"./lib/decorators/array":105,"./lib/decorators/flow":106,"./lib/decorators/fold":107,"./lib/decorators/inspect":108,"./lib/decorators/iterate":109,"./lib/decorators/progress":110,"./lib/decorators/timed":111,"./lib/decorators/unhandledRejection":112,"./lib/decorators/with":113}],119:[function(require,module,exports){
+},{"./lib/Promise":97,"./lib/TimeoutError":99,"./lib/apply":100,"./lib/decorators/array":101,"./lib/decorators/flow":102,"./lib/decorators/fold":103,"./lib/decorators/inspect":104,"./lib/decorators/iterate":105,"./lib/decorators/progress":106,"./lib/decorators/timed":107,"./lib/decorators/unhandledRejection":108,"./lib/decorators/with":109}],115:[function(require,module,exports){
 function LonLatProjection(width, height) {
     var imageSize = { width: width, height: height };
     function getBoundingRect(regions) {
@@ -34927,7 +34768,7 @@ function LonLatProjection(width, height) {
 }
 
 module.exports = LonLatProjection;
-},{}],120:[function(require,module,exports){
+},{}],116:[function(require,module,exports){
 
 var shp = require('shpjs/lib/index.js');
 var readAsArrayBuffer = require('./utils/readAsArrayBuffer');
@@ -34981,7 +34822,7 @@ var Shp = Object.assign(shp, {
 });
 
 module.exports = Shp;
-},{"./utils/Path":182,"./utils/readAsArrayBuffer":185,"./utils/readAsText":186,"shpjs/lib/index.js":91}],121:[function(require,module,exports){
+},{"./utils/Path":178,"./utils/readAsArrayBuffer":181,"./utils/readAsText":182,"shpjs/lib/index.js":89}],117:[function(require,module,exports){
 var defaultValue = require('./cesium/Core/defaultValue');
 var defined = require('./cesium/Core/defined');
 var when = require('when');
@@ -35159,7 +35000,7 @@ VectorStyle.Default = new VectorStyle();
 
 module.exports = VectorStyle;
 
-},{"./cesium/Core/defaultValue":158,"./cesium/Core/defined":160,"when":118}],122:[function(require,module,exports){
+},{"./cesium/Core/defaultValue":154,"./cesium/Core/defined":156,"when":114}],118:[function(require,module,exports){
 //不支持shp格式，如果需要支持shp格式，请在页面引用shpjs
 //或者将入口改为VectorTileImageryProvider 
 var loadJson = require('./cesium/Core/Resource').fetchJson;
@@ -37290,7 +37131,7 @@ if (typeof L != 'undefined' && L.GridLayer && L.GridLayer.extend) {
 }
 module.exports = VectorTileImageryProvider;
 
-},{"./LonLatProjection":119,"./VectorStyle":121,"./cesium/Core/Event":133,"./cesium/Core/Math":139,"./cesium/Core/Rectangle":140,"./cesium/Core/Resource":146,"./cesium/Core/defaultValue":158,"./cesium/Core/defineProperties":159,"./cesium/Core/defined":160,"./turf-light":181,"./utils/Path":182,"./utils/drawText":184}],123:[function(require,module,exports){
+},{"./LonLatProjection":115,"./VectorStyle":117,"./cesium/Core/Event":129,"./cesium/Core/Math":135,"./cesium/Core/Rectangle":136,"./cesium/Core/Resource":142,"./cesium/Core/defaultValue":154,"./cesium/Core/defineProperties":155,"./cesium/Core/defined":156,"./turf-light":177,"./utils/Path":178,"./utils/drawText":180}],119:[function(require,module,exports){
 //增加对shp格式的支持
 /**
    * 
@@ -37301,7 +37142,7 @@ module.exports = VectorTileImageryProvider;
 var VectorTileImageryProvider = require('./VectorTileImageryProvider-light');
 VectorTileImageryProvider.shp = require('./Shp')
 module.exports = VectorTileImageryProvider;
-},{"./Shp":120,"./VectorTileImageryProvider-light":122}],124:[function(require,module,exports){
+},{"./Shp":116,"./VectorTileImageryProvider-light":118}],120:[function(require,module,exports){
 module.exports = {
     // Resource:require('./cesium/Core/Resource'),
     when: require('./cesium/ThirdParty/when'),
@@ -37319,7 +37160,7 @@ module.exports = {
     Rectangle: require('./cesium/Core/Rectangle'),
     writeTextToCanvas: require('./cesium/Core/writeTextToCanvas')
 };
-},{"./cesium/Core/Cartesian2":125,"./cesium/Core/Cartesian3":126,"./cesium/Core/Cartesian4":127,"./cesium/Core/Color":130,"./cesium/Core/Event":133,"./cesium/Core/GeographicTilingScheme":137,"./cesium/Core/Math":139,"./cesium/Core/Rectangle":140,"./cesium/Core/TaskProcessor":148,"./cesium/Core/TilingScheme":149,"./cesium/Core/WebMercatorTilingScheme":153,"./cesium/Core/writeTextToCanvas":177,"./cesium/ThirdParty/when":179}],125:[function(require,module,exports){
+},{"./cesium/Core/Cartesian2":121,"./cesium/Core/Cartesian3":122,"./cesium/Core/Cartesian4":123,"./cesium/Core/Color":126,"./cesium/Core/Event":129,"./cesium/Core/GeographicTilingScheme":133,"./cesium/Core/Math":135,"./cesium/Core/Rectangle":136,"./cesium/Core/TaskProcessor":144,"./cesium/Core/TilingScheme":145,"./cesium/Core/WebMercatorTilingScheme":149,"./cesium/Core/writeTextToCanvas":173,"./cesium/ThirdParty/when":175}],121:[function(require,module,exports){
 var Check=require('./Check');
 var defaultValue=require('./defaultValue');
 var defined=require('./defined');
@@ -38059,7 +37900,7 @@ var CesiumMath=require('./Math');
 
     module.exports= Cartesian2;
 
-},{"./Check":129,"./DeveloperError":131,"./Math":139,"./defaultValue":158,"./defined":160,"./freezeObject":163}],126:[function(require,module,exports){
+},{"./Check":125,"./DeveloperError":127,"./Math":135,"./defaultValue":154,"./defined":156,"./freezeObject":159}],122:[function(require,module,exports){
 var Check=require('./Check');
 var defaultValue=require('./defaultValue');
 var defined=require('./defined');
@@ -39145,7 +38986,7 @@ var CesiumMath=require('./Math');
 
     module.exports= Cartesian3;
 
-},{"./Check":129,"./DeveloperError":131,"./Math":139,"./defaultValue":158,"./defined":160,"./freezeObject":163}],127:[function(require,module,exports){
+},{"./Check":125,"./DeveloperError":127,"./Math":135,"./defaultValue":154,"./defined":156,"./freezeObject":159}],123:[function(require,module,exports){
 var Check=require('./Check');
 var defaultValue=require('./defaultValue');
 var defined=require('./defined');
@@ -40049,7 +39890,7 @@ var CesiumMath=require('./Math');
 
     module.exports= Cartesian4;
 
-},{"./Check":129,"./DeveloperError":131,"./Math":139,"./defaultValue":158,"./defined":160,"./freezeObject":163}],128:[function(require,module,exports){
+},{"./Check":125,"./DeveloperError":127,"./Math":135,"./defaultValue":154,"./defined":156,"./freezeObject":159}],124:[function(require,module,exports){
 var Cartesian3=require('./Cartesian3');
 var Check=require('./Check');
 var defaultValue=require('./defaultValue');
@@ -40320,7 +40161,7 @@ var scaleToGeodeticSurface=require('./scaleToGeodeticSurface');
 
     module.exports= Cartographic;
 
-},{"./Cartesian3":126,"./Check":129,"./Math":139,"./defaultValue":158,"./defined":160,"./freezeObject":163,"./scaleToGeodeticSurface":176}],129:[function(require,module,exports){
+},{"./Cartesian3":122,"./Check":125,"./Math":135,"./defaultValue":154,"./defined":156,"./freezeObject":159,"./scaleToGeodeticSurface":172}],125:[function(require,module,exports){
 var defined=require('./defined');
 var DeveloperError=require('./DeveloperError');
 
@@ -40503,7 +40344,7 @@ var DeveloperError=require('./DeveloperError');
 
     module.exports= Check;
 
-},{"./DeveloperError":131,"./defined":160}],130:[function(require,module,exports){
+},{"./DeveloperError":127,"./defined":156}],126:[function(require,module,exports){
 var Check=require('./Check');
 var defaultValue=require('./defaultValue');
 var defined=require('./defined');
@@ -42681,7 +42522,7 @@ var CesiumMath=require('./Math');
 
     module.exports= Color;
 
-},{"./Check":129,"./FeatureDetection":134,"./Math":139,"./defaultValue":158,"./defined":160,"./freezeObject":163}],131:[function(require,module,exports){
+},{"./Check":125,"./FeatureDetection":130,"./Math":135,"./defaultValue":154,"./defined":156,"./freezeObject":159}],127:[function(require,module,exports){
 var defined=require('./defined');
 
     'use strict';
@@ -42759,7 +42600,7 @@ var defined=require('./defined');
 
     module.exports= DeveloperError;
 
-},{"./defined":160}],132:[function(require,module,exports){
+},{"./defined":156}],128:[function(require,module,exports){
 var Cartesian3=require('./Cartesian3');
 var Cartographic=require('./Cartographic');
 var Check=require('./Check');
@@ -43401,7 +43242,7 @@ var scaleToGeodeticSurface=require('./scaleToGeodeticSurface');
 
     module.exports= Ellipsoid;
 
-},{"./Cartesian3":126,"./Cartographic":128,"./Check":129,"./DeveloperError":131,"./Math":139,"./defaultValue":158,"./defineProperties":159,"./defined":160,"./freezeObject":163,"./scaleToGeodeticSurface":176}],133:[function(require,module,exports){
+},{"./Cartesian3":122,"./Cartographic":124,"./Check":125,"./DeveloperError":127,"./Math":135,"./defaultValue":154,"./defineProperties":155,"./defined":156,"./freezeObject":159,"./scaleToGeodeticSurface":172}],129:[function(require,module,exports){
 var Check=require('./Check');
 var defined=require('./defined');
 var defineProperties=require('./defineProperties');
@@ -43569,7 +43410,7 @@ var defineProperties=require('./defineProperties');
 
     module.exports= Event;
 
-},{"./Check":129,"./defineProperties":159,"./defined":160}],134:[function(require,module,exports){
+},{"./Check":125,"./defineProperties":155,"./defined":156}],130:[function(require,module,exports){
 var defaultValue=require('./defaultValue');
 var defined=require('./defined');
 var defineProperties=require('./defineProperties');
@@ -43907,7 +43748,7 @@ var when=require('when');
 
     module.exports= FeatureDetection;
 
-},{"./DeveloperError":131,"./Fullscreen":135,"./defaultValue":158,"./defineProperties":159,"./defined":160,"when":118}],135:[function(require,module,exports){
+},{"./DeveloperError":127,"./Fullscreen":131,"./defaultValue":154,"./defineProperties":155,"./defined":156,"when":114}],131:[function(require,module,exports){
 var defined=require('./defined');
 var defineProperties=require('./defineProperties');
 
@@ -44160,7 +44001,7 @@ var defineProperties=require('./defineProperties');
 
     module.exports= Fullscreen;
 
-},{"./defineProperties":159,"./defined":160}],136:[function(require,module,exports){
+},{"./defineProperties":155,"./defined":156}],132:[function(require,module,exports){
 var Cartesian3 = require('./Cartesian3');
 var Cartographic = require('./Cartographic');
 var defaultValue = require('./defaultValue');
@@ -44271,7 +44112,7 @@ GeographicProjection.prototype.unproject = function (cartesian, result) {
 
 module.exports = GeographicProjection;
 
-},{"./Cartesian3":126,"./Cartographic":128,"./DeveloperError":131,"./Ellipsoid":132,"./defaultValue":158,"./defineProperties":159,"./defined":160}],137:[function(require,module,exports){
+},{"./Cartesian3":122,"./Cartographic":124,"./DeveloperError":127,"./Ellipsoid":128,"./defaultValue":154,"./defineProperties":155,"./defined":156}],133:[function(require,module,exports){
 var Cartesian2=require('./Cartesian2');
 var Check=require('./Check');
 var defaultValue=require('./defaultValue');
@@ -44504,7 +44345,7 @@ var Rectangle=require('./Rectangle');
 
     module.exports= GeographicTilingScheme;
 
-},{"./Cartesian2":125,"./Check":129,"./Ellipsoid":132,"./GeographicProjection":136,"./Math":139,"./Rectangle":140,"./defaultValue":158,"./defineProperties":159,"./defined":160}],138:[function(require,module,exports){
+},{"./Cartesian2":121,"./Check":125,"./Ellipsoid":128,"./GeographicProjection":132,"./Math":135,"./Rectangle":136,"./defaultValue":154,"./defineProperties":155,"./defined":156}],134:[function(require,module,exports){
 var Check=require('./Check');
 var defaultValue=require('./defaultValue');
 var defined=require('./defined');
@@ -44734,7 +44575,7 @@ var defineProperties=require('./defineProperties');
 
     module.exports= Heap;
 
-},{"./Check":129,"./defaultValue":158,"./defineProperties":159,"./defined":160}],139:[function(require,module,exports){
+},{"./Check":125,"./defaultValue":154,"./defineProperties":155,"./defined":156}],135:[function(require,module,exports){
 var MersenneTwister = require('mersenne-twister');
 var Check = require('./Check');
 var defaultValue = require('./defaultValue');
@@ -45765,7 +45606,7 @@ CesiumMath.fastApproximateAtan2 = function (x, y) {
 
 module.exports = CesiumMath;
 
-},{"./Check":129,"./DeveloperError":131,"./defaultValue":158,"./defined":160,"mersenne-twister":60}],140:[function(require,module,exports){
+},{"./Check":125,"./DeveloperError":127,"./defaultValue":154,"./defined":156,"mersenne-twister":60}],136:[function(require,module,exports){
 var Cartographic=require('./Cartographic');
 var Check=require('./Check');
 var defaultValue=require('./defaultValue');
@@ -46641,7 +46482,7 @@ var CesiumMath=require('./Math');
 
     module.exports= Rectangle;
 
-},{"./Cartographic":128,"./Check":129,"./Ellipsoid":132,"./Math":139,"./defaultValue":158,"./defineProperties":159,"./defined":160,"./freezeObject":163}],141:[function(require,module,exports){
+},{"./Cartographic":124,"./Check":125,"./Ellipsoid":128,"./Math":135,"./defaultValue":154,"./defineProperties":155,"./defined":156,"./freezeObject":159}],137:[function(require,module,exports){
 var defaultValue=require('./defaultValue');
 var defined=require('./defined');
 var RequestState=require('./RequestState');
@@ -46839,7 +46680,7 @@ var RequestType=require('./RequestType');
 
     module.exports= Request;
 
-},{"./RequestState":144,"./RequestType":145,"./defaultValue":158,"./defined":160}],142:[function(require,module,exports){
+},{"./RequestState":140,"./RequestType":141,"./defaultValue":154,"./defined":156}],138:[function(require,module,exports){
 var defined=require('./defined');
 var parseResponseHeaders=require('./parseResponseHeaders');
 
@@ -46902,7 +46743,7 @@ var parseResponseHeaders=require('./parseResponseHeaders');
 
     module.exports= RequestErrorEvent;
 
-},{"./defined":160,"./parseResponseHeaders":174}],143:[function(require,module,exports){
+},{"./defined":156,"./parseResponseHeaders":170}],139:[function(require,module,exports){
 var Uri=require('./Uri');
 var when=require('when');
 var Check=require('./Check');
@@ -47340,7 +47181,7 @@ var RequestState=require('./RequestState');
 
     module.exports= RequestScheduler;
 
-},{"./Check":129,"./Event":133,"./Heap":138,"./RequestState":144,"./Uri":151,"./defaultValue":158,"./defineProperties":159,"./defined":160,"./isBlobUri":168,"./isDataUri":170,"when":118}],144:[function(require,module,exports){
+},{"./Check":125,"./Event":129,"./Heap":134,"./RequestState":140,"./Uri":147,"./defaultValue":154,"./defineProperties":155,"./defined":156,"./isBlobUri":164,"./isDataUri":166,"when":114}],140:[function(require,module,exports){
 var freezeObject=require('./freezeObject');
 
     'use strict';
@@ -47402,7 +47243,7 @@ var freezeObject=require('./freezeObject');
 
     module.exports= freezeObject(RequestState);
 
-},{"./freezeObject":163}],145:[function(require,module,exports){
+},{"./freezeObject":159}],141:[function(require,module,exports){
 var freezeObject=require('./freezeObject');
 
     'use strict';
@@ -47448,8 +47289,8 @@ var freezeObject=require('./freezeObject');
 
     module.exports= freezeObject(RequestType);
 
-},{"./freezeObject":163}],146:[function(require,module,exports){
-(function (global,Buffer){
+},{"./freezeObject":159}],142:[function(require,module,exports){
+(function (global,Buffer){(function (){
 var Uri=require('uri');
 var when=require('when');
 var appendForwardSlash=require('./appendForwardSlash');
@@ -49511,9 +49352,9 @@ var TrustedServers=require('./TrustedServers');
 
     module.exports= Resource;
 
-}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer)
+}).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer)
 
-},{"./Check":129,"./DeveloperError":131,"./FeatureDetection":134,"./Request":141,"./RequestErrorEvent":142,"./RequestScheduler":143,"./RequestState":144,"./RuntimeError":147,"./TrustedServers":150,"./appendForwardSlash":154,"./clone":156,"./combine":157,"./defaultValue":158,"./defineProperties":159,"./defined":160,"./deprecationWarning":161,"./freezeObject":163,"./getAbsoluteUri":164,"./getBaseUri":165,"./getExtensionFromUri":166,"./isBlobUri":168,"./isCrossOriginUrl":169,"./isDataUri":170,"./loadAndExecuteScript":171,"./objectToQuery":172,"./queryToObject":175,"buffer":30,"uri":100,"when":118}],147:[function(require,module,exports){
+},{"./Check":125,"./DeveloperError":127,"./FeatureDetection":130,"./Request":137,"./RequestErrorEvent":138,"./RequestScheduler":139,"./RequestState":140,"./RuntimeError":143,"./TrustedServers":146,"./appendForwardSlash":150,"./clone":152,"./combine":153,"./defaultValue":154,"./defineProperties":155,"./defined":156,"./deprecationWarning":157,"./freezeObject":159,"./getAbsoluteUri":160,"./getBaseUri":161,"./getExtensionFromUri":162,"./isBlobUri":164,"./isCrossOriginUrl":165,"./isDataUri":166,"./loadAndExecuteScript":167,"./objectToQuery":168,"./queryToObject":171,"buffer":30,"uri":96,"when":114}],143:[function(require,module,exports){
 var defined=require('./defined');
 
     'use strict';
@@ -49583,7 +49424,7 @@ var defined=require('./defined');
 
     module.exports= RuntimeError;
 
-},{"./defined":160}],148:[function(require,module,exports){
+},{"./defined":156}],144:[function(require,module,exports){
 var when = require('when');
 var buildModuleUrl = require('./buildModuleUrl');
 var defaultValue = require('./defaultValue');
@@ -49936,7 +49777,7 @@ TaskProcessor._canTransferArrayBuffer = undefined;
 
 module.exports = TaskProcessor;
 
-},{"./DeveloperError":131,"./Event":133,"./FeatureDetection":134,"./Resource":146,"./RuntimeError":147,"./buildModuleUrl":155,"./defaultValue":158,"./defined":160,"./destroyObject":162,"./getAbsoluteUri":164,"./isCrossOriginUrl":169,"when":118}],149:[function(require,module,exports){
+},{"./DeveloperError":127,"./Event":129,"./FeatureDetection":130,"./Resource":142,"./RuntimeError":143,"./buildModuleUrl":151,"./defaultValue":154,"./defined":156,"./destroyObject":158,"./getAbsoluteUri":160,"./isCrossOriginUrl":165,"when":114}],145:[function(require,module,exports){
 var defineProperties=require('./defineProperties');
 var DeveloperError=require('./DeveloperError');
 
@@ -50066,7 +49907,7 @@ var DeveloperError=require('./DeveloperError');
 
     module.exports= TilingScheme;
 
-},{"./DeveloperError":131,"./defineProperties":159}],150:[function(require,module,exports){
+},{"./DeveloperError":127,"./defineProperties":155}],146:[function(require,module,exports){
 var Uri=require('./Uri');
 var defined=require('./defined');
 var DeveloperError=require('./DeveloperError');
@@ -50216,7 +50057,7 @@ var DeveloperError=require('./DeveloperError');
 
     module.exports= TrustedServers;
 
-},{"./DeveloperError":131,"./Uri":151,"./defined":160}],151:[function(require,module,exports){
+},{"./DeveloperError":127,"./Uri":147,"./defined":156}],147:[function(require,module,exports){
 /**
  * @license
  *
@@ -50492,7 +50333,7 @@ URI.prototype.toString = function () {
 module.exports = URI;
 
 
-},{}],152:[function(require,module,exports){
+},{}],148:[function(require,module,exports){
 var Cartesian3=require('./Cartesian3');
 var Cartographic=require('./Cartographic');
 var defaultValue=require('./defaultValue');
@@ -50643,7 +50484,7 @@ var CesiumMath=require('./Math');
 
     module.exports= WebMercatorProjection;
 
-},{"./Cartesian3":126,"./Cartographic":128,"./DeveloperError":131,"./Ellipsoid":132,"./Math":139,"./defaultValue":158,"./defineProperties":159,"./defined":160}],153:[function(require,module,exports){
+},{"./Cartesian3":122,"./Cartographic":124,"./DeveloperError":127,"./Ellipsoid":128,"./Math":135,"./defaultValue":154,"./defineProperties":155,"./defined":156}],149:[function(require,module,exports){
 var Cartesian2=require('./Cartesian2');
 var defaultValue=require('./defaultValue');
 var defined=require('./defined');
@@ -50895,7 +50736,7 @@ var WebMercatorProjection=require('./WebMercatorProjection');
 
     module.exports= WebMercatorTilingScheme;
 
-},{"./Cartesian2":125,"./Ellipsoid":132,"./Rectangle":140,"./WebMercatorProjection":152,"./defaultValue":158,"./defineProperties":159,"./defined":160}],154:[function(require,module,exports){
+},{"./Cartesian2":121,"./Ellipsoid":128,"./Rectangle":136,"./WebMercatorProjection":148,"./defaultValue":154,"./defineProperties":155,"./defined":156}],150:[function(require,module,exports){
 
     'use strict';
 
@@ -50911,7 +50752,7 @@ var WebMercatorProjection=require('./WebMercatorProjection');
 
     module.exports= appendForwardSlash;
 
-},{}],155:[function(require,module,exports){
+},{}],151:[function(require,module,exports){
 var defined=require('./defined');
 var DeveloperError=require('./DeveloperError');
 var getAbsoluteUri=require('./getAbsoluteUri');
@@ -51039,7 +50880,7 @@ var Resource=require('./Resource');
 
     module.exports= buildModuleUrl;
 
-},{"./DeveloperError":131,"./Resource":146,"./defined":160,"./getAbsoluteUri":164}],156:[function(require,module,exports){
+},{"./DeveloperError":127,"./Resource":142,"./defined":156,"./getAbsoluteUri":160}],152:[function(require,module,exports){
 var defaultValue=require('./defaultValue');
 
     'use strict';
@@ -51076,7 +50917,7 @@ var defaultValue=require('./defaultValue');
 
     module.exports= clone;
 
-},{"./defaultValue":158}],157:[function(require,module,exports){
+},{"./defaultValue":154}],153:[function(require,module,exports){
 var defaultValue=require('./defaultValue');
 var defined=require('./defined');
 
@@ -51153,7 +50994,7 @@ var defined=require('./defined');
 
     module.exports= combine;
 
-},{"./defaultValue":158,"./defined":160}],158:[function(require,module,exports){
+},{"./defaultValue":154,"./defined":156}],154:[function(require,module,exports){
 var freezeObject=require('./freezeObject');
 
     'use strict';
@@ -51187,7 +51028,7 @@ var freezeObject=require('./freezeObject');
 
     module.exports= defaultValue;
 
-},{"./freezeObject":163}],159:[function(require,module,exports){
+},{"./freezeObject":159}],155:[function(require,module,exports){
 var defined=require('./defined');
 
     'use strict';
@@ -51219,7 +51060,7 @@ var defined=require('./defined');
 
     module.exports= defineProperties;
 
-},{"./defined":160}],160:[function(require,module,exports){
+},{"./defined":156}],156:[function(require,module,exports){
 
     'use strict';
 
@@ -51242,7 +51083,7 @@ var defined=require('./defined');
 
     module.exports= defined;
 
-},{}],161:[function(require,module,exports){
+},{}],157:[function(require,module,exports){
 var defined=require('./defined');
 var DeveloperError=require('./DeveloperError');
 var oneTimeWarning=require('./oneTimeWarning');
@@ -51300,7 +51141,7 @@ var oneTimeWarning=require('./oneTimeWarning');
 
     module.exports= deprecationWarning;
 
-},{"./DeveloperError":131,"./defined":160,"./oneTimeWarning":173}],162:[function(require,module,exports){
+},{"./DeveloperError":127,"./defined":156,"./oneTimeWarning":169}],158:[function(require,module,exports){
 var defaultValue=require('./defaultValue');
 var DeveloperError=require('./DeveloperError');
 
@@ -51359,7 +51200,7 @@ var DeveloperError=require('./DeveloperError');
 
     module.exports= destroyObject;
 
-},{"./DeveloperError":131,"./defaultValue":158}],163:[function(require,module,exports){
+},{"./DeveloperError":127,"./defaultValue":154}],159:[function(require,module,exports){
 var defined=require('./defined');
 
     'use strict';
@@ -51382,7 +51223,7 @@ var defined=require('./defined');
 
     module.exports= freezeObject;
 
-},{"./defined":160}],164:[function(require,module,exports){
+},{"./defined":156}],160:[function(require,module,exports){
 var Uri=require('uri');
 var defaultValue=require('./defaultValue');
 var defined=require('./defined');
@@ -51432,7 +51273,7 @@ var DeveloperError=require('./DeveloperError');
 
     module.exports= getAbsoluteUri;
 
-},{"./DeveloperError":131,"./defaultValue":158,"./defined":160,"uri":100}],165:[function(require,module,exports){
+},{"./DeveloperError":127,"./defaultValue":154,"./defined":156,"uri":96}],161:[function(require,module,exports){
 var Uri=require('uri');
 var defined=require('./defined');
 var DeveloperError=require('./DeveloperError');
@@ -51484,7 +51325,7 @@ var DeveloperError=require('./DeveloperError');
 
     module.exports= getBaseUri;
 
-},{"./DeveloperError":131,"./defined":160,"uri":100}],166:[function(require,module,exports){
+},{"./DeveloperError":127,"./defined":156,"uri":96}],162:[function(require,module,exports){
 var Uri=require('uri');
 var defined=require('./defined');
 var DeveloperError=require('./DeveloperError');
@@ -51527,7 +51368,7 @@ var DeveloperError=require('./DeveloperError');
 
     module.exports= getExtensionFromUri;
 
-},{"./DeveloperError":131,"./defined":160,"uri":100}],167:[function(require,module,exports){
+},{"./DeveloperError":127,"./defined":156,"uri":96}],163:[function(require,module,exports){
 var defined=require('./defined');
 
     'use strict';
@@ -51548,7 +51389,7 @@ var defined=require('./defined');
 
     module.exports= isArray;
 
-},{"./defined":160}],168:[function(require,module,exports){
+},{"./defined":156}],164:[function(require,module,exports){
 var Check=require('./Check');
 
     'use strict';
@@ -51575,7 +51416,7 @@ var Check=require('./Check');
 
     module.exports= isBlobUri;
 
-},{"./Check":129}],169:[function(require,module,exports){
+},{"./Check":125}],165:[function(require,module,exports){
 var defined=require('./defined');
 
     'use strict';
@@ -51609,7 +51450,7 @@ var defined=require('./defined');
 
     module.exports= isCrossOriginUrl;
 
-},{"./defined":160}],170:[function(require,module,exports){
+},{"./defined":156}],166:[function(require,module,exports){
 var Check=require('./Check');
 
     'use strict';
@@ -51636,7 +51477,7 @@ var Check=require('./Check');
 
     module.exports= isDataUri;
 
-},{"./Check":129}],171:[function(require,module,exports){
+},{"./Check":125}],167:[function(require,module,exports){
 var when=require('when');
 
         'use strict';
@@ -51667,7 +51508,7 @@ var when=require('when');
 
     module.exports= loadAndExecuteScript;
 
-},{"when":118}],172:[function(require,module,exports){
+},{"when":114}],168:[function(require,module,exports){
 var defined=require('./defined');
 var DeveloperError=require('./DeveloperError');
 var isArray=require('./isArray');
@@ -51730,7 +51571,7 @@ var isArray=require('./isArray');
 
     module.exports= objectToQuery;
 
-},{"./DeveloperError":131,"./defined":160,"./isArray":167}],173:[function(require,module,exports){
+},{"./DeveloperError":127,"./defined":156,"./isArray":163}],169:[function(require,module,exports){
 var defaultValue=require('./defaultValue');
 var defined=require('./defined');
 var DeveloperError=require('./DeveloperError');
@@ -51783,7 +51624,7 @@ var DeveloperError=require('./DeveloperError');
 
     module.exports= oneTimeWarning;
 
-},{"./DeveloperError":131,"./defaultValue":158,"./defined":160}],174:[function(require,module,exports){
+},{"./DeveloperError":127,"./defaultValue":154,"./defined":156}],170:[function(require,module,exports){
 
     'use strict';
 
@@ -51826,7 +51667,7 @@ var DeveloperError=require('./DeveloperError');
 
     module.exports= parseResponseHeaders;
 
-},{}],175:[function(require,module,exports){
+},{}],171:[function(require,module,exports){
 var defined=require('./defined');
 var DeveloperError=require('./DeveloperError');
 var isArray=require('./isArray');
@@ -51892,7 +51733,7 @@ var isArray=require('./isArray');
 
     module.exports= queryToObject;
 
-},{"./DeveloperError":131,"./defined":160,"./isArray":167}],176:[function(require,module,exports){
+},{"./DeveloperError":127,"./defined":156,"./isArray":163}],172:[function(require,module,exports){
 var Cartesian3=require('./Cartesian3');
 var defined=require('./defined');
 var DeveloperError=require('./DeveloperError');
@@ -52023,7 +51864,7 @@ var CesiumMath=require('./Math');
 
     module.exports= scaleToGeodeticSurface;
 
-},{"./Cartesian3":126,"./DeveloperError":131,"./Math":139,"./defined":160}],177:[function(require,module,exports){
+},{"./Cartesian3":122,"./DeveloperError":127,"./Math":135,"./defined":156}],173:[function(require,module,exports){
 var measureText=require('../ThirdParty/measureText');
 var Color=require('./Color');
 var defaultValue=require('./defaultValue');
@@ -52159,7 +52000,7 @@ var DeveloperError=require('./DeveloperError');
 
     module.exports= writeTextToCanvas;
 
-},{"../ThirdParty/measureText":178,"./Color":130,"./DeveloperError":131,"./defaultValue":158,"./defined":160}],178:[function(require,module,exports){
+},{"../ThirdParty/measureText":174,"./Color":126,"./DeveloperError":127,"./defaultValue":154,"./defined":156}],174:[function(require,module,exports){
 /*
   This library rewrites the Canvas2D "measureText" function
   so that it returns a more complete metrics object.
@@ -52376,7 +52217,7 @@ var measureText = function (context2D, textstring, stroke, fill) {
 module.exports = measureText;
 // });
 
-},{}],179:[function(require,module,exports){
+},{}],175:[function(require,module,exports){
 /**
   @license
   when.js - https://github.com/cujojs/when
@@ -53126,8 +52967,8 @@ define(function () {
 	// Boilerplate for AMD, Node, and browser global
 );
 
-},{}],180:[function(require,module,exports){
-(function (global){
+},{}],176:[function(require,module,exports){
+(function (global){(function (){
 
 var g = typeof window != "undefined" ? window : global;
 if (typeof g.Cesium == 'undefined') {
@@ -53136,12 +52977,12 @@ if (typeof g.Cesium == 'undefined') {
 g.Cesium.VectorTileImageryProvider = require('./VectorTileImageryProvider');
 g.Cesium.proj4=require('proj4');
 module.exports = g.Cesium;
-}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+}).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
-},{"./VectorTileImageryProvider":123,"./cesium-core":124,"proj4":82}],181:[function(require,module,exports){
+},{"./VectorTileImageryProvider":119,"./cesium-core":120,"proj4":83}],177:[function(require,module,exports){
 
-var turfHelpers = require('@turf/helpers'); 
-var turf = Object.assign(turfHelpers,   {
+var turfHelpers = require('@turf/helpers');
+var turf = Object.assign({}, turfHelpers, {
     bbox: require('@turf/bbox').default,
     bboxPolygon: require('@turf/bbox-polygon').default,
     bboxClip: require('@turf/bbox-clip').default,
@@ -53335,7 +53176,7 @@ turf.pointToFeatureDistance = function (pt, fc, options) {
 }
 
 module.exports = turf;
-},{"@turf/bbox":4,"@turf/bbox-clip":1,"@turf/bbox-polygon":3,"@turf/boolean-point-in-polygon":5,"@turf/center":7,"@turf/center-of-mass":6,"@turf/centroid":8,"@turf/distance":13,"@turf/helpers":14,"@turf/invariant":17,"@turf/point-to-line-distance":19,"@turf/polygon-to-line":20,"@turf/simplify":22,"@turf/within":26}],182:[function(require,module,exports){
+},{"@turf/bbox":4,"@turf/bbox-clip":1,"@turf/bbox-polygon":3,"@turf/boolean-point-in-polygon":5,"@turf/center":7,"@turf/center-of-mass":6,"@turf/centroid":8,"@turf/distance":13,"@turf/helpers":14,"@turf/invariant":17,"@turf/point-to-line-distance":19,"@turf/polygon-to-line":20,"@turf/simplify":22,"@turf/within":26}],178:[function(require,module,exports){
 
 /**
 *@class
@@ -53392,7 +53233,7 @@ Path.ChangeExtension = function (fname, newExt) {
 }
 
 module.exports = Path;
-},{}],183:[function(require,module,exports){
+},{}],179:[function(require,module,exports){
 
 function Rect(x, y, w, h) {
     return { x: x, y: y, width: w, height: h };
@@ -53431,7 +53272,7 @@ function drawRoundedRect(rect, r, ctx) {
 }
 
 module.exports = drawRoundedRect;
-},{}],184:[function(require,module,exports){
+},{}],180:[function(require,module,exports){
 
 var drawRoundedRect = require('./drawRoundedRect');
 var writeTextToCanvas=require('../cesium/Core/writeTextToCanvas');
@@ -53541,7 +53382,7 @@ function drawText(text, options) {
 }
 
 module.exports = drawText; 
-},{"../cesium/Core/writeTextToCanvas":177,"./drawRoundedRect":183}],185:[function(require,module,exports){
+},{"../cesium/Core/writeTextToCanvas":173,"./drawRoundedRect":179}],181:[function(require,module,exports){
 
 function readAsArrayBuffer(file, onProgress) {
     return new Promise(function (resolve, reject) {
@@ -53559,7 +53400,7 @@ function readAsArrayBuffer(file, onProgress) {
     })
 }
 module.exports = readAsArrayBuffer;
-},{}],186:[function(require,module,exports){
+},{}],182:[function(require,module,exports){
 
 function readAsText(file, onProgress) {
     return new Promise(function (resolve, reject) {
@@ -53577,6 +53418,6 @@ function readAsText(file, onProgress) {
     })
 }
 module.exports = readAsText;
-},{}]},{},[180])(180)
+},{}]},{},[176])(176)
 });
 //# sourceMappingURL=CesiumVectorTile.js.map
